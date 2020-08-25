@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="23px" viewBox="0 0 18 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Navigation Web / Fullsize Items / Resting</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="R2S-Page-Components" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-family="FontAwesome5Free-Solid, Font Awesome 5 Free" font-size="22" font-weight="700">
+        <g id="Documents-(1)---side-panel-colour" transform="translate(-34.000000, -300.000000)">
+            <g filter="url(#filter-1)" id="Navigation-Web-/-Fullsize-Items-/-Resting">
+                <g transform="translate(34.000000, 301.000000)">
+                    <text id="" fill="#FAFBFF">
+                        <tspan x="0.75" y="19"></tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

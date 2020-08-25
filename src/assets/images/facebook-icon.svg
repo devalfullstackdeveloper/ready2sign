@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="7px" height="14px" viewBox="0 0 7 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Facebook</title>
+    <g id="R2S-Page-Components" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Sign-Up" transform="translate(-267.000000, -760.000000)" fill="#8181A5" fill-rule="nonzero">
+            <g id="Social" transform="translate(247.000000, 744.000000)">
+                <g id="Icon">
+                    <path d="M24.3437517,30 L24.3437517,22.9991803 L26.2762841,22.9991803 L26.5323864,20.5866591 L24.3437517,20.5866591 L24.347035,19.379169 C24.347035,18.7499463 24.4068196,18.4127945 25.3105651,18.4127945 L26.5187057,18.4127945 L26.5187057,16 L24.5858997,16 C22.2642888,16 21.447142,17.1703324 21.447142,19.1384634 L21.447142,20.5869323 L20,20.5869323 L20,22.9994536 L21.447142,22.9994536 L21.447142,30 L24.3437517,30 Z" id="Facebook"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

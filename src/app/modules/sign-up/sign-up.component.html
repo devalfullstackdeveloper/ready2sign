@@ -1,0 +1,159 @@
+<section class="page-wrapper container">
+  <div class="page-left">
+      <a href="#" class="logo"><img src="assets/images/r2s-logo.svg" alt="Ready2Sign Logo" /></a>
+
+      <h1>Create account</h1>
+
+      <!-- <form class="signup-form" [formGroup]="signupForm">
+          <p>
+            <label for="first-name">Firstname</label>
+            <input type="text" id="Firstname" formControlName="Firstname" class="text-field">
+
+            <label *ngIf="submitted && f.Firstname.errors  && f.Firstname.errors.required" class="alert-red">Please enter Firstname</label>
+          </p>
+
+          <p>
+            <label for="last-name">Lastname</label>
+            <input type="text" id="Lastname" formControlName="Lastname" class="text-field">
+
+            <label *ngIf="submitted && f.Lastname.errors  && f.Lastname.errors.required" class="alert-red">Please enter full Lastname</label>
+          </p>
+
+          <p>
+            <label for="email">Email</label>
+            <input type="email" id="Email" formControlName="Email" class="text-field">
+
+            <label *ngIf="submitted && f.Email.errors && f.Email.errors.required" class="alert-red">Please Enter Email</label>
+            <label *ngIf="submitted && f.Email.errors && f.Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
+          </p>
+
+          <p>
+            <label for="mobile">Mobile</label>
+            <input type="number" id="Mobile" formControlName="Mobile" class="text-field">
+
+            <label *ngIf="submitted && f.Mobile.errors && f.Mobile.errors.required" class="alert-red">Please Enter Mobile</label>
+          </p>
+
+          <p>
+            <label for="workmobile">Workphone</label>
+            <input type="number" id="Workphone" formControlName="Workphone" class="text-field">
+
+            <label *ngIf="submitted && f.Workphone.errors && f.Workphone.errors.required" class="alert-red">Please Enter Workphone</label>
+          </p>
+
+          <p>
+            <label for="branch">Branch</label>
+            <input type="text" id="Branch" formControlName="Branch" class="text-field">
+
+            <label *ngIf="submitted && f.Branch.errors && f.Branch.errors.required" class="alert-red">Please Enter Branch</label>
+          </p>
+
+          <p>
+            <label for="position">Position</label>
+            <input type="text" id="Position" formControlName="Position" class="text-field">
+
+            <label *ngIf="submitted && f.Position.errors && f.Position.errors.required" class="alert-red">Please Enter Position</label>
+          </p>
+
+          <p>
+            <label for="password">Password</label>
+            <input type="password" id="Password" formControlName="Password" placeholder="Start typing..." class="text-field">
+
+            <label *ngIf="submitted && f.Password.errors && f.Password.errors.required" class="alert-red">Please enter a Password</label>
+            <label *ngIf="f.Password.errors && f.Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
+          </p>
+
+          <p class="terms-block">
+              <input type="radio" id="terms" formControlName="acceptTerms" (change)="acceptsTC($event)" name="acceptTerms" [value]="acceptTerms">
+              <label for="terms">I agree with terms & conditions</label>
+
+              <label *ngIf="submitted && f.acceptTerms.errors && f.acceptTerms.errors.required" class="alert-red">Accept Terms & Conditions is required</label>
+          </p>
+          <div class="buttons-sec">
+              <a class="blue-btn btn pointer" (click)="onSubmit()">Sign Up</a>
+              <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
+          </div>
+      </form> -->
+
+      <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+        <p>
+          <label for="first-name">Firstname</label>
+          <input type="text" id="Firstname" name="Firstname" #Firstname="ngModel" [(ngModel)]="User.Firstname" class="text-field" required>
+
+          <label *ngIf="f.submitted && Firstname.invalid && Firstname.errors.required" class="alert-red">Please enter Firstname</label>
+        </p>
+
+        <p>
+          <label for="last-name">Lastname</label>
+          <input type="text" id="Lastname" name="Lastname" #Lastname="ngModel" [(ngModel)]="User.Lastname" class="text-field" required>
+
+          <label *ngIf="f.submitted && Lastname.invalid  && Lastname.errors.required" class="alert-red">Please enter full Lastname</label>
+        </p>
+
+        <p>
+          <label for="email">Email</label>
+          <input type="email" id="Email" name="Email" #Email="ngModel" [(ngModel)]="User.Email" class="text-field" required email>
+
+          <label *ngIf="f.submitted && Email.invalid && Email.errors.required" class="alert-red">Please Enter Email</label>
+          <label *ngIf="f.submitted && Email.invalid && Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
+        </p>
+
+        <p>
+          <label for="mobile">Mobile</label>
+          <input type="number" id="Mobile" name="Mobile" #Mobile="ngModel" [(ngModel)]="User.Mobile" class="text-field" required>
+
+          <label *ngIf="f.submitted && Mobile.invalid && Mobile.errors.required" class="alert-red">Please Enter Mobile</label>
+        </p>
+
+        <p>
+          <label for="workmobile">Workphone</label>
+          <input type="number" id="Workphone" name="Workphone" #Workphone="ngModel" [(ngModel)]="User.Workphone" class="text-field" required>
+
+          <label *ngIf="f.submitted && Workphone.invalid && Workphone.errors.required" class="alert-red">Please Enter Workphone</label>
+        </p>
+
+        <p>
+          <label for="branch">Branch</label>
+          <input type="text" id="Branch" name="Branch" #Branch="ngModel" [(ngModel)]="User.Branch" class="text-field" required>
+
+          <label *ngIf="f.submitted && Branch.invalid && Branch.errors.required" class="alert-red">Please Enter Branch</label>
+        </p>
+
+        <p>
+          <label for="position">Position</label>
+          <input type="text" id="Position" name="Position" #Position="ngModel" [(ngModel)]="User.Position" class="text-field" required>
+
+          <label *ngIf="f.submitted && Position.invalid && Position.errors.required" class="alert-red">Please Enter Position</label>
+        </p>
+
+        <p>
+          <label for="password">Password</label>
+          <input type="password" id="Password" name="Password" #Password="ngModel" [(ngModel)]="User.Password" placeholder="Start typing..." class="text-field" required minlength="6">
+
+          <label *ngIf="f.submitted && Password.invalid && Password.errors.required" class="alert-red">Please enter a Password</label>
+          <label *ngIf="f.submitted && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
+        </p>
+
+        <p class="terms-block">
+            <input type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
+            <label for="terms">I agree with terms & conditions</label>
+
+            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red">Accept Terms & Conditions is required</label>
+        </p>
+        <div class="buttons-sec">
+            <!-- <a class="blue-btn btn pointer" type="submit" (click)="onSubmit()">Sign Up</a> -->
+            <button class="blue-btn btn" type="submit">Sign Up</button>
+            <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
+        </div>
+      </form>
+
+      <div class="other-options">
+          <a href="#" class="facebook"></a>
+          <a href="#" class="google"></a>
+          <span>Or sign in with</span>
+      </div>
+  </div>
+  <div class="page-right">
+      <div class="image-block"></div>
+  </div>
+</section>

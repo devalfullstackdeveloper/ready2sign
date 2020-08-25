@@ -1,0 +1,73 @@
+<!-- <div class="col-md-6 offset-md-3 mt-5">
+    <div class="alert alert-info">
+        Username: test<br />
+        Password: test
+    </div>
+    <div class="card">
+        <h4 class="card-header">Angular 9 JWT Login Example</h4>
+        <div class="card-body">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text"  formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
+                    <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                        <div *ngIf="f.username.errors.required">Username is required</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
+                    <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                        <div *ngIf="f.password.errors.required">Password is required</div>
+                    </div>
+                </div>
+                <button [disabled]="loading" class="btn btn-primary">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    Login
+                </button>
+                <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
+            </form>
+        </div>
+    </div>
+</div> -->
+
+
+<section class="page-wrapper container">
+  <div class="page-left">
+      <a href="#" class="logo"><img src="assets/images/r2s-logo.svg" alt="Ready2Sign Logo" /></a>
+
+      <h1>Login</h1>
+
+      <form class="signup-form" [formGroup]="loginForm">
+          <p>
+              <label for="full-name">User name</label>
+              <input type="text" id="user-name" formControlName="username" placeholder="Catherine Shaw" class="text-field">
+
+              <label *ngIf="submitted && f.username.errors  && f.username.errors.required" class="alert-red">Please enter username</label>
+          </p>
+          <p>
+              <label for="password">Password</label>
+              <input type="password" id="password" formControlName="password" placeholder="Start typing..." class="text-field">
+              
+              <label *ngIf="submitted && f.password.errors && f.password.errors.required" class="alert-red">Please enter password</label>
+              <span class="text-right pt-10 d-block"><a class="btn-link" [routerLink]="['/forgot-password']">forgot password ?</a></span>
+              <!-- <label *ngIf="f.password.errors && f.password.errors.minlength" class="alert-red">Password must be at least 6 characters</label> -->
+          </p>
+            <div class="buttons-sec login-pg">
+                <a class="blue-btn btn pointer" (click)="onSubmit()">Sign In</a>
+                <a class="lightblue-btn btn pointer" [routerLink]="['/sign-up']">Create new account</a>
+            </div>
+
+
+      </form>
+      
+      <div class="other-options">
+          <a href="#" class="facebook"></a>
+          <a href="#" class="google"></a>
+          <span>Or sign in with</span>
+      </div>
+  </div>
+  <div class="page-right">
+      <div class="image-block"></div>
+  </div>
+</section>

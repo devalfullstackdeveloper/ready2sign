@@ -1,0 +1,11 @@
+.sidebar-links {
+  height: 75% !important;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.sidebar-footer .user-info ul {
+  z-index: 1 !important;
+}

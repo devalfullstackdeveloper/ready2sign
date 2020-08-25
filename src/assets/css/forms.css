@@ -1,0 +1,215 @@
+.page-left label {
+    display: block;
+    font-size: 14px;
+    line-height: 21px;
+    color: #8181A5;
+}
+
+.page-left .buttons-sec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttons-sec .blue-btn {
+    margin-right: 9px;
+    background: #5E81F4;
+    color: #fff;
+}
+
+.other-options {
+    display: flex;
+    align-items: center;
+}
+
+.other-options a {
+    border: 1px solid #ECECF2;
+    width: 46px;
+    height: 46px;
+    display: inline-block;
+    border-radius: 8px;
+    margin-right: 6px;
+}
+
+.other-options a.facebook {
+    background: url(../images/facebook-icon.svg) no-repeat center / 7px;
+}
+
+.other-options a.google {
+    background: url(../images/google-icon.svg) no-repeat center / 12px;
+    margin-right: 15px;
+}
+
+.other-options span {
+    font-size: 14px;
+    line-height: 21px;
+    color: #8181A5;
+}
+
+.page-right {
+    width: calc(100% - 802px);
+    position: relative;
+    height: 920px;
+}
+
+.page-right .image-block{  
+    background: url(../images/signup-bg.svg) no-repeat right center;
+    position: absolute;
+    top: 0px;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+}
+
+/*** Reset Password ***/
+.page-left .buttons-sec.reset-pass {
+    margin-top: 47px;
+}
+
+/*** Login ***/
+.page-left .buttons-sec.login-pg {
+    margin-top: 196px;
+}
+
+/** Form Elements **/
+.btn {
+    background: rgba(94, 129, 244, 0.1);
+    color: #5E81F4;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-block;
+    height: 46px;
+    line-height: 46px;
+    text-decoration: none;
+    border-radius: 8px;
+    width: 178px;
+    text-align: center;
+}
+
+.btn-green {
+    background: #7ce7ac;
+    color: #fff;  
+}
+
+.text-field {
+    border: none;
+    border-bottom: 1px solid #F0F0F3;
+    width: 100%;
+    padding: 5px 0 18px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1C1D21;
+}
+
+.text-field::-webkit-input-placeholder {
+    color: #1C1D21;
+}
+
+.text-field::-moz-placeholder { 
+    color: #1C1D21;
+}
+
+.text-field:-ms-input-placeholder { 
+    color: #1C1D21;
+}
+
+.text-field:-moz-placeholder {
+    color: #1C1D21;
+}
+
+.text-field:focus {
+    outline: none;
+}
+
+input[type="text"].text-field {
+    background: url(../images/user-icon.png) no-repeat 90% 6px / 20px;
+}
+
+input[type="email"].text-field {
+    background: url(../images/email-icon.svg) no-repeat 90% 6px / 16px;
+}
+
+input[type="password"].text-field.success {
+    background: url(../images/success-icon.svg) no-repeat 90% 6px / 16px;
+}
+
+/** Placeholder **/
+input[type="password"].text-field::-webkit-input-placeholder {
+    color: #8181A5;
+}
+
+input[type="password"].text-field::-moz-placeholder { 
+    color: #8181A5;
+}
+
+input[type="password"].text-field:-ms-input-placeholder { 
+    color: #8181A5;
+}
+
+input[type="password"].text-field:-moz-placeholder {
+    color: #8181A5;
+}
+
+/** Custom Radio **/
+
+[type="radio"]:checked,
+[type="radio"]:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+
+[type="radio"]:checked + label,
+[type="radio"]:not(:checked) + label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #1C1D21;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+}
+
+[type="radio"]:checked + label:before,
+[type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #1B51E5;
+    border-radius: 100%;
+    background: #fff;
+}
+
+[type="radio"]:checked + label:after,
+[type="radio"]:not(:checked) + label:after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 6px solid #1B51E5;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+[type="radio"]:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+
+[type="radio"]:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}

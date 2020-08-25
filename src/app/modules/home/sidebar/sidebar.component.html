@@ -1,0 +1,46 @@
+<div class="sidebar-logo">
+  <a href="#"><img src="assets/images/logo.svg" alt="Sidebar Logo" /></a>
+</div>
+
+<div class="sidebar-links" (click)="closeOption()">
+  <ul>
+      <li class="documents"><a (click)="home()">Documents</a></li>
+      <li class="template"><a href="#">Template</a></li>
+      <li class="settings"><a (click)="setting()">Settings</a></li>
+      <li class="help-center"><a href="#">Help Center</a></li>
+  </ul>
+</div>
+
+<div class="sidebar-footer">
+  <div class="selected-account" (click)="closeOption()">
+      <label for="select_account">Selected account</label>
+      <!-- <select id="select_account" name="select_account">
+          <option value="Hocking Stuart">Hocking Stuart</option>
+          <option value="Hocking Stuart">Account b</option>
+          <option value="Hocking Stuart">Account c</option>
+          <option value="Hocking Stuart">Account d</option>
+          <option value="Hocking Stuart">Account e</option>
+      </select> -->
+      <select [(ngModel)]="selectedaccount" (change)="accountChange($event)">
+        <option *ngFor="let ac of userAccounts" [value]="ac.Id">{{ac.Name}}</option>
+        <!-- <option *ngIf="let ac of userAccounts" [value]="ac.Id"> {{ac.Name}} </option> -->
+      </select>
+  </div>
+
+  <div class="user-info">
+      <div class="user-image">
+          <img src="assets/images/user-image.svg" alt="User Image" />
+          <span class="status"></span>
+      </div>
+
+      <span class="userName">Catherine Shaw</span>
+
+      <a (click)="optionChange()" class="more-info-sec active pointer"></a>
+
+      <ul class="info-popup-sm" *ngIf="options">
+          <li class="profile pointer"><a href="#">View profile</a></li>
+          <li class="signout pointer" (click)="signOut()"><a>Sign out</a></li>
+      </ul>
+  </div>
+
+</div>

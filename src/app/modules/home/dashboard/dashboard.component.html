@@ -1,0 +1,363 @@
+<!-- <div id="content">
+    <div>
+        Dashboard Component
+        <button (click)="click()">Click</button>
+    </div>
+
+    <div>
+      <button (click)="signOut()">Sign-Out</button>
+    </div>
+</div> -->
+
+<div class="page-header">
+  <div class="header-left">
+      <div class="collapse-sidebar">
+          <span class="icon-arrow-left"></span>
+          <button type="button" class="sidebar-toggle"></button>
+      </div>
+
+      <span class="user-name">Hocking Stuart</span>
+  </div>
+
+  <div class="header-right">
+      <a href="#" class="btn btn-green create-doc">Create document</a>
+
+      <a href="#" class="search-btn"></a>
+  </div>
+</div>
+
+<!-- <div>
+  <label>Selected Account Number:- {{accountNumber}}</label>
+</div> -->
+
+<!-- Content area -->
+<div class="content-area">
+  <div class="left-sidebar-block">
+      <h2>Documents</h2>
+      <ul class="folder-list">
+          <li [ngClass]="(selectedType == 'draft') ? 'active folder-blue-ico' : ''" ><a class="pointer" (click)="documentChange('draft')">Drafts (5)</a></li>
+          <li [ngClass]="(selectedType == 'approval') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('approval')">Approval (2)</a></li>
+          <li [ngClass]="(selectedType == 'sent') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('sent')">Sent (200)</a></li>
+          <li [ngClass]="(selectedType == 'withdrawn') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('withdrawn')">Withdrawn (40)</a></li>
+          <li [ngClass]="(selectedType == 'completed') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('completed')">Completed (120)</a></li>
+          <li [ngClass]="(selectedType == 'expired') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('expired')">Expired (10)</a></li>
+          <li [ngClass]="(selectedType == 'all') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('all')">All (240)</a></li>
+      </ul>
+  </div>
+
+  <section class="content-block">
+      <div class="d-flex-between-top search-area">
+        <div class="search-expanded">
+          <input type="search" name="" id="" class="search-field" placeholder="Search..">
+          <div class="icons-wrap">
+              <button class="search-ico"></button>
+              <button class="arrow-right"></button>
+          </div>
+        </div>
+          <h2>Advanced</h2>
+      </div>
+
+      <!-- Draft -->
+      <div class="filter-table" *ngIf="selectedType == 'draft'">
+          <table>
+              <thead>
+                  <tr>
+                      <th>Title <span class="dropdown-arrow"></span></th>
+                      <th>Title <span class="dropdown-arrow"></span></th>
+                      <th>Modified <span class="dropdown-arrow"></span></th>
+                      <th>Recipient <span class="dropdown-arrow"></span></th>
+                      <th>Status <span class="dropdown-arrow"></span></th>
+                      <th>Linked <span class="dropdown-arrow"></span></th>
+                  </tr>
+              </thead>
+
+              <tbody>
+                  <tr *ngFor="let draft of drafts;let i = index" [ngClass]="(selectedDraft == draft.id) ? 'selected-doc-row' : ''" (click)="selectDraft(draft.id)">
+                      <td>{{draft.title}}</td>
+                      <td><a href="#">{{draft.email}}</a></td>
+                      <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                      <td>
+                          <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                          <a href="#">{{draft.recipient_email}}</a>
+                      </td>
+                      <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                      <td class="info-popup-wrap setting-wrap">
+                        <a href="#" class="link"></a>
+                        <a class="setting-dots pointer" (click)="selectOption(i)"></a>
+                        <ul class="info-popup-sm" *ngIf="draft.options">
+                          <li class="delete" (click)="deleteDraft(i)"><a href="#">delete</a></li>
+                          <li class="duplicate" (click)="addDuplicate(i,draft)"><a class="pointer">Duplicate</a></li>
+                        </ul>
+                      </td>
+
+                  </tr>
+
+                  <!-- <tr>
+                      <td>Property agreement xyz</td>
+                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
+                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
+                      <td>
+                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+                          <a href="#">adam.richards&#64;r2s.co</a>
+                      </td>
+                      <td>Sent <span class="numbers orange-border">7</span></td>
+                      <td><a href="#" class="link"></a></td>
+                  </tr>
+
+                  <tr>
+                      <td>Property agreement xyz</td>
+                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
+                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
+                      <td>
+                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+                          <a href="#">adam.richards&#64;r2s.co</a>
+                      </td>
+                      <td>Sent <span class="numbers red-border">8</span></td>
+                      <td><a href="#" class="link"></a></td>
+                  </tr>
+
+                  <tr>
+                      <td>Property agreement xyz</td>
+                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
+                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
+                      <td>
+                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+                          <a href="#">adam.richards&#64;r2s.co</a>
+                      </td>
+                      <td>Draft</td>
+                      <td><a href="#" class="link"></a></td>
+                  </tr>
+
+                  <tr>
+                      <td>Property agreement xyz</td>
+                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
+                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
+                      <td>
+                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+                          <a href="#">adam.richards&#64;r2s.co</a>
+                      </td>
+                      <td>Completed</td>
+                      <td><a href="#" class="link"></a></td>
+                  </tr> -->
+              </tbody>
+          </table>
+
+
+
+          <!-- <table class="table table-striped" [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="5">
+            <thead>
+            <tr>
+                <th style="width: 20%">
+                    <mfDefaultSorter by="name">Name</mfDefaultSorter>
+                </th>
+                <th style="width: 50%">
+                    <mfDefaultSorter by="email">Email</mfDefaultSorter>
+                </th>
+                <th style="width: 10%">
+                    <mfDefaultSorter by="age">Age</mfDefaultSorter>
+                </th>
+                <th style="width: 20%">
+                    <mfDefaultSorter by="city">City</mfDefaultSorter>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of mf.data">
+                <td>{{item.name}}</td>
+                <td>{{item.email}}</td>
+                <td class="text-right">{{item.age}}</td>
+                <td>{{item.city | uppercase}}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4">
+                    <mfBootstrapPaginator [rowsOnPageSet]="[5,10,25]"></mfBootstrapPaginator>
+                </td>
+            </tr>
+            </tfoot>
+        </table> -->
+        </div>
+
+    <!-- Approval -->
+    <div class="filter-table" *ngIf="selectedType == 'approval'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+    <!-- Sent -->
+    <div class="filter-table" *ngIf="selectedType == 'sent'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+    <!-- Withdrawn -->
+    <div class="filter-table" *ngIf="selectedType == 'withdrawn'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+    <!-- Completed -->
+    <div class="filter-table" *ngIf="selectedType == 'completed'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+    <!-- Expired -->
+    <div class="filter-table" *ngIf="selectedType == 'expired'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+    <!-- All -->
+    <div class="filter-table" *ngIf="selectedType == 'all'">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Title <span class="dropdown-arrow"></span></th>
+                    <th>Modified <span class="dropdown-arrow"></span></th>
+                    <th>Recipient <span class="dropdown-arrow"></span></th>
+                    <th>Status <span class="dropdown-arrow"></span></th>
+                    <th>Linked <span class="dropdown-arrow"></span></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let draft of drafts">
+                    <td>{{draft.title}}</td>
+                    <td><a href="#">{{draft.email}}</a></td>
+                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
+                    <td>
+                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
+                        <a href="#">{{draft.recipient_email}}</a>
+                    </td>
+                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
+                    <td><a href="#" class="link"></a></td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+  </section>
+</div>
