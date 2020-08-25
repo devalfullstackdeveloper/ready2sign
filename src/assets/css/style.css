@@ -47,7 +47,7 @@ p {
   font-size: 32px;
   font-family: "Lato", sans-serif;
   line-height: 42px;
-  margin: 84px 0 47px;
+  margin: 50px 0;
 }
 
 .signup-form {
@@ -307,7 +307,16 @@ p {
   background-repeat: no-repeat;
   background-position: right center;
 }
-
+.buttons-sec .btn {
+  flex: 1;
+}
+.frgt_pwd{display: block; text-align: right;padding-top: 10px;}
+.btn-link {
+  color: #5E81F4;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: capitalize;
+}
 .info-popup-sm li a {
   font-size: 14px;
   line-height: 21px;
@@ -880,7 +889,7 @@ input:-moz-placeholder {
 [type="checkbox"]:not(:checked) + label,
 [type="checkbox"]:checked + label {
   position: relative;
-  padding-left: 1.95em;
+  padding-left: 2.95em;
   cursor: pointer;
 }
 
@@ -890,11 +899,11 @@ input:-moz-placeholder {
   position: absolute;
   left: 1px;
   top: 0;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #5e81f4;
   background: #fff;
-  border-radius: 4px;
+  border-radius: 20px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -902,13 +911,14 @@ input:-moz-placeholder {
 [type="checkbox"]:checked + label:after {
   content: "";
   position: absolute;
-  top: 2px;
-  left: 3px;
+  top: 5px;
+  left: 6px;
   transition: all 0.2s;
-  background: #5e81f4 url(../images/check.png) no-repeat center;
+  background: #5e81f4;
   background-size: 14px;
-  width: 16px;
-  height: 17px;
+  width: 14px;
+  height: 14px;
+  border-radius: 15px;
 }
 
 [type="checkbox"]:not(:checked) + label:after {
@@ -1337,7 +1347,7 @@ button.btn-active {
 }
 
 .add-user-form .form-footer .save {
-  padding: 15px 25px;
+  padding: 15px 20px;
   cursor: pointer;
 }
 
@@ -1405,8 +1415,12 @@ button.btn-active {
   width: 186px;
   border-bottom: 1px solid #f0f0f3;
   padding-bottom: 24px;
+  background-position: 100% 20%;
+  text-transform: capitalize;
 }
-
+.pagination a.active{background-color: #ed5d7d !important;border: 1px solid #ed5d7d !important;}
+.pagination {margin-top: 30px;}
+.users-table{padding: 30px 30px 30px 0px;}
 .wrapper-status-groups .search-area {
   padding: 0;
   margin-bottom: 0;
@@ -1638,6 +1652,7 @@ button.grey-btn {
   background: #7ce7ac;
   width: 140px;
 }
+.setting-form .form-footer .save.btn-grey{background-color:#8181a5}
 
 .text-right {
   text-align: right;

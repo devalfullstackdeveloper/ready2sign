@@ -50,7 +50,7 @@
               <input type="password" id="password" formControlName="password" placeholder="Start typing..." class="text-field">
               
               <label *ngIf="submitted && f.password.errors && f.password.errors.required" class="alert-red">Please enter password</label>
-              <span class="text-right pt-10 d-block"><a class="btn-link" [routerLink]="['/forgot-password']">forgot password ?</a></span>
+              <span class="text-right pt-10 d-block frgt_pwd"><a class="btn-link" [routerLink]="['/forgot-password']">forgot password ?</a></span>
               <!-- <label *ngIf="f.password.errors && f.password.errors.minlength" class="alert-red">Password must be at least 6 characters</label> -->
           </p>
             <div class="buttons-sec login-pg">

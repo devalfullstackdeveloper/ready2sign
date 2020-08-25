@@ -101,7 +101,7 @@
           <fieldset class="form-footer">
             <button type="reset">Cancel</button>
 
-            <button type="submit" class="save" >Save</button>
+            <button type="submit" class="save btn-grey" >Save</button>
           </fieldset>
         </form>
       </section>
@@ -174,14 +174,14 @@
             </tfoot>             -->
           </table> 
           <div>
-            <div>
+            <!-- <div>
               <div class="col-md-2">
                 <label>Summary: </label>
                 <select name="selectedQuantity" id="aantal" class="form-control" [(ngModel)]="selectedQuantity" (change)="selectNoOfRows(selectedQuantity)">
                   <option *ngFor="let option of options"  [value]="option">{{option}}</option>
                </select>
             </div>
-            </div>
+            </div> -->
             <div class="right">
               <div class="pagination pagination-sm">
                 <a href="javascript:void(0);" (click)="leftArrow()">&laquo;</a>
@@ -405,7 +405,7 @@
 
           <fieldset class="form-footer">
             <button (click)="displayModel()">Cancel</button>
-            <button class="save save-ico" type="submit" (click)="sendInvitation()">Send Invitation</button>
+            <button class="save" type="submit" (click)="sendInvitation()">Send Invitation</button>
           </fieldset>
 
         </form>
