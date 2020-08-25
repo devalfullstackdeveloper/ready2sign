@@ -62,17 +62,8 @@ export class SettingsService {
     }))
   }
 
-  getAllUsers(data,filterstring){
-    console.log("json--",filterstring);
-    return this.http.get<any>(`${environment.apiUrl}/api/user/getusersbyaccount/${data}`,{headers:this.httpHeader})
-    .pipe(map(res=>{
-      return res;
-    }))
-  }
-
-  getAllUsers2(data,filter){
+  getAllUsers(data,filter){    
     console.log("json--",data,filter);
-
     const httpOptions = {
       headers: this.httpHeader,
       params: {'$top': filter.top,'$skip':filter.skip,'$orderby':filter.filterOn+'_'+filter.order}
@@ -82,7 +73,7 @@ export class SettingsService {
     .pipe(map(res=>{
       return res;
     }))
-  }
+  }  
 
   inviteUser(data){
     return this.http.post<any>(`${environment.apiUrl}/api/user/create`,data,{headers:this.httpHeader})
@@ -116,6 +107,40 @@ export class SettingsService {
     return this.http.delete<any>(`${environment.apiUrl}/api/user/${id}`,{headers:this.httpHeader})
     .pipe(map(res => {
       return res
+    }))
+  }
+
+  saveToken(data){
+    console.log("data---",data);
+    var User = this.currentUserSubject.value;
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ User.access_token
+    })
+    return this.http.post<any>(`${environment.apiUrl}/api/app/token`,data,{headers:httpHeader})
+    .pipe(map(res=>{
+      console.log("res---",res);
+      return res;
+    }))
+  }
+
+  getAuthToken(code){
+    let data = {
+      grant_type : "authorization_code",
+      client_id : "8e9f08d6-566e-4ba1-b43f-c46511c8a17d",
+      client_secret : "8ca09131-6e29-4e2c-a425-0d3b9f4bed13",
+      redirect_uri : "http://localhost:65385/home/callback",
+      code : code,
+    }
+    // JSON.stringify({email: email, password: password})
+    console.log("data for send---",data,JSON.stringify(data));
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    })
+    return this.http.post<any>(`https://login.propertyme.com/connect/token`,data,{headers:httpHeader})
+    .pipe(map(res=>{
+      console.log("auth generated---",res);
+      return res;
     }))
   }
 }

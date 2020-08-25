@@ -1,6 +1,7 @@
 import { Component, OnInit,AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from 'src/app/core/service/authentication.service';
+import { AlertService } from '../../core/service/alert.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -17,7 +18,8 @@ export class SignUpComponent implements OnInit,AfterViewInit {
   constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private alertService : AlertService
   ) {
     // redirect to home if already logged in
     if (this.authenticationService.currentUserValue) {
@@ -29,9 +31,9 @@ export class SignUpComponent implements OnInit,AfterViewInit {
       var Id = params['id']
       console.log("id--",Id);
       // call api
-      this.authenticationService.getUserById(Id).subscribe(res=>{
-        console.log("user--",res);
-      })
+      // this.authenticationService.getUserById(Id).subscribe(res=>{
+      //   console.log("user--",res);
+      // })
 
 
         // this.settings.getUserById(user.Id).subscribe(res=>{
@@ -68,10 +70,29 @@ export class SignUpComponent implements OnInit,AfterViewInit {
 
 
   onSubmit() {
+    // delete this.User.acceptTerms;
+    let data = {
+      email :this.User.Email,
+      password:this.User.Password,
+      confirmPassword:this.User.confirm_Password,
+    }
     console.log("Calling---",this.User);
       this.submitted = true;
 
       this.loading = true;
+      this.authenticationService.registerUser(data)
+      .subscribe(res=>{
+        console.log("res-->",res);
+        if(res.WasSuccessful == true){
+          this.alertService.successPage("It is under development");
+        }
+        else{
+          this.alertService.error("It is under development");
+        }
+      },error => {
+        console.log("Error------",error)
+        this.alertService.error(error);
+      })
       // this.authenticationService.login(this.f.username.value, this.f.password.value)
       //     .pipe(first())
       //     .subscribe(
@@ -83,5 +104,4 @@ export class SignUpComponent implements OnInit,AfterViewInit {
       //             this.loading = false;
       //         });
   }
-
 }

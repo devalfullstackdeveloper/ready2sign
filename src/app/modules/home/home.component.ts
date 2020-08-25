@@ -15,14 +15,14 @@ export class HomeComponent implements OnInit {
       $('.sidebar').on('mouseover', function() {
           // $('.sidebar').addClass('sidebar-expanded');
           // $('.sidebar').removeClass('sidebar-collapsed');
-          $('.sidebar').addClass('sidebar-collapsed');
+          $('.sidebar').removeClass('sidebar-collapsed');
           // $('.page___content').removeClass('page-expanded');
       });
 
       $('.sidebar').on('mouseout', function() {
           // $('.sidebar').removeClass('sidebar-expanded');
           // $('.sidebar').addClass('sidebar-collapsed');
-          $('.sidebar').removeClass('sidebar-collapsed');
+          $('.sidebar').addClass('sidebar-collapsed');
           // $('.page___content').addClass('page-expanded');
       });
     }) 

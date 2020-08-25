@@ -123,10 +123,10 @@
           <table>
             <thead>
               <tr class="filter-head">
-                <th (click)="filterBy('Name')">User details <span class="filter-ico filtered"></span></th>
+                <th (click)="filterBy('Name')">User details <span class="filter-ico" [ngClass]="{'filtered' : filter.firstName  == true}" ></span></th>
                 <th>Access</th>
-                <th (click)="filterBy('lastSignIn')">Last signed in <span class="filter-ico"></span></th>
-                <th (click)="filterBy('firstSignIn')">First signed in <span class="filter-ico"></span></th>
+                <th (click)="filterBy('lastSignIn')">Last signed in <span class="filter-ico" [ngClass]="{'filtered' : filter.lastSignIn == true}"></span></th>
+                <th (click)="filterBy('firstSignIn')">First signed in <span class="filter-ico" [ngClass]="{'filtered' : filter.firstSignIn == true}"></span></th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -163,21 +163,33 @@
                 </td>
               </tr>
             </tbody>
-            <tfoot>
+            <!-- <tfoot>
               <div class="right">
                 <div class="pagination pagination-sm">
                   <a href="javascript:void(0);">&laquo;</a>
-                  <a href="javascript:void(0);">1</a>
-                  <a href="javascript:void(0);" class="active">2</a>
-                  <a href="javascript:void(0);">3</a>
-                  <a href="javascript:void(0);">4</a>
-                  <a href="javascript:void(0);">5</a>
-                  <a href="javascript:void(0);">6</a>
+                  <a href="javascript:void(0);" *ngFor = "let number of numberArray" (click)="pageNoClick($event,number)" [ngClass]="{'active' : number == activePage }">{{number}}</a>              
                   <a href="javascript:void(0);">&raquo;</a>
                 </div>
               </div>              
-            </tfoot>            
+            </tfoot>             -->
           </table> 
+          <div>
+            <div>
+              <div class="col-md-2">
+                <label>Summary: </label>
+                <select name="selectedQuantity" id="aantal" class="form-control" [(ngModel)]="selectedQuantity" (change)="selectNoOfRows(selectedQuantity)">
+                  <option *ngFor="let option of options"  [value]="option">{{option}}</option>
+               </select>
+            </div>
+            </div>
+            <div class="right">
+              <div class="pagination pagination-sm">
+                <a href="javascript:void(0);" (click)="leftArrow()">&laquo;</a>
+                <a href="javascript:void(0);" *ngFor = "let number of numberArray" (click)="pageNoClick($event,number)" [ngClass]="{'active' : number == activePage }">{{number}}</a>              
+                <a href="javascript:void(0);" (click)="rightArrow()">&raquo;</a>
+              </div>
+            </div> 
+          </div>          
         </div>
       </section>
 

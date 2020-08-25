@@ -75,7 +75,7 @@
           </div>
       </form> -->
 
-      <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+      <!-- <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
         <p>
           <label for="first-name">Firstname</label>
           <input type="text" id="Firstname" name="Firstname" #Firstname="ngModel" [(ngModel)]="User.Firstname" class="text-field" required>
@@ -140,8 +140,47 @@
 
             <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red">Accept Terms & Conditions is required</label>
         </p>
-        <div class="buttons-sec">
-            <!-- <a class="blue-btn btn pointer" type="submit" (click)="onSubmit()">Sign Up</a> -->
+        <div class="buttons-sec">            
+            <button class="blue-btn btn" type="submit">Sign Up</button>
+            <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
+        </div>
+      </form> -->
+
+      <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>        
+
+        <p>
+          <label for="email">Email</label>
+          <input type="email" id="Email" name="Email" #Email="ngModel" [(ngModel)]="User.Email" class="text-field" required email>
+
+          <label *ngIf="f.submitted && Email.invalid && Email.errors.required" class="alert-red">Please Enter Email</label>
+          <label *ngIf="f.submitted && Email.invalid && Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
+        </p>        
+
+        <p>
+          <label for="password">Password</label>
+          <input type="password" id="Password" name="Password" #Password="ngModel" [(ngModel)]="User.Password" placeholder="Start typing..." class="text-field" required minlength="6">
+
+          <label *ngIf="f.submitted && Password.invalid && Password.errors.required" class="alert-red">Please enter a Password</label>
+          <label *ngIf="f.submitted && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
+        </p>
+
+        <p>
+          <label for="password">Confirm Password</label>
+          <input type="password" id="confirm_Password" name="confirm_Password" #confirm_Password="ngModel" [(ngModel)]="User.confirm_Password" placeholder="Start typing..." class="text-field" required minlength="6">
+
+          <label *ngIf="f.submitted && confirm_Password.invalid && confirm_Password.errors.required" class="alert-red">Please enter a Password</label>
+          <label *ngIf="f.submitted && confirm_Password.invalid && confirm_Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
+        </p>       
+
+
+
+        <p class="terms-block">
+            <input type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
+            <label for="terms">I agree with terms & conditions</label>
+
+            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red">Accept Terms & Conditions is required</label>
+        </p>
+        <div class="buttons-sec">            
             <button class="blue-btn btn" type="submit">Sign Up</button>
             <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
         </div>

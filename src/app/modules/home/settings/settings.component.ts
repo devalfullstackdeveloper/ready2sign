@@ -6,6 +6,8 @@ import { FormBuilder,FormGroup,Validators } from '@angular/forms';
 import { SignaturePad } from 'ngx-signaturepad/signature-pad';
 import { Toast } from 'ngx-toastr';
 import { error } from 'protractor';
+import { skip } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -52,7 +54,7 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   ];  
 
   filter : any = {
-    top : 10,
+    top : 3,
     skip : 0,
     filterOn : 'FirstName',
     order : 'Asc',
@@ -65,8 +67,18 @@ export class SettingsComponent implements OnInit, AfterViewInit {
     confirmPassword: 123456,Branch:"",Position:"",AccountId:null,Role:"Standard",Groups:[]};
   access_level : string = this.inviteUserJson.Role;
   statusInInviteUser :number = 0;
+  totalUsers : number;
+  exactPage : any;
+  numberArray : any = [];
+  activePage : any = 1;
+  pageNo : number = 1;
+  options : any = [3, 5, 10, 20, 50];
+  selectedQuantity = 3;
+  rfrsToken : any;
+  accToken : any;
+  code : any;
 
-  constructor(private settings:SettingsService,private authenticationService:AuthenticationService,private alertService:AlertService) {
+  constructor(private activeRoute:ActivatedRoute, private settings:SettingsService,private authenticationService:AuthenticationService,private alertService:AlertService) {
       console.log("Constructure Calling-----", (<any>window).activeAcountNumber);
     this.accountNumber = (<any>window).activeAcountNumber;
     this.getAccount();
@@ -83,6 +95,16 @@ export class SettingsComponent implements OnInit, AfterViewInit {
      }
 
   ngOnInit(): void {
+    this.activeRoute.queryParams.subscribe(params=>{
+      console.log("parms--",params);
+      console.log("code--",params['code']);
+      this.code = params['code'];
+    });
+
+    if(this.code){
+      console.log("get auth token api call---");
+      this.getAuthToken(this.code);
+    }
   }
 
   ngAfterViewInit(){
@@ -112,11 +134,70 @@ export class SettingsComponent implements OnInit, AfterViewInit {
 
   getAllUsers(){
     this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
-      this.allUsers = res;
-      console.log("get users---",this.allUsers);
-    });
+      this.allUsers = res.Data;
+      this.totalUsers = res.TotalCount;
+      console.log("get users all data---",res);
+      console.log("get users---",this.allUsers);    
+      this.pageNoCalculation();
+    });    
   }
 
+  pageNoCalculation(){
+    this.numberArray = [];
+    let page= this.totalUsers/this.filter.top;
+      let tempPage = page.toFixed();     
+      
+      if(Number(tempPage) < page){
+        this.exactPage = Number(tempPage) + 1;        
+        for(let i=0;i<this.exactPage;i++)
+        {          
+          this.numberArray.push(this.pageNo);
+          this.pageNo++;              
+        }          
+        this.pageNo = 1;
+      }
+      else{
+        this.exactPage = Number(tempPage);       
+        for(let i=0;i<this.exactPage;i++)
+        {          
+          this.numberArray.push(this.pageNo);
+          this.pageNo++;                
+        }        
+        this.pageNo = 1;  
+      }
+  }
+
+  pageNoClick(event,pgNo){
+    this.activePage = pgNo;
+    console.log("event--",event.target.value,"pgNo--",pgNo);
+    this.filter.skip = this.filter.top * (pgNo - 1);
+    console.log("count--",this.filter.skip);    
+    this.getAllUsers();
+  }
+
+  leftArrow(){
+    console.log("left arrow",this.activePage,this.filter);
+    this.activePage = Number(this.activePage - 1);    
+    this.filter.skip = this.filter.top * (this.activePage - 1);
+    console.log("skip---",this.filter.skip);
+  
+    this.getAllUsers();
+  }
+  rightArrow(){
+    console.log("right arrow",this.activePage,this.filter);
+    this.activePage = Number(this.activePage);
+    this.filter.skip = this.filter.top * (this.activePage);    
+    console.log("skip---",this.filter.skip);
+    this.getAllUsers();
+    this.activePage ++;
+  }
+
+  selectNoOfRows(no){    
+    console.log("select---",no,this.options,this.selectedQuantity);
+    this.filter.top = no;
+    this.getAllUsers();
+  }
+  
   filterBy(type){
     console.log("usr",type);    
     if(type == 'Name'){      
@@ -149,8 +230,8 @@ export class SettingsComponent implements OnInit, AfterViewInit {
       else 
         this.filter.order = 'Desc';
     }    
-    this.settings.getAllUsers2(this.accountNumber,this.filter).subscribe(res=>{
-      this.allUsers = res;
+    this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
+      this.allUsers = res.Data;
       console.log("get users---",this.allUsers);
     });
     
@@ -353,9 +434,43 @@ export class SettingsComponent implements OnInit, AfterViewInit {
 
   //------------------ Connected-App ------------
   propertyOn(){
-    // var url = "https://login.propertyme.com/connect/authorize?response_type=code&state=&client_id=8e9f08d6-566e-4ba1-b43f-c46511c8a17d&scope=contact:read%20activity:read%20property:read%20communication:read%20transaction:read%20offline_access&redirect_uri=http://localhost:65385/home/callback"
-    var url = "https://login.propertyme.com/connect/authorize?response_type=code&state=&client_id=8e9f08d6-566e-4ba1-b43f-c46511c8a17d&scope=contact:read%20activity:read%20property:read%20communication:read%20transaction:read%20offline_access&redirect_uri=http://localhost:4200/admin/settings"
+    var url = "https://login.propertyme.com/connect/authorize?response_type=code&state=&client_id=8e9f08d6-566e-4ba1-b43f-c46511c8a17d&scope=contact:read%20activity:read%20property:read%20communication:read%20transaction:read%20offline_access&redirect_uri=http://localhost:65385/home/callback"
+    // var url = "https://login.propertyme.com/connect/authorize?response_type=code&state=&client_id=8e9f08d6-566e-4ba1-b43f-c46511c8a17d&scope=contact:read%20activity:read%20property:read%20communication:read%20transaction:read%20offline_access&redirect_uri=http://localhost:65385/admin/settings"
     window.open(url,'_blank')
   }
   
+  getAuthToken(code){
+    console.log("code -----",code);
+
+    // let res = {
+    //     access_token: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1OTgyODA2MjMsImV4cCI6MTU5ODI4NDIyMywiaXNzIjoiaHR0cHM6Ly9sb2dpbi5wcm9wZXJ0eW1lLmNvbSIsImF1ZCI6WyJodHRwczovL2xvZ2luLnByb3BlcnR5bWUuY29tL3Jlc291cmNlcyIsImh0dHBzOi8vYXBwLnByb3BlcnR5bWUuY29tL2FwaSJdLCJjbGllbnRfaWQiOiI4ZTlmMDhkNi01NjZlLTRiYTEtYjQzZi1jNDY1MTFjOGExN2QiLCJzdWIiOiJDdXN0b21lcklkX2E1MzgwMzFhLWY3MGMtNGJkNi1iYzg1LWQ2ZGIyNjZmYTMzMCIsImF1dGhfdGltZSI6MTU5ODI4MDYwNywiaWRwIjoibG9jYWwiLCJjdXN0b21lcl9pZCI6ImE1MzgwMzFhLWY3MGMtNGJkNi1iYzg1LWQ2ZGIyNjZmYTMzMCIsIm1lbWJlcl9pZCI6ImFiZmYwMDI0LWE4M2QtNGUwZS1hZTg0LWM1ZjgxYjNkZmRmZCIsIm1lbWJlcl9hY2Nlc3NfaWQiOiJhYmZmMDAyNC1hODNlLTQyNTEtOTU4Zi1lM2ZjYjIzYzAwZWIiLCJzY29wZSI6WyJwcm9wZXJ0eTpyZWFkIiwiY29tbXVuaWNhdGlvbjpyZWFkIiwiYWN0aXZpdHk6cmVhZCIsInRyYW5zYWN0aW9uOnJlYWQiLCJjb250YWN0OnJlYWQiLCJvZmZsaW5lX2FjY2VzcyJdLCJhbXIiOlsicHdkIl19.UFehMRjEjEqbRsX71ASvLZFWi-4WP6Nk9TtaMHpXHYUlzQiuM0GL7lyTPEpeKE6xwT-ND0zOYp-1xkknWRSSlXTRzIDqROJRC-TrUgVltWKFKS2RtJDK5C-Zvt-laO_ytwmKqwJbfsgyS-mq0I0DeJmiNXK9Bowa1mmcpPmWXM_FuSt3KFfRAdcYdf7tT4AzVUBfczWTiu_pQhnONkU6YH_O8dPdL6CHrEz2s7Hr_kZOiAsUoAfSrsrdD6k6F27-unf2DEZHxdl4dMk1Njh9Jel1eLImREpCIYupFzKuNFJU64dz0wsexxOvEBk8d-9dbOmqQvYSG-c_FH0YtYzeRg",
+    //     expires_in: 3600,
+    //     token_type: "Bearer",
+    //     refresh_token: "fc181d6d5bfdd86e1773c6c8df12aa2c30f4c02f7458e3c9bee4d99b176ef0d6"
+    // };
+    // if(res.access_token && res.refresh_token){
+    //   this.saveToken(res.access_token,res.refresh_token);
+    // }
+    this.settings.getAuthToken(code).subscribe(res=>{
+      console.log("get auth token--",res);
+      if(res.access_token && res.refresh_token){
+        // this.saveToken(res.access_token,res.refresh_token);
+      }
+    });
+    this.accToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1OTgyODA2MjMsImV4cCI6MTU5ODI4NDIyMywiaXNzIjoiaHR0cHM6Ly9sb2dpbi5wcm9wZXJ0eW1lLmNvbSIsImF1ZCI6WyJodHRwczovL2xvZ2luLnByb3BlcnR5bWUuY29tL3Jlc291cmNlcyIsImh0dHBzOi8vYXBwLnByb3BlcnR5bWUuY29tL2FwaSJdLCJjbGllbnRfaWQiOiI4ZTlmMDhkNi01NjZlLTRiYTEtYjQzZi1jNDY1MTFjOGExN2QiLCJzdWIiOiJDdXN0b21lcklkX2E1MzgwMzFhLWY3MGMtNGJkNi1iYzg1LWQ2ZGIyNjZmYTMzMCIsImF1dGhfdGltZSI6MTU5ODI4MDYwNywiaWRwIjoibG9jYWwiLCJjdXN0b21lcl9pZCI6ImE1MzgwMzFhLWY3MGMtNGJkNi1iYzg1LWQ2ZGIyNjZmYTMzMCIsIm1lbWJlcl9pZCI6ImFiZmYwMDI0LWE4M2QtNGUwZS1hZTg0LWM1ZjgxYjNkZmRmZCIsIm1lbWJlcl9hY2Nlc3NfaWQiOiJhYmZmMDAyNC1hODNlLTQyNTEtOTU4Zi1lM2ZjYjIzYzAwZWIiLCJzY29wZSI6WyJwcm9wZXJ0eTpyZWFkIiwiY29tbXVuaWNhdGlvbjpyZWFkIiwiYWN0aXZpdHk6cmVhZCIsInRyYW5zYWN0aW9uOnJlYWQiLCJjb250YWN0OnJlYWQiLCJvZmZsaW5lX2FjY2VzcyJdLCJhbXIiOlsicHdkIl19.UFehMRjEjEqbRsX71ASvLZFWi-4WP6Nk9TtaMHpXHYUlzQiuM0GL7lyTPEpeKE6xwT-ND0zOYp-1xkknWRSSlXTRzIDqROJRC-TrUgVltWKFKS2RtJDK5C-Zvt-laO_ytwmKqwJbfsgyS-mq0I0DeJmiNXK9Bowa1mmcpPmWXM_FuSt3KFfRAdcYdf7tT4AzVUBfczWTiu_pQhnONkU6YH_O8dPdL6CHrEz2s7Hr_kZOiAsUoAfSrsrdD6k6F27-unf2DEZHxdl4dMk1Njh9Jel1eLImREpCIYupFzKuNFJU64dz0wsexxOvEBk8d-9dbOmqQvYSG-c_FH0YtYzeRg";
+    this.rfrsToken = "fc181d6d5bfdd86e1773c6c8df12aa2c30f4c02f7458e3c9bee4d99b176ef0d6";
+    this.saveToken();
+  }
+
+  saveToken(){
+    let data = {
+      accountid:1,
+      refreshtoken:this.accToken,
+      accesstoken:this.rfrsToken
+    };
+    
+    this.settings.saveToken(data).subscribe(res=>{
+      console.log("save Token--",res);
+    });
+  }
 }

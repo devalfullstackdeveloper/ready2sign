@@ -1,0 +1,7 @@
+{
+    "/admin": {
+        "target": "https://login.propertyme.com",
+        "secure": true,
+        "changeOrigin": true
+    }
+}

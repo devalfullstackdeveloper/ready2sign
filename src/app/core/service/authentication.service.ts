@@ -161,4 +161,14 @@ export class AuthenticationService {
       console.log("Account Number---",(<any>window).activeAcountNumber)
       return this.$accountNumber.asObservable()
     }
+
+    registerUser(data){
+      const httpHeader = new HttpHeaders({
+        'Content-Type': 'application/json'        
+      })
+       return this.http.post<any>(`${environment.apiUrl}/api/authorize/register`,data,{headers:httpHeader})
+       .pipe(map(res=>{
+         return res;
+       }))
+    }
 }
