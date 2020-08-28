@@ -6,3 +6,22 @@
 .pointer{
   cursor: pointer;
 }
+
+input[type="text"].text-field {
+  background: url(/assets/images/user-icon.png) no-repeat 90% 6px / 20px;
+}
+.text-field {
+  border: none;
+  border-bottom: 1px solid #F0F0F3;
+  width: 100%;
+  padding: 5px 0 18px;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1C1D21;
+}
+.margin-right{
+  margin-right:6px;
+}
+.frgt_pwd{display: block; margin-top: 5px;}
+.frgt_pwd a{text-decoration: none; font-weight: 800; color:#5E81F4; font-size: 16px; text-transform: capitalize;}

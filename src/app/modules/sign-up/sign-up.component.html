@@ -175,21 +175,28 @@
 
 
         <p class="terms-block">
-            <input type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
-            <label for="terms">I agree with terms & conditions</label>
+          
 
-            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red">Accept Terms & Conditions is required</label>
+              <input class="custom-check" type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
+            
+            <label for="terms" >I agree with terms & conditions</label>
+
+            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red blck">Accept Terms & Conditions is required</label>
         </p>
-        <div class="buttons-sec">            
-            <button class="blue-btn btn" type="submit">Sign Up</button>
+        <div class="buttons-sec" *ngIf="!showLoginButton">            
+            <button class="btnnew" type="submit">Sign Up</button>
             <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
+        </div>
+        <div class="return-box" *ngIf="showLoginButton">
+          <span >User Activated</span>
+          <a class="blue-btn btn pointer grn" [routerLink]="['/login']" *ngIf="showLoginButton">Retrun to Login</a>
         </div>
       </form>
 
       <div class="other-options">
-          <a href="#" class="facebook"></a>
-          <a href="#" class="google"></a>
-          <span>Or sign in with</span>
+        <span class="margin-right">Or sign in with</span>
+        <a href="#" class="facebook"></a>
+        <a href="#" class="google"></a>          
       </div>
   </div>
   <div class="page-right">

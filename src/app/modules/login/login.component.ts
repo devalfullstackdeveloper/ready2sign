@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/core/service/authentication.service';
+import { AlertService } from '../../core/service/alert.service';
 
 
 @Component({ templateUrl: 'login.component.html',styleUrls: ['./login.component.css'] })
@@ -14,6 +15,7 @@ export class LoginComponent implements OnInit {
     error = '';
 
     constructor(
+        private alert : AlertService,
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
@@ -57,9 +59,10 @@ export class LoginComponent implements OnInit {
                     // this.router.navigate([this.returnUrl]);
                     this.router.navigate(['/admin/home']);
                 },
-                error => {
+                error => {                    
                     this.error = error;
                     this.loading = false;
+                    this.alert.error(error.error_description);
                 });
     }
 

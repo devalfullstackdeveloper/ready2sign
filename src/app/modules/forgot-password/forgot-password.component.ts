@@ -13,6 +13,10 @@ export class ForgotPasswordComponent implements OnInit {
 
   forgotForm: FormGroup;
   submitted = false;
+  success:boolean= false;
+  error:boolean= false;
+  successRes = "";
+  errorRes = "";
 
   constructor(
     private formBuilder: FormBuilder,
@@ -42,12 +46,16 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     this.authenticationService.forgotPassword(this.f.email.value).subscribe(res => {
-      // console.log("Res----",res)
-      this.toastr.success(res)
-    },error => {
-      this.toastr.error(error);
+      
+      this.success = true;
+      this.error = false;
+      this.successRes = res;
+      console.log("success--",res);
+    },error => {      
+      console.log(error.Message);
+      this.error = true;
+      this.success = false;
+      this.errorRes = error.Message;
     })
-
   }
-
 }

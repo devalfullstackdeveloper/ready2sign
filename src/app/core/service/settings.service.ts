@@ -33,6 +33,7 @@ export class SettingsService {
   getAdminUsers(data){
     return this.http.get<any>(`${environment.apiUrl}/api/user/getadminusers/${data}`,{headers:this.httpHeader})
     .pipe(map(res=>{
+      console.log("admin users-----",res);
       res = [
         {
           "id":1,
@@ -62,11 +63,10 @@ export class SettingsService {
     }))
   }
 
-  getAllUsers(data,filter){    
-    console.log("json--",data,filter);
+  getAllUsers(data,filter){        
     const httpOptions = {
       headers: this.httpHeader,
-      params: {'$top': filter.top,'$skip':filter.skip,'$orderby':filter.filterOn+'_'+filter.order}
+      params: {'$top': filter.top,'$skip':filter.skip,'$orderby':filter.filterOn+'_'+filter.order,'searchtext':filter.search,'status':filter.status}
     };
 
     return this.http.get<any>(`${environment.apiUrl}/api/user/getusersbyaccount/${data}`,httpOptions)
@@ -110,19 +110,7 @@ export class SettingsService {
     }))
   }
 
-  saveToken(data){
-    console.log("data---",data);
-    var User = this.currentUserSubject.value;
-    const httpHeader = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer '+ User.access_token
-    })
-    return this.http.post<any>(`${environment.apiUrl}/api/app/token`,data,{headers:httpHeader})
-    .pipe(map(res=>{
-      console.log("res---",res);
-      return res;
-    }))
-  }
+ 
 
   getAuthToken(code){
     let data = {
@@ -136,6 +124,7 @@ export class SettingsService {
     console.log("data for send---",data,JSON.stringify(data));
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Access-Control-Allow-Origin':'*'
     })
     return this.http.post<any>(`https://login.propertyme.com/connect/token`,data,{headers:httpHeader})
     .pipe(map(res=>{
@@ -143,4 +132,28 @@ export class SettingsService {
       return res;
     }))
   }
+
+  saveToken(data){    
+    var User = this.currentUserSubject.value;
+    const httpHeader = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer '+ User.access_token
+    })
+    return this.http.post<any>(`${environment.apiUrl}/api/app/token`,data,{headers:httpHeader})
+    .pipe(map(res=>{      
+      return res;
+    }))
+  }
+  getAllApps(data,filter){        
+    const httpOptions = {
+      headers: this.httpHeader,
+      params: {'$orderby':filter.filterOn+'_'+filter.order,'searchtext':filter.search,'status':filter.status}
+    };
+
+    return this.http.get<any>(`${environment.apiUrl}/api/app/${data}`,httpOptions)
+    .pipe(map(res=>{
+      return res;
+    }))
+  } 
+  // https://ready2signapi.newpathstudio.com.au/api/app/1?searchtext=prop&$orderby=Name_Asc&$filter=true
 }

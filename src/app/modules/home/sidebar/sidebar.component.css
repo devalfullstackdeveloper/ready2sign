@@ -9,3 +9,15 @@
 .sidebar-footer .user-info ul {
   z-index: 1 !important;
 }
+.sidebar.sidebar-collapsed{color: #000;}
+.sidebar .sidebar-logo a.logomini{
+  display: none;
+}
+.sidebar.sidebar-collapsed .sidebar-logo a.logomini{
+  display: block;
+}
+.sidebar.sidebar-collapsed .sidebar-logo a.logo{
+  display: none;
+}
+
+

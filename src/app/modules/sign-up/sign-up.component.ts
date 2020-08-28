@@ -9,10 +9,12 @@ import { AlertService } from '../../core/service/alert.service';
   styleUrls: ['./sign-up.component.css']
 })
 export class SignUpComponent implements OnInit,AfterViewInit {
+    showLoginButton = false;
     loading = false;
     submitted = false;
     returnUrl: string;
     error = '';
+    check = false;
     User : any = {}
 
   constructor(
@@ -69,6 +71,10 @@ export class SignUpComponent implements OnInit,AfterViewInit {
   }
 
 
+  click(){
+    this.check = true;
+  }
+
   onSubmit() {
     // delete this.User.acceptTerms;
     let data = {
@@ -84,9 +90,11 @@ export class SignUpComponent implements OnInit,AfterViewInit {
       .subscribe(res=>{
         console.log("res-->",res);
         if(res.WasSuccessful == true){
+          this.showLoginButton = true;
           this.alertService.successPage("It is under development");
         }
         else{
+          this.showLoginButton = false;
           this.alertService.error("It is under development");
         }
       },error => {

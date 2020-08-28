@@ -15,13 +15,29 @@ export class ErrorInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
         return next.handle(request).pipe(catchError(err => {
+            console.log("error in  interceptor--",err);
+            // if (err.status === 401) {
+            //     this.authenticationService.logout();
+            // }
+            // else {
+            //     const error = err.error.message || err.statusText;
+            //     return throwError(error);
+            // }
 
             if (err.status === 401) {
+                console.log("401----",err);
                 this.authenticationService.logout();
             }
-            else {
+            else if(err.status === 400)
+            {
+                console.log("400----",err);
+                return throwError(err.error);
+            }
+            else
+            {
+                console.log("any----",err);
                 const error = err.error.message || err.statusText;
-                return throwError(error);
+                return throwError(err);
             }
         }))
     }

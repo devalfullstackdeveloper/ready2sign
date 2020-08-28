@@ -1,42 +1,121 @@
 .disabled-contenct {
-    pointer-events: none;
-    opacity: 0.6;
-  }
+  pointer-events: none;
+  opacity: 0.6;
+}
 
-  .pointer{
-    cursor: pointer;
-  }
+.disabled-checkbox {
+  pointer-events: none;
+}
 
-  .pagination {
-    display: inline-block;
-  }
-  
-  .pagination a {
-    color: black;
-    float: left;
-    padding: 8px 16px;
-    text-decoration: none;
-    border: 1px solid #ddd;
-  }
-  
-  .pagination a.active {
-    background-color: #5e81f4;
-    color: white;
-    border: 1px solid #5e81f4;
-  }
-  
-  .pagination a:hover:not(.active) {background-color: #ddd;}
-  
-  .pagination a:first-child {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-  }
-  
-  .pagination a:last-child {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
+.pointer {
+  cursor: pointer;
+}
 
-  .right{
-    text-align-last : right;
-  }
+.pagination {
+  display: inline-block;
+}
+
+/* [type="checkbox"]:not(:checked)+label:after,
+[type="checkbox"]:checked+label:after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 9px;
+  width: 5px;
+  height: 10px;
+  border: solid #5e81f4;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg) !important;
+  background: #fff;
+  border-radius: 0;
+}
+
+.chkboxBlock {
+  display: block !important;
+  margin-left: auto;
+}
+
+[type="checkbox"]:not(:checked)+label:before,
+[type="checkbox"]:checked+label:before {
+  border-radius: 0;
+} */
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+}
+
+.setting-form fieldset span.error {
+  margin-left: 160px;
+    margin-top: -30px;
+  position: relative;
+  display: block;
+  margin-bottom: 10px;
+  color: #ff808b;
+}
+.add-user-form.setting-form fieldset span.error{margin-top: -10px;}
+
+.pagination a.active {
+  background-color: #5e81f4;
+  color: white;
+  border: 1px solid #5e81f4;
+}
+
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
+}
+
+.pagination a:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.pagination a:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.right {
+  text-align-last: right;
+}
+.active_user_wrapper{color: #5e81f4;font-weight: 700;}
+.status-active {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-top: 40px;
+  padding-bottom: 5px;
+  color: #5e81f4;
+  cursor:pointer
+}
+
+.setting-form .form-footer .save:hover {
+  background-color: #5ac48a !important;
+}
+
+select::-ms-expand {	display: none; }
+select{
+  -webkit-appearance: none;
+  appearance: none;
+}
+.wrapper-status-groups.customm{padding: 0px 0 0 38px;width: 82%;}
+.wrapper-status-groups.customm span{margin-right: 15px;}
+select.select-custom{
+  width: 100%;
+    border: 0;
+    background: transparent;
+    text-transform: capitalize;
+    font-weight: 700;
+}
+.form-control {
+  border-bottom: 1px solid #f0f0f3;
+}
+.site-search-wrapper .card::-webkit-scrollbar {
+  width: 0px;
+}
+.site-search-wrapper .card, .site-search-wrapper{position: fixed;}

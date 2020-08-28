@@ -8,6 +8,7 @@ import { Toast } from 'ngx-toastr';
 import { error } from 'protractor';
 import { skip } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-settings',
@@ -35,6 +36,8 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   adminUsers : any;
   displayForm = "companyProfile";
   invited = false;
+  userUpdate = false;
+  Message = "";
   showInviteModel = false;
   companyProfileData : any = {};
   allUsers : any;
@@ -48,23 +51,36 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   statusInEditUser : number;
   prtmngmnt : boolean = false;
   dflt : boolean = false;
+  selectedId : any;
   Groups = [
     {name :"Default", id: 1},
     {name :"Property Management", id: 2}
   ];  
 
   filter : any = {
-    top : 3,
+    top : 5,
     skip : 0,
     filterOn : 'FirstName',
     order : 'Asc',
     firstName : false,
     lastSignIn : false,
-    firstSignIn : false
+    firstSignIn : false,
+    search : "",
+    status : ""
   }
 
+  propertyFilter : any = {   
+    filterOn : 'FirstName',
+    order : 'Asc',
+    app_srt : false,
+    status_srt : false,    
+    search : "",
+    status : ""
+  }
+  status_user = "";
+
   inviteUserJson : any = {FirstName:"",LastName:"",email:"",MobileNumber:null,Phone:null,password:123456,
-    confirmPassword: 123456,Branch:"",Position:"",AccountId:null,Role:"Standard",Groups:[]};
+    confirmPassword: 123456,Branch:"",Position:"",AccountId:null,Role:"Standard",Groups:[1]};
   access_level : string = this.inviteUserJson.Role;
   statusInInviteUser :number = 0;
   totalUsers : number;
@@ -73,28 +89,36 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   activePage : any = 1;
   pageNo : number = 1;
   options : any = [3, 5, 10, 20, 50];
-  selectedQuantity = 3;
+  selectedQuantity = 5;
   rfrsToken : any;
   accToken : any;
   code : any;
-
-  constructor(private activeRoute:ActivatedRoute, private settings:SettingsService,private authenticationService:AuthenticationService,private alertService:AlertService) {
+  activeApp : boolean = true;
+  InactiveApp : boolean = false;
+  constructor(private location: Location,private activeRoute:ActivatedRoute, private settings:SettingsService,private authenticationService:AuthenticationService,private alertService:AlertService) {
       console.log("Constructure Calling-----", (<any>window).activeAcountNumber);
     this.accountNumber = (<any>window).activeAcountNumber;
     this.getAccount();
     this.getAdminUsers();
     this.getAllUsers();
 
-    this.authenticationService.getActiveAccountNumber().subscribe(data => {
-        this.accountNumber = data
-        console.log("acc no",this.accountNumber);
-        this.getAccount();
-        this.getAdminUsers();
-        this.getAllUsers();
-      })
+    // this.authenticationService.getActiveAccountNumber().subscribe(data => {
+    //     this.accountNumber = data
+    //     console.log("acc no",this.accountNumber);
+    //     this.getAccount();
+    //     this.getAdminUsers();
+    //     this.getAllUsers();
+    //   })
      }
 
   ngOnInit(): void {
+    this.authenticationService.getActiveAccountNumber().subscribe(data => {
+      this.accountNumber = data
+      console.log("acc no",this.accountNumber);
+      this.getAccount();
+      this.getAdminUsers();
+      this.getAllUsers();
+    })
     this.activeRoute.queryParams.subscribe(params=>{
       console.log("parms--",params);
       console.log("code--",params['code']);
@@ -104,44 +128,88 @@ export class SettingsComponent implements OnInit, AfterViewInit {
     if(this.code){
       console.log("get auth token api call---");
       this.getAuthToken(this.code);
-    }
+    }   
   }
 
   ngAfterViewInit(){
 
   }
 
+  cancelForm(){
+    this.location.back();
+  }
   getAccount(){
-    this.settings.getAccount(this.accountNumber).subscribe(res=>{
-      this.companyProfileData = res;
-      console.log("get account==>",this.companyProfileData);
-    })
+    if(this.accountNumber){
+      this.settings.getAccount(this.accountNumber).subscribe(res=>{
+        this.companyProfileData = res;   
+        console.log("company data===",this.companyProfileData);   
+      })
+    }
   }
 
   getAdminUsers(){
-    this.settings.getAdminUsers(this.accountNumber).subscribe(res=>{
-      console.log("get admin usres--",res);
-      this.adminUsers = res
-    })
+    if(this.accountNumber){
+      this.settings.getAdminUsers(this.accountNumber).subscribe(res=>{     
+        this.adminUsers = res;
+        console.log("admin users--",this.adminUsers);
+      })
+    }    
   }
 
-  onSubmit(){
+  companyProfileUpdate(){
     // alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.companyProfileData, null, 4));
+    this.companyProfileData.PrimaryContactId = null;
     this.settings.updateCompanyProfile(this.companyProfileData).subscribe(res=>{
       console.log("updated---",res);
+      this.alertService.successPage(res);
+    },error=>{
+      this.alertService.error(error.Message);
     })
   }
 
   getAllUsers(){
-    this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
-      this.allUsers = res.Data;
-      this.totalUsers = res.TotalCount;
-      console.log("get users all data---",res);
-      console.log("get users---",this.allUsers);    
-      this.pageNoCalculation();
-    });    
+    if(this.accountNumber){
+      this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
+        console.log("resss---",res);
+        if(res.Data.length > 0){
+          this.allUsers = res.Data;
+          this.totalUsers = res.TotalCount;       
+          this.pageNoCalculation();
+        }
+        else
+        {
+          this.allUsers = [];
+          this.totalUsers = 0;       
+          this.pageNoCalculation();
+          // this.alertService.successPage("Data Not Found.");
+        }
+      });
+    }        
   }
-
+  searchUser(event){
+    if(event.target.value.length > 0){
+      this.filter.search = event.target.value;
+      console.log("search text--",this.filter);
+      this.getAllUsers();
+    } 
+    else{
+      this.filter.search = "";
+      this.getAllUsers();
+    }   
+    
+  }
+  selectStatus(event){
+    console.log("status---",event.target.value);
+    if(event.target.value == 'All'){
+      this.filter.status = "";
+      this.getAllUsers();
+    }
+    else{
+      this.filter.status = event.target.value;
+      console.log("filter --",this.filter);
+      this.getAllUsers();
+    }    
+  }
   pageNoCalculation(){
     this.numberArray = [];
     let page= this.totalUsers/this.filter.top;
@@ -168,38 +236,35 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   }
 
   pageNoClick(event,pgNo){
-    this.activePage = pgNo;
-    console.log("event--",event.target.value,"pgNo--",pgNo);
-    this.filter.skip = this.filter.top * (pgNo - 1);
-    console.log("count--",this.filter.skip);    
+    this.activePage = pgNo;    
+    this.filter.skip = this.filter.top * (pgNo - 1);    
     this.getAllUsers();
   }
 
   leftArrow(){
-    console.log("left arrow",this.activePage,this.filter);
-    this.activePage = Number(this.activePage - 1);    
-    this.filter.skip = this.filter.top * (this.activePage - 1);
-    console.log("skip---",this.filter.skip);
-  
-    this.getAllUsers();
+    if(this.activePage > 1){
+      this.activePage = Number(this.activePage - 1);  
+      console.log("active page--",this.activePage);  
+      this.filter.skip = this.filter.top * (this.activePage - 1); 
+      this.getAllUsers();
+    }   
   }
   rightArrow(){
-    console.log("right arrow",this.activePage,this.filter);
-    this.activePage = Number(this.activePage);
-    this.filter.skip = this.filter.top * (this.activePage);    
-    console.log("skip---",this.filter.skip);
-    this.getAllUsers();
-    this.activePage ++;
+    if(this.activePage < this.exactPage){
+      this.activePage = Number(this.activePage);
+      this.filter.skip = this.filter.top * (this.activePage);        
+      this.activePage ++;
+      console.log("this page---",this.activePage);
+      this.getAllUsers();
+    }  
   }
 
-  selectNoOfRows(no){    
-    console.log("select---",no,this.options,this.selectedQuantity);
+  selectNoOfRows(no){
     this.filter.top = no;
     this.getAllUsers();
   }
   
-  filterBy(type){
-    console.log("usr",type);    
+  filterBy(type){   
     if(type == 'Name'){      
       this.filter.firstName = !this.filter.firstName;
       this.filter.firstSignIn = false;
@@ -229,24 +294,24 @@ export class SettingsComponent implements OnInit, AfterViewInit {
         this.filter.order = 'Asc';
       else 
         this.filter.order = 'Desc';
-    }    
-    this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
-      this.allUsers = res.Data;
-      console.log("get users---",this.allUsers);
-    });
-    
+    }
+    if(this.accountNumber){
+      this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
+        this.allUsers = res.Data;
+      });
+    }   
+    else{
+      console.log("account no noy found");
+    }
   }
 
-  setDisplay(page){
-    console.log("page--",page);
+  setDisplay(page){    
     this.displayForm = page;
   }
   displayModel(){
     this.showInviteModel = !this.showInviteModel;
   }
-  openActiveBox(id,mailId){
-    console.log("id",id);
-    console.log("mail",mailId);
+  openActiveBox(id,mailId){   
     if(this.userIndex == id){
       this.openActvBox = !this.openActvBox;
     }
@@ -258,8 +323,7 @@ export class SettingsComponent implements OnInit, AfterViewInit {
     this.userMail = mailId;
   }
 
-  changeAccessLevel(level){
-    console.log(level);
+  changeAccessLevel(level){   
     this.access_level = level;
     this.inviteUserJson.Role = level;
   }
@@ -272,30 +336,32 @@ export class SettingsComponent implements OnInit, AfterViewInit {
     else{
       let index = this.GroupsArrayInvite.indexOf(val);
       this.GroupsArrayInvite.splice(index,1);
-    }
-    console.log("check box 3 --",this.GroupsArrayInvite);
+    }    
     this.inviteUserJson.Groups = this.GroupsArrayInvite;
   }
 
-  sendInvitation(){
+  sendInvitation(inviteUserForm){
+    
     this.inviteUserJson.AccountId = this.accountNumber;
-
-    console.log("inviteUserJson---",this.inviteUserJson);
-
+    console.log("invide json--",this.inviteUserJson);
     this.settings.inviteUser(this.inviteUserJson).subscribe(res=>{
-      console.log("user create--",res);
       if(res.WasSuccessful == true){
+        inviteUserForm.reset();
         this.getAllUsers();
         this.showInviteModel = false;
         this.invited = true;
+        this.Message = "User successfully invited "
+        setTimeout (() => {          
+          this.invited = false;
+       }, 5000);
       }
+    },error=>{
+      this.alertService.error(error);
     })
   }
 
   activateUser(user,stts){
-    console.log("user --",user,stts);
-    this.settings.updateStatus(user.Id,stts).subscribe(res => {
-      console.log("Update Status Res---",res)
+    this.settings.updateStatus(user.Id,stts).subscribe(res => {      
       if(res.WasSuccessful){
         this.getAllUsers();
       }else{
@@ -310,8 +376,7 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   }
 
   deleteUser(user){
-    this.settings.deleteUser(user.Id).subscribe(res => {
-      console.log("Delete User Res---",res)
+    this.settings.deleteUser(user.Id).subscribe(res => {      
       if(res.WasSuccessful){
         this.getAllUsers();
       }else{
@@ -323,16 +388,14 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   }
 
   editUser(user){
-    this.settings.getUserById(user.Id).subscribe(res=>{
-      console.log("get user by id--",res);
+    this.settings.getUserById(user.Id).subscribe(res=>{      
       this.userData = res;
+      // this
       this.access_level_edit = res.Role;
-      this.statusInEditUser = res.UserStatus;
-      console.log("type 1--",this.statusInEditUser);
-
+      this.statusInEditUser = res.UserStatus;      
+console.log("user astatus----",this.userData,this.statusInEditUser);
       let grps= res.Groups;
-      for(let i=0;i<grps.length;i++){
-        console.log("value-", grps[i]);
+      for(let i=0;i<grps.length;i++){        
         if(grps[i] == 1){
           this.dflt = true;
         }
@@ -344,6 +407,10 @@ export class SettingsComponent implements OnInit, AfterViewInit {
     this.edtUsr = true;
   }
 
+  selectedRow(id){
+    console.log("id-----",id);
+    this.selectedId = id;
+  }
   changeAccessLevelEdit(level){
     this.access_level_edit = level;
     this.userData.Role = level;
@@ -351,8 +418,6 @@ export class SettingsComponent implements OnInit, AfterViewInit {
 
   changeStatusEdit(stts){
     this.statusInEditUser = stts;
-    console.log("type--",typeof(stts));
-    console.log("type 1--",typeof(this.statusInEditUser));
     this.userData.UserStatus = stts;
   }
 
@@ -365,19 +430,48 @@ export class SettingsComponent implements OnInit, AfterViewInit {
       let index = this.GroupsArrayInvite.indexOf(val);
       this.GroupsArrayInvite.splice(index,1);
     }
-    console.log("check box 3 --",this.GroupsArrayInvite);
     this.userData.Groups = this.GroupsArrayInvite;
 
   }
 
-  updateUser(){
-    console.log("userData--",this.userData);
-    this.settings.updateUser(this.userData).subscribe(res=>{
-      console.log("update user--",res);
+  updateUser(){    
+    console.log("update user ---",this.userData);
+    let req = {
+      email: this.userData.Email,
+      password: "123456",
+      confirmPassword: "123456",
+      FirstName: this.userData.FirstName,
+      LastName: this.userData.LastName,
+      Position: this.userData.Position,
+      AccountId: this.userData.AccountId,
+      Groups: this.userData.Groups,
+      Status: 0,
+      Role: this.userData.Role,
+      Phone: this.userData.PhoneNumber,
+      MobileNumber: this.userData.MobileNumber,
+      Branch: this.userData.Branch,
+      Userstatus: this.userData.UserStatus,
+      Id: this.userData.Id
+    }
+
+    this.settings.updateUser(req).subscribe(res=>{       
+      if(res.WasSuccessful == true){        
+        this.getAllUsers();
+        this.edtUsr = false;
+        this.invited = true;
+        this.Message = res.Messages   
+        setTimeout (() => {          
+          this.invited = false;
+       }, 5000);
+      }
+    },error=>{
+      console.log("error",error);
+      this.alertService.error(error.Messages[0]);
     });
   }
 
   displayEditModel(){
+    console.log("displayEditModel Calling---------")
     this.edtUsr = !this.edtUsr;
   }
 
@@ -423,9 +517,12 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   }
 
   sendResetLink(data){
+    console.log("Edit- model---",this.edtUsr);
     console.log("Reset-Data-----",data);
     this.authenticationService.forgotPassword(data.Email).subscribe(res => {
       console.log("Res---",res)
+      console.log("Edit- model-1--",this.edtUsr);
+      // this.edtUsr = true
       this.alertService.successPage(res);
     },error => {
       this.alertService.error(error);
@@ -465,12 +562,61 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   saveToken(){
     let data = {
       accountid:1,
-      refreshtoken:this.accToken,
-      accesstoken:this.rfrsToken
+      refreshtoken:this.rfrsToken,
+      accesstoken:this.accToken
     };
     
     this.settings.saveToken(data).subscribe(res=>{
       console.log("save Token--",res);
+      if(res.WasSuccessful == true){
+        
+      }
     });
   }
+
+  selectStatusApps(event){
+    console.log("status---",event.target.value);
+    if(event.target.value == 'All'){
+      this.propertyFilter.status = "";
+      this.getAllUsers();
+    }
+    else{
+      this.propertyFilter.status = event.target.value;
+      console.log("filter --",this.filter);
+      this.getAllUsers();
+    } 
+  }
+  searchApps(event){
+
+  }
+  appsFilterBy(type){
+    if(type == 'App'){      
+      this.propertyFilter.app_srt = !this.propertyFilter.app_srt;
+      this.propertyFilter.status_srt = false;      
+      this.propertyFilter.filterOn = type;
+      if(this.propertyFilter.app_srt == true)
+        this.propertyFilter.order = 'Asc';
+      else 
+        this.propertyFilter.order = 'Desc';
+    }
+    if(type == 'Status'){      
+      this.propertyFilter.status_srt = !this.propertyFilter.status_srt;
+      this.propertyFilter.app_srt = false;      
+      this.propertyFilter.filterOn = type;
+      if(this.propertyFilter.status_srt == true)
+        this.propertyFilter.order = 'Asc';
+      else 
+        this.propertyFilter.order = 'Desc'; 
+    }
+    console.log("this filter--",this.propertyFilter);
+
+    // if(this.accountNumber){
+    //   this.settings.getAllUsers(this.accountNumber,this.filter).subscribe(res=>{
+    //     this.allUsers = res.Data;
+    //   });
+    // }   
+    // else{
+    //   console.log("account no noy found");
+    // }
+  }  
 }

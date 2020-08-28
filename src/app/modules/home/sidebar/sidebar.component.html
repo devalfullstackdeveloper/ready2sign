@@ -1,17 +1,22 @@
+<!-- <div class="sidebar-logo">
+  <a href="#" class="logomini"><img src="assets/images/logo-sm.png" alt="Sidebar Logo" /></a>  
+</div> -->
+
 <div class="sidebar-logo">
-  <a href="#"><img src="assets/images/logo-sm.png" alt="Sidebar Logo" /></a>
+  <a href="#" class="expended-sidebar-logo"><img src="assets/images/logo.svg" alt="Sidebar Logo" /></a>
+  <a href="#" class="collapsed-sidebar-logo"><img src="assets/images/logo-sm.svg" alt="Sidebar Logo" /></a>
 </div>
 
 <div class="sidebar-links" (click)="closeOption()">
-  <ul>
-      <li class="documents pointer"><a (click)="home()">Documents</a></li>
+  <ul class="nav">
+      <li class="documents pointer active" (click)="home()"><a >Documents</a></li>
       <li class="template pointer"><a >Template</a></li>
-      <li class="settings pointer"><a (click)="setting()">Settings</a></li>
+      <li class="settings pointer" (click)="setting()"><a >Settings</a></li>
       <li class="help-center pointer"><a >Help Center</a></li>
   </ul>
 </div>
 
-<div class="sidebar-footer">
+<div class="sidebar-footer"> 
   <div class="selected-account" (click)="closeOption()">
       <label for="select_account">Selected account</label>
       <!-- <select id="select_account" name="select_account">
@@ -21,7 +26,7 @@
           <option value="Hocking Stuart">Account d</option>
           <option value="Hocking Stuart">Account e</option>
       </select> -->
-      <select [(ngModel)]="selectedaccount" (change)="accountChange($event)">
+      <select id="select_account" class="sidebar-select" [(ngModel)]="selectedaccount" (change)="accountChange($event)">
         <option *ngFor="let ac of userAccounts" [value]="ac.Id">{{ac.Name}}</option>
         <!-- <option *ngIf="let ac of userAccounts" [value]="ac.Id"> {{ac.Name}} </option> -->
       </select>
@@ -42,5 +47,4 @@
           <li class="signout pointer" (click)="signOut()"><a>Sign out</a></li>
       </ul>
   </div>
-
 </div>

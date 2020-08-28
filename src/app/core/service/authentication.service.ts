@@ -171,4 +171,15 @@ export class AuthenticationService {
          return res;
        }))
     }
+    
+    verifyEmailandCode(data){
+      const httpHeader = new HttpHeaders({
+        'Content-Type': 'application/json'        
+      })
+       return this.http.post<any>(`${environment.apiUrl}/api/Authorize/verifyurl`,data,{headers:httpHeader})
+       .pipe(map(res=>{
+         return res;
+       }))
+    }
+
 }

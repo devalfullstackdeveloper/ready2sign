@@ -1,8 +1,8 @@
 <!-- <section class="main-wrapper">
 
   <div class="page-content"> -->
-    <span class="notification" *ngIf="invited == true">
-      <span class="invited-user">User successfully invited</span>
+    <span class="notification" *ngIf="invited == true || userUpdate == true">
+      <span class="invited-user">{{Message}}</span>
     </span>
     <div class="page-header">
       <div class="header-left">
@@ -15,8 +15,9 @@
       </div>
 
       <div class="header-right">
-        <button class="invite-btn" *ngIf="displayForm == 'users' || displayForm == 'connectedApps'" (click)="displayModel()">Invite user</button>
-        <a href="#" class="search-btn"></a>
+        <!-- <button class="invite-btn" *ngIf="displayForm == 'users' || displayForm == 'connectedApps'" (click)="displayModel()">Invite user</button> -->
+        <a class="btn btn-green invite-user-btn pointer" *ngIf="displayForm == 'users' || displayForm == 'connectedApps'" (click)="displayModel()">Invite User</a>
+        <!-- <a href="#" class="search-btn"></a> -->
       </div>
     </div>
 
@@ -49,57 +50,66 @@
             <h3>{{companyProfileData.ExpiryDate | date}}</h3>
           </span>
         </div>
-        <form class="setting-form" #companyProfileForm="ngForm" (ngSubmit)="companyProfileForm.form.valid && onSubmit()" novalidate>
+        <form class="setting-form" #companyProfileForm="ngForm" (ngSubmit)="companyProfileForm.form.valid && companyProfileUpdate()" novalidate>
           <fieldset>
             <label>Company</label>
-            <input type="text"  class="focused form-control" placeholder=""
-            #Name="ngModel" [(ngModel)]="companyProfileData.Name" name="Name" required/>
-            <div *ngIf="companyProfileForm.submitted && Name.invalid" class="invalid-feedback">
-              <div *ngIf="Name.errors.required">Title is required</div>
-            </div>
+            <input type="text"  class="form-control" placeholder=""
+            #Name="ngModel" [(ngModel)]="companyProfileData.Name" name="Name" required
+            [ngClass]="{ 'focused': companyProfileForm.submitted && Name.invalid }"/>
+            <span *ngIf="companyProfileForm.submitted && Name.invalid" class="invalid-feedback error">
+              <span *ngIf="Name.errors.required">Title is required</span>
+            </span>
           </fieldset>
 
           <fieldset>
             <label>Phone</label>
-            <input type="number" name="Phone" class="form-control" placeholder="03 9859 3809"
-            #Phone="ngModel" [(ngModel)]="companyProfileData.Phone" required/>
-            <div *ngIf="companyProfileForm.submitted && Phone.invalid" class="invalid-feedback">
-              <div *ngIf="Phone.errors.required">Phone is required</div>
-            </div>
+            <input type="text" name="Phone" class="form-control" placeholder=""
+            #Phone="ngModel" [(ngModel)]="companyProfileData.Phone" required
+            pattern="^[0-9]*$"
+            oninput="validity.valid||(value='');"
+            [ngClass]="{ 'focused': companyProfileForm.submitted && Phone.invalid }"/>
+            <span *ngIf="companyProfileForm.submitted && Phone.invalid" class="invalid-feedback error">
+              <span *ngIf="Phone.errors.required">Phone is required</span>
+            </span>
           </fieldset>
 
           <fieldset>
             <label>Address</label>
-            <input type="text" name="StreetAddress" id="StreetAddress" class="form-control" placeholder="1539 Burke Road, North Balwyn VIC 3104"
-            #StreetAddress="ngModel" [(ngModel)]="companyProfileData.StreetAddress" required/>
-            <div *ngIf="companyProfileForm.submitted && StreetAddress.invalid" class="invalid-feedback">
-              <div *ngIf="StreetAddress.errors.required">address is required</div>
-            </div>
+            <input type="text" name="StreetAddress" id="StreetAddress" class="form-control" placeholder=""
+            #StreetAddress="ngModel" [(ngModel)]="companyProfileData.StreetAddress" required
+            [ngClass]="{ 'focused': companyProfileForm.submitted && StreetAddress.invalid }"/>
+            <span *ngIf="companyProfileForm.submitted && StreetAddress.invalid" class="invalid-feedback error">
+              <span *ngIf="StreetAddress.errors.required">Address is required</span>
+            </span>
           </fieldset>
 
           <fieldset>
             <label>Primary contact</label>
             <div class="custom-select form-control">
-              <select #PrimaryContactId="ngModel" [(ngModel)]="companyProfileData.PrimaryContactId" name="PrimaryContactId">
-                <option *ngFor="let admin of adminUsers">{{admin.name}}</option>
+              <select #PrimaryContactId="ngModel" [(ngModel)]="companyProfileData.PrimaryContactId" 
+              name="PrimaryContactId" 
+              [ngClass]="{ 'focused': companyProfileForm.submitted && PrimaryContactId.invalid }" >
+                <option value=null>Please select </option>
+                <option *ngFor="let admin of adminUsers" value=null>{{admin.name}}</option>
               </select>
             </div>
-            <div *ngIf="companyProfileForm.submitted && PrimaryContactId.invalid" class="invalid-feedback">
-              <div *ngIf="PrimaryContactId.errors.required">primaryContact is required</div>
-            </div>
+            <!-- <span *ngIf="companyProfileForm.submitted && PrimaryContactId.invalid" class="invalid-feedback error">
+              <span *ngIf="PrimaryContactId.errors.required">primaryContact is required</span>
+            </span> -->
           </fieldset>
 
           <fieldset>
             <label>Default email footer statement</label>
-            <textarea name="defaultEmail" #defaultEmail="ngModel" [(ngModel)]="companyProfileData.defaultEmail" rows="6" class="form-control"
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."></textarea>
-            <div *ngIf="companyProfileForm.submitted && defaultEmail.invalid" class="invalid-feedback">
-              <div *ngIf="defaultEmail.errors.required">defaultEmail is required</div>
-            </div>
+            <textarea placeholder="Start typing..." name="defaultEmail" #defaultEmail="ngModel" [(ngModel)]="companyProfileData.defaultEmail" rows="6" class="form-control"
+            [ngClass]="{ 'focused': companyProfileForm.submitted && defaultEmail.invalid }"
+           ></textarea>
+            <span *ngIf="companyProfileForm.submitted && defaultEmail.invalid" class="invalid-feedback error">
+              <span *ngIf="defaultEmail.errors.required">defaultEmail is required</span>
+            </span>
           </fieldset>
 
           <fieldset class="form-footer">
-            <button type="reset">Cancel</button>
+            <button class="pointer" type="button" (click)="cancelForm()">Cancel</button>
 
             <button type="submit" class="save btn-grey" >Save</button>
           </fieldset>
@@ -108,15 +118,23 @@
       <!-- section of users -->
       <section class="content-block" *ngIf="displayForm == 'users'">
         <div class="filter-table users-table">
-          <div class="wrapper-status-groups">
-            <span>status</span>
+          <div class="wrapper-status-groups status-search-wrap customm">
+            <span>
+            <select class="select-custom" name="status_user" [(ngModel)]="status_user" id="aantal" (change)="selectStatus($event)">
+              <option value="" selected hidden><span>status</span></option>
+              <option value="All">All</option>
+              <option value="2">Active</option>
+              <option value="3">Inactive</option>
+              <option value="1">Invited</option>
+           </select>
+            </span>
             <span>All groups</span>
             <div class="d-flex-between-top search-area">
               <div class="search-expanded">
-                <input type="search" name="" id="" class="search-field" placeholder="Search.." />
-                <div class="icons-wrap">
+                <input type="search" id="" class="search-field" (keyup.enter)="searchUser($event)" placeholder="Search users..." />
+                <!-- <div class="icons-wrap">
                   <button class="search-ico"></button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -134,35 +152,97 @@
             <tbody>
               <tr *ngFor="let user of allUsers,let i=index" [ngClass]="{'inactive-user-row' : user.UserStatus == 'Active' || user.UserStatus == 'InActive'}">
                 <td class="user-details pointer">
-                  <strong (click)="editUser(user)">{{user.FirstName}} {{user.LastName}}</strong><a href="mailto:{{user.Email}}">{{user.Email}}</a>
+                  <strong (click)="editUser(user)" *ngIf="!user.FirstName || !user.LastName">N/A</strong><strong (click)="editUser(user)" *ngIf="user.FirstName && user.LastName">{{user.FirstName}} {{user.LastName}}</strong><a href="mailto:{{user.Email}}">{{user.Email}}</a>
                 </td>
                 <td>
-                  {{user.RoleName}}
+                  <span *ngIf="user.RoleName">{{user.RoleName}}</span>  <span *ngIf="!user.RoleName">N/A</span>
                 </td>
                 <td>
-                  <time datetime="2020-05-23 14:23">{{user.LastSignIn | date:'dd/MM/yyyy HH:mm'}}</time>
+                  <span *ngIf="user.LastSignIn"><time >{{user.LastSignIn | date:'dd/MM/yyyy HH:mm'}}</time></span>
+                  <span *ngIf="!user.LastSignIn">N/A</span>
                 </td>
                 <td>
-                  <time datetime="2020-05-23 14:23">{{user.FirstSignIn | date:'dd/MM/yyyy HH:mm'}}</time>
+                  <span *ngIf="user.FirstSignIn"><time >{{user.FirstSignIn | date:'dd/MM/yyyy HH:mm'}}</time></span>
+                  <span *ngIf="!user.FirstSignIn">N/A</span>
                 </td>
-                <td class="status-active" *ngIf = "user.UserStatus == 'Invited'">{{user.UserStatus}}</td>
-                <td class="status-active setting-wrap" *ngIf = "user.UserStatus == 'Active' || user.UserStatus == 'InActive'">
-                  <div class="wrapper-block">
-                    <span>
+                <td class="status-active setting-wrap" *ngIf = "user.UserStatus == 'Active'">{{user.UserStatus}}
+                  
+                    <!-- <span>
                       {{user.UserStatus}}
-                    </span>
-                    <div class="info-popup-wrap">
+                    </span> -->
+                    <div class="wrapper-block">
+                    <div class="info-popup-wrap"  *ngIf = "user.UserStatus == 'Active'">
                       <a class="pointer" class="setting-dots" (click)="openActiveBox(i,user.Email)"></a>
                       <ul class="info-popup-sm" *ngIf="openActvBox == true && userIndex == i && user.Email == userMail">
                         <li class="delete"><a class="pointer" (click)="deleteUser(user)">delete</a></li>
-                        <li class="checkmark-ico" *ngIf = "user.UserStatus == 'InActive'"><a class="pointer" (click)="activateUser(user,1);openActiveBox(i,user.Email)">Activate</a></li>
+                        <!-- <li class="checkmark-ico" *ngIf = "user.UserStatus == 'Active'"><a class="pointer" (click)="activateUser(user,1);openActiveBox(i,user.Email)">Activate</a></li> -->
                         <li class="checkmark-ico" *ngIf = "user.UserStatus == 'Active'"><a class="pointer" (click)="activateUser(user,0);openActiveBox(i,user.Email)">Deactivate</a></li>
                       </ul>
                     </div>
                   </div>
                 </td>
+                <td class="status-active setting-wrap" *ngIf = "user.UserStatus == 'Invited' || user.UserStatus == 'InActive'">
+                  <span *ngIf="user.UserStatus == 'Invited'">
+                    Invited
+                  </span>
+                  <span *ngIf="user.UserStatus == 'InActive'">
+                    Inactive
+                  </span>
+                  <div class="wrapper-block">
+                    
+                    <div class="info-popup-wrap"  *ngIf = "user.UserStatus == 'InActive'">
+                      <a class="pointer" class="setting-dots" (click)="openActiveBox(i,user.Email)"></a>
+                      <ul class="info-popup-sm" *ngIf="openActvBox == true && userIndex == i && user.Email == userMail">
+                        <li class="delete"><a class="pointer" (click)="deleteUser(user)">delete</a></li>
+                        <li class="checkmark-ico" *ngIf = "user.UserStatus == 'InActive'"><a class="pointer" (click)="activateUser(user,1);openActiveBox(i,user.Email)">Activate</a></li>
+                        <!-- <li class="checkmark-ico" *ngIf = "user.UserStatus == 'Active'"><a class="pointer" (click)="activateUser(user,0);openActiveBox(i,user.Email)">Deactivate</a></li> -->
+                      </ul>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="allUsers.length == 0">
+                <td colspan="5" align="center">No Data Found</td>
               </tr>
             </tbody>
+            <!-- <tbody>
+              <tr *ngFor="let user of allUsers,let i=index" [ngClass]="{'inactive-user-row' : user.Id == selectedId}" (click)="selectedRow(user.Id)">
+                <td class="user-details pointer">
+                  <strong (click)="editUser(user)" *ngIf="!user.FirstName || !user.LastName || user.FirstName=='' || user.LastName==''">N/A</strong><strong (click)="editUser(user)" *ngIf="user.FirstName && user.LastName">{{user.FirstName}} {{user.LastName}}</strong><a href="mailto:{{user.Email}}">{{user.Email}}</a>
+                </td>
+                <td>
+                  <span *ngIf="user.RoleName">{{user.RoleName}}</span>  <span *ngIf="!user.RoleName">N/A</span>
+                </td>
+                <td>
+                  <span *ngIf="user.LastSignIn"><time >{{user.LastSignIn | date:'dd/MM/yyyy HH:mm'}}</time></span>
+                  <span *ngIf="!user.LastSignIn">N/A</span>
+                </td>
+                <td>
+                  <span *ngIf="user.FirstSignIn"><time >{{user.FirstSignIn | date:'dd/MM/yyyy HH:mm'}}</time></span>
+                  <span *ngIf="!user.FirstSignIn">N/A</span>
+                </td>
+                
+                <td class="status-active" *ngIf = "user.UserStatus == 'Invited'">{{user.UserStatus}}
+                <td class="status-active" [ngClass]="{'setting-wrap': (user.Id == selectedId) && (user.UserStatus == 'Inactive' || user.UserStatus == 'Active')}"
+                *ngIf = "user.UserStatus == 'Inactive' || user.UserStatus == 'Active'">
+                  <div class="wrapper-block" *ngIf="(user.Id == selectedId) && (user.UserStatus == 'Inactive' || user.UserStatus == 'Active')">
+                    <span>
+                      {{user.UserStatus}}
+                    </span>
+                    <div class="info-popup-wrap"  *ngIf = "user.UserStatus == 'InActive'">
+                      <a class="pointer" class="setting-dots" (click)="openActiveBox(i,user.Email)"></a>
+                      <ul class="info-popup-sm" *ngIf="openActvBox == true && userIndex == i && user.Email == userMail">
+                        <li class="delete"><a class="pointer" (click)="deleteUser(user)">delete</a></li>
+                        <li class="checkmark-ico" *ngIf = "user.UserStatus == 'InActive'"><a class="pointer" (click)="activateUser(user,1);openActiveBox(i,user.Email)">Activate</a></li>                        
+                      </ul>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="allUsers.length == 0">
+                <td colspan="5" align="center">No Data Found</td>
+              </tr>
+            </tbody> -->
             <!-- <tfoot>
               <div class="right">
                 <div class="pagination pagination-sm">
@@ -182,10 +262,10 @@
                </select>
             </div>
             </div> -->
-            <div class="right">
+            <div class="right" *ngIf="numberArray.length > 0">
               <div class="pagination pagination-sm">
                 <a href="javascript:void(0);" (click)="leftArrow()">&laquo;</a>
-                <a href="javascript:void(0);" *ngFor = "let number of numberArray" (click)="pageNoClick($event,number)" [ngClass]="{'active' : number == activePage }">{{number}}</a>              
+                <a href="javascript:void(0);" *ngFor = "let number of numberArray" (click)="pageNoClick($event,number)" [ngClass]="{'active' : number == activePage }">{{number}}</a>
                 <a href="javascript:void(0);" (click)="rightArrow()">&raquo;</a>
               </div>
             </div> 
@@ -197,7 +277,12 @@
       <section class="content-block" *ngIf="displayForm == 'connectedApps'">
         <div class="filter-table users-table">
           <div class="wrapper-status-groups status-search-wrap">
-            <span>status</span>
+            <span><select name="status_user" [(ngModel)]="status_user" id="aantal" class="select-custom" (change)="selectStatusApps($event)">
+              <option value="" selected hidden><span>status</span></option>
+              <option value="All">All</option> 
+              <option value="1">Active</option> 
+              <option value="0">Inactive</option>
+            </select></span>
 
             <div class="d-flex-between-top search-area">
               <div class="search-expanded">
@@ -206,38 +291,39 @@
                   name=""
                   id=""
                   class="search-field"
-                  placeholder="Search.."
+                  placeholder="Search Apps..."
+                  (keyup.enter)="searchApps($event)"
                 />
-                <div class="icons-wrap">
+                <!-- <div class="icons-wrap">
                   <button class="search-ico"></button>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
           <table>
             <thead>
               <tr class="filter-head">
-                <th>App <span class="filter-ico filtered"></span></th>
+                <th (click)="appsFilterBy('App')">App <span class="filter-ico" [ngClass]="{'filtered' : propertyFilter.app_srt  == true}"></span></th>
 
-                <th>Status <span class="filter-ico"></span></th>
+                <th (click)="appsFilterBy('Status')">Status <span class="filter-ico" [ngClass]="{'filtered' : propertyFilter.status_srt  == true}"></span></th>
               </tr>
             </thead>
 
             <tbody>
               <tr>
                 <td class="user-details apps-link-wrap">
-                  <a href="#" class="apps-link"></a>
+                  <a class="apps-link"></a>
                   <span>
                     <strong>PropertyMe</strong
-                    ><a href="#">www.propertyme.com.au</a>
+                    ><a>www.propertyme.com.au</a>
                   </span>
                 </td>
 
                 <td class="status-active">
                   <div class="btn-group form-control button-wrapper">
-                    <!-- <button class="green-btn" (click)="propertyOn()">on</button> -->
-                    <button (click)="propertyOn()">on</button>
-                    <button class="grey-btn">off</button>
+                    <!-- <button class="green-btn" (click)="propertyOn()">on</button> -->                    
+                    <button (click)="propertyOn()" [ngClass]="{'green-btn' : activeApp == true}">on</button>
+                    <button class="" [ngClass]="{'grey-btn' : InactiveApp == true}">off</button>
                   </div>
                 </td>
                 <td></td>
@@ -246,7 +332,7 @@
                 <td></td>
               </tr>
 
-              <tr class="active-row-connec-app">
+              <!-- <tr class="active-row-connec-app">
                 <td class="user-details apps-link-wrap active">
                   <a href="#" class="apps-link"></a>
                   <span>
@@ -266,30 +352,36 @@
                 <td></td>
                 <td></td>
                 <td></td>
-              </tr>
+              </tr> -->
             </tbody>
           </table>
         </div>
       </section>
     </div>
 
-  <div class="site-search-wrapper add-User-block" *ngIf="showInviteModel == true" >
+  <div class="site-search-wrapper  add-user-block" *ngIf="showInviteModel == true" >
     <div class="card">
       <div class="contianer-sm">
         <button class="close" (click)="displayModel()"></button>
         <h2>Add user</h2>
-        <form class="setting-form add-user-form" #inviteUserForm="ngForm" >
+        <form class="setting-form add-user-form" #inviteUserForm="ngForm" (ngSubmit)="inviteUserForm.form.valid && sendInvitation(inviteUserForm)">
           <fieldset>
             <label>First name</label>
             <input
               type="text"
               id="firstName_invite"
-              class="form-control"
-              placeholder="Jack"
+              class="form-control" [ngClass]="{ 'focused': inviteUserForm.submitted && firstName_invite.invalid }"
+              placeholder=""
               [(ngModel)] = "inviteUserJson.FirstName"
-              #firstName = "ngModel"
+              #firstName_invite = "ngModel"
               name="firstName_invite"
+              required
+              pattern="[A-za-z]*$"
             />
+            <span class="error" *ngIf="inviteUserForm.submitted && firstName_invite.invalid">
+              <span *ngIf="firstName_invite.errors.required">First name is required</span>
+              <span *ngIf="firstName_invite.errors.pattern">Enter valid first name</span>
+            </span>
           </fieldset>
 
           <fieldset>
@@ -298,11 +390,17 @@
               type="text"
               name="LastName_invite"
               id="LastName_invite"
-              class="form-control"
-              placeholder="Silvagni"
+              class="form-control" [ngClass]="{ 'focused': inviteUserForm.submitted && LastName_invite.invalid }"
+              placeholder=""
               [(ngModel)] = "inviteUserJson.LastName"
-              #LastName_invite = "ngModel"
+              #LastName_invite = "ngModel"              
+              required
+              pattern="[A-Za-z]*$"
             />
+            <span class="error" *ngIf="inviteUserForm.submitted && LastName_invite.invalid">
+              <span *ngIf="LastName_invite.errors.required">Last name is required</span>
+              <span *ngIf="LastName_invite.errors.pattern">Enter valid last name</span>
+            </span>
           </fieldset>
 
           <fieldset>
@@ -311,37 +409,57 @@
               type="text"
               name="email_invite"
               id="email_invite"
-              class="focused form-control"
+              class="form-control" [ngClass]="{ 'focused': inviteUserForm.submitted && email_invite.invalid }"
               placeholder=""
               [(ngModel)] = "inviteUserJson.email"
               #email_invite = "ngModel"
+              required
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
             />
+            <span class="error" *ngIf="inviteUserForm.submitted && email_invite.invalid">
+              <span *ngIf="email_invite.errors.required">Email is required</span>
+              <div *ngIf="email_invite.errors?.pattern">Email must be a valid email</div>
+            </span>
+            
           </fieldset>
 
           <fieldset>
             <label>Mobile</label>
             <input
-              type="number"
+              type="text"
               name="mobile_invite"
               id="mobile_invite"
-              class="form-control"
+              class="form-control" [ngClass]="{ 'focused': inviteUserForm.submitted && mobile_invite.invalid }"
               placeholder=""
               [(ngModel)] = "inviteUserJson.MobileNumber"
               #mobile_invite = "ngModel"
+              required              
+              pattern="^[0-9]*$"
+              maxlength="10"
+              oninput="validity.valid||(value='');"
             />
+            <span class="error" *ngIf="inviteUserForm.submitted && mobile_invite.invalid">
+              <span *ngIf="mobile_invite.errors.required">Mobile number is required</span>
+              <span *ngIf="mobile_invite.errors?.pattern">Enter valid mobile number</span>
+            </span>
           </fieldset>
 
           <fieldset>
             <label>Work phone</label>
             <input
-              type="number"
+              type="text"
               name="work_phone"
               id="work_phone"
               class="form-control"
               placeholder=""
               [(ngModel)] = "inviteUserJson.Phone"
-              #work_phone = "ngModel"
+              #work_phone = "ngModel"    
+              pattern="[0-9]*$"
+              oninput="validity.valid||(value='');"
             />
+            <span class="error" *ngIf="inviteUserForm.submitted && work_phone.invalid">              
+              <span *ngIf="work_phone.errors?.pattern">Enter valid number</span>
+            </span>
           </fieldset>
 
           <fieldset>
@@ -373,18 +491,18 @@
           <fieldset>
             <label>Access level</label>
             <div class="btn-group form-control">
-              <button (click)="changeAccessLevel('Admin')" [ngClass]="{'btn-active' : access_level == 'Admin'}">Admin</button>
-              <button (click)="changeAccessLevel('Manager')" [ngClass]="{'btn-active' : access_level == 'Manager'}">Manager</button>
-              <button (click)="changeAccessLevel('Standard')" [ngClass]="{'btn-active' : access_level == 'Standard'}">Standard</button>
+              <button type="button" (click)="changeAccessLevel('Admin')" [ngClass]="{'btn-active' : access_level == 'Admin'}">Admin</button>
+              <button type="button" (click)="changeAccessLevel('Manager')" [ngClass]="{'btn-active' : access_level == 'Manager'}">Manager</button>
+              <button type="button" (click)="changeAccessLevel('Standard')" [ngClass]="{'btn-active' : access_level == 'Standard'}">Standard</button>
             </div>
           </fieldset>
 
-          <fieldset class="groups-block">
+          <fieldset class="groups-block" >
             <label>Groups</label>
-            <div class="btn-group form-control">
+            <div class="btn-group form-control chkboxBlock">
 
-              <div class="custom-checkbox">
-                <input type="checkbox" id="1" (change)="changeGroup(1,$event.target.checked)" name="Default">
+              <div class="custom-checkbox disabled-checkbox" readonly>
+                <input type="checkbox" id="1" (change)="changeGroup(1,$event.target.checked)" name="Default" checked readonly>
                 <label for="1">Default</label>
               </div>
 
@@ -398,14 +516,14 @@
           <fieldset>
             <label>Status</label>
             <div class="btn-group form-control disabled-contenct" >
-              <button [ngClass]="{'btn-active' : statusInInviteUser == 1}">Active</button>
-              <button [ngClass]="{'btn-active' : statusInInviteUser == 0}">Inactive</button>
+              <button type="button"  [ngClass]="{'btn-active' : statusInInviteUser == 1}">Active</button>
+              <button type="button"  [ngClass]="{'btn-active' : statusInInviteUser == 0}">Inactive</button>
             </div>
           </fieldset>
 
           <fieldset class="form-footer">
-            <button (click)="displayModel()">Cancel</button>
-            <button class="save" type="submit" (click)="sendInvitation()">Send Invitation</button>
+            <button type="button" class="pointer" (click)="displayModel()">Cancel</button>
+            <button class="save save-hvr save-ico" type="submit" >Send Invitation</button>
           </fieldset>
 
         </form>
@@ -414,22 +532,26 @@
     </div>
   </div>
 
-  <div class="site-search-wrapper add-User-block" *ngIf="edtUsr == true && userData">
+  <div class="site-search-wrapper add-user-block" *ngIf="edtUsr == true && userData">
     <div class="card">
       <div class="contianer-sm">
         <button class="close" (click)="displayEditModel()"></button>
         <h2>Edit user</h2>
-        <form class="setting-form add-user-form" #editUserForm="ngForm" >
+        <form class="setting-form add-user-form" #editUserForm="ngForm" (ngSubmit)="editUserForm.form.valid && updateUser()">
           <fieldset>
             <label>First name</label>
             <input
               type="text"
               id="FirstName_edit"
-              class="form-control"
+              class="form-control focused" [ngClass]="{ 'focused': editUserForm.submitted && FirstName_edit.invalid }"
               [(ngModel)] = "userData.FirstName"
               #FirstName_edit = "ngModel"
               name="FirstName_edit"
-            />
+              required
+            />            
+            <span class="error" *ngIf="editUserForm.submitted && FirstName_edit.invalid">              
+              <span *ngIf="FirstName_edit.errors.required">First name is required</span>
+            </span>
           </fieldset>
 
           <fieldset>
@@ -437,11 +559,16 @@
             <input
               type="text"
               name="LastName_edit"
-              id="LastName_edit"
-              class="form-control"
+              id="LastName_edit" 
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && LastName_edit.invalid }"
               [(ngModel)] = "userData.LastName"
               #LastName_edit = "ngModel"
+              required
             />
+            <span class="error" *ngIf="editUserForm.submitted && LastName_edit.invalid">
+              <span *ngIf="LastName_edit.errors.required">Last name is required</span>
+              <span *ngIf="LastName_edit.errors.pattern">Enter valid last name</span>
+            </span>
           </fieldset>
 
           <fieldset>
@@ -450,36 +577,48 @@
               type="text"
               name="email_edit"
               id="email_edit"
-              class="focused form-control"
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && email_edit.invalid }"
               placeholder=""
               [(ngModel)] = "userData.Email"
               #email_edit = "ngModel"
+              required
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
             />
+            <span class="error" *ngIf="editUserForm.submitted && email_edit.invalid">
+              <span *ngIf="email_edit.errors.required">Email is required</span>
+              <div *ngIf="email_edit.errors?.pattern">Email must be a valid email</div>
+            </span>
           </fieldset>
 
           <fieldset>
             <label>Mobile</label>
             <input
-              type="number"
+              type="text"
               name="mobile_edit"
               id="mobile_edit"
-              class="form-control"
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && mobile_edit.invalid }"
               placeholder=""
               [(ngModel)] = "userData.MobileNumber"
               #mobile_edit = "ngModel"
+              required
+              pattern="^[0-9]*$"
+              maxlength="10"
+              oninput="validity.valid||(value='');"
             />
           </fieldset>
 
           <fieldset>
             <label>Work phone</label>
             <input
-              type="number"
+              type="text"
               name="work_phone_edit"
               id="work_phone_edit"
-              class="form-control"
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && work_phone_edit.invalid }"
               placeholder=""
               [(ngModel)] = "userData.PhoneNumber"
               #work_phone_edit = "ngModel"
+              pattern="^[0-9]*$"
+              oninput="validity.valid||(value='');"
             />
           </fieldset>
 
@@ -489,7 +628,7 @@
               type="text"
               name="branch_edit"
               id="branch_edit"
-              class="form-control"
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && branch_edit.invalid }"
               placeholder=""
               [(ngModel)] = "userData.Branch"
               #branch_edit = "ngModel"
@@ -502,7 +641,7 @@
               type="text"
               name="position_edit"
               id="position_edit"
-              class="form-control"
+              class="form-control" [ngClass]="{ 'focused': editUserForm.submitted && position_edit.invalid }"
               placeholder=""
               [(ngModel)] = "userData.Position"
               #position_edit = "ngModel"
@@ -512,15 +651,15 @@
           <fieldset>
             <label>Access level</label>
             <div class="btn-group form-control">
-              <button (click)="changeAccessLevelEdit('Admin')" [ngClass]="{'btn-active' : access_level_edit == 'Admin'}">Admin</button>
-              <button (click)="changeAccessLevelEdit('Manager')" [ngClass]="{'btn-active' : access_level_edit == 'Manager'}">Manager</button>
-              <button (click)="changeAccessLevelEdit('Standard')" [ngClass]="{'btn-active' : access_level_edit == 'Standard'}">Standard</button>
+              <button type="button" (click)="changeAccessLevelEdit('Admin')" [ngClass]="{'btn-active' : access_level_edit == 'Admin'}">Admin</button>
+              <button type="button" (click)="changeAccessLevelEdit('Manager')" [ngClass]="{'btn-active' : access_level_edit == 'Manager'}">Manager</button>
+              <button type="button" (click)="changeAccessLevelEdit('Standard')" [ngClass]="{'btn-active' : access_level_edit == 'Standard'}">Standard</button>
             </div>
           </fieldset>
 
           <fieldset class="groups-block">
             <label>Groups</label>
-            <div class="btn-group form-control">
+            <div class="btn-group form-control chkboxBlock">
 
               <div class="custom-checkbox">
                 <input type="checkbox" id="1" (change)="changeGroupEdit(1,$event.target.checked,userData)" [checked]="dflt" name="Default">
@@ -548,22 +687,28 @@
             </div>
           </fieldset>
 
-          <fieldset class="reset-ps">
+          <fieldset class="reset-ps" *ngIf="statusInEditUser !== 1">
             <label>Password reset</label>
-            <button class="send-reset-link" (click)="sendResetLink(userData)">Send reset link</button>
+            <button type="button" name="sendLink" id="sendLink" class="send-reset-link" (click)="sendResetLink(userData)">Send reset link</button>
           </fieldset>
 
-          <fieldset>
+          <fieldset >
             <label>Status</label>
-            <div class="btn-group form-control" >
-              <button (click)="changeStatusEdit(1)" [ngClass]="{'btn-active' : statusInEditUser == 1}">Active</button>
-              <button (click)="changeStatusEdit(0)" [ngClass]="{'btn-active' : statusInEditUser == 0}">Inactive</button>
+            <div class="btn-group form-control" [ngClass]="{'disabled-contenct' : statusInEditUser == 1}">
+              <button type="button" (click)="changeStatusEdit(2)" class="pointer" [ngClass]="{'btn-active' : statusInEditUser == 2}">Active</button>
+              <button type="button" (click)="changeStatusEdit(3)" class="pointer" [ngClass]="{'btn-active' : statusInEditUser == 3 || statusInEditUser == 1}">Inactive</button>
+              <!-- disable button -->
+              <!-- <button type="button" (click)="changeStatusEdit(2)" [ngClass]="{'btn-active' : statusInEditUser == 2}">Active</button> -->
+              <!-- <button type="button" (click)="changeStatusEdit(3)" [ngClass]="{'btn-active' : statusInEditUser == 3 || statusInEditUser == 1}">Inactive</button> -->
+              
             </div>
           </fieldset>
+          
 
           <fieldset class="form-footer">
-            <button (click)="displayEditModel()">Cancel</button>
-            <button class="save" type="submit" (click)="updateUser()">Send Invitation</button>
+            <button (click)="displayEditModel()" class="pointer" type="button">Cancel</button>
+            <button class="save save-ico" type="submit" name="saveUser" id="saveUser"
+            >Save</button>
           </fieldset>
 
         </form>
