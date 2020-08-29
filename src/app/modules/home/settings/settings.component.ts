@@ -95,6 +95,12 @@ export class SettingsComponent implements OnInit, AfterViewInit {
   code : any;
   activeApp : boolean = true;
   InactiveApp : boolean = false;
+ 
+  validControl : any= {
+    titleValid : true,
+    addressValid : true,
+    isValid : true
+  };
   constructor(private location: Location,private activeRoute:ActivatedRoute, private settings:SettingsService,private authenticationService:AuthenticationService,private alertService:AlertService) {
       console.log("Constructure Calling-----", (<any>window).activeAcountNumber);
     this.accountNumber = (<any>window).activeAcountNumber;
@@ -155,10 +161,46 @@ export class SettingsComponent implements OnInit, AfterViewInit {
       })
     }    
   }
+  checkStringEmptry(type){
+    console.log("type---",type);    
+    if(this.companyProfileData.Name){
+      let titleValid = false;
+      const valueNoWhiteSpace = this.companyProfileData.Name.trim();
+      titleValid = valueNoWhiteSpace === this.companyProfileData.Name;     
+      titleValid ? null : { whitespace: true };
+      console.log("tru false==",titleValid); 
+      this.validControl.titleValid = titleValid;
+    }
+    if(this.companyProfileData.StreetAddress){
+      let addressValid = false;
+      const valueNoWhiteSpace = this.companyProfileData.StreetAddress.trim();
+      addressValid = valueNoWhiteSpace === this.companyProfileData.StreetAddress;     
+      addressValid ? null : { whitespace: true };
+      console.log("tru false==",addressValid);
+      this.validControl.addressValid = addressValid;
+    }
+    if(this.companyProfileData.defaultEmail){
+      let emailFooterValid = false;
+      const valueNoWhiteSpace = this.companyProfileData.defaultEmail.trim();
+      emailFooterValid = valueNoWhiteSpace === this.companyProfileData.defaultEmail;     
+      emailFooterValid ? null : { whitespace: true };
+      console.log("tru false==",emailFooterValid);
+      this.validControl.emailFooterValid = emailFooterValid
+    }
+    if(this.validControl.titleValid == true && this.validControl.addressValid == true ){
+      this.validControl.isValid = true;
+    }
+    else{
+      this.validControl.isValid = false;
+    }
+    console.log("valid control-----",this.validControl.isValid);
+  }
 
   companyProfileUpdate(){
-    // alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.companyProfileData, null, 4));
+    // alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.companyProfileData, null, 4));    
     this.companyProfileData.PrimaryContactId = null;
+    console.log("company data===",this.companyProfileData);
+
     this.settings.updateCompanyProfile(this.companyProfileData).subscribe(res=>{
       console.log("updated---",res);
       this.alertService.successPage(res);

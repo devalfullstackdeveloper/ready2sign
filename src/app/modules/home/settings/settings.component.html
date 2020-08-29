@@ -50,15 +50,17 @@
             <h3>{{companyProfileData.ExpiryDate | date}}</h3>
           </span>
         </div>
-        <form class="setting-form" #companyProfileForm="ngForm" (ngSubmit)="companyProfileForm.form.valid && companyProfileUpdate()" novalidate>
+        <form class="setting-form" #companyProfileForm="ngForm" (ngSubmit)="validControl.isValid && companyProfileForm.form.valid && companyProfileUpdate()" novalidate>
           <fieldset>
             <label>Company</label>
             <input type="text"  class="form-control" placeholder=""
             #Name="ngModel" [(ngModel)]="companyProfileData.Name" name="Name" required
-            [ngClass]="{ 'focused': companyProfileForm.submitted && Name.invalid }"/>
+            [ngClass]="{ 'focused': (companyProfileForm.submitted && Name.invalid) ||  (validControl.titleValid == false)}"
+            (keyup)="checkStringEmptry('Name')"/>
             <span *ngIf="companyProfileForm.submitted && Name.invalid" class="invalid-feedback error">
               <span *ngIf="Name.errors.required">Title is required</span>
             </span>
+            <span class="invalid-feedback error" *ngIf="validControl.titleValid == false">Title is not valid</span>
           </fieldset>
 
           <fieldset>
@@ -77,10 +79,12 @@
             <label>Address</label>
             <input type="text" name="StreetAddress" id="StreetAddress" class="form-control" placeholder=""
             #StreetAddress="ngModel" [(ngModel)]="companyProfileData.StreetAddress" required
-            [ngClass]="{ 'focused': companyProfileForm.submitted && StreetAddress.invalid }"/>
+            [ngClass]="{ 'focused': (companyProfileForm.submitted && StreetAddress.invalid) || (validControl.addressValid == false) }"
+            (keyup)="checkStringEmptry('StreetAddress')"/>
             <span *ngIf="companyProfileForm.submitted && StreetAddress.invalid" class="invalid-feedback error">
               <span *ngIf="StreetAddress.errors.required">Address is required</span>
             </span>
+            <span class="invalid-feedback error" *ngIf="validControl.addressValid == false">Address is not valid</span>
           </fieldset>
 
           <fieldset>
