@@ -1,0 +1,449 @@
+<!-- <p>templates works!</p> -->
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="ball-clip-rotate" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>
+
+<div class="page-header">
+  <div class="header-left">
+    <div class="collapse-sidebar" (click)="toggleSidebar()">
+      <span class="icon-arrow-left"></span>
+      <button type="button" class="sidebar-toggle"></button>
+    </div>
+
+    <span class="user-name">{{companyProfileData.Name}}</span>
+  </div>
+
+  <div class="header-right">
+    <a (click)="clickedCreateTemplate()" class="btn btn-green create-doc pointer">Create Template</a>
+
+    <!-- <a href="javascript:void(0);" class="search-btn"></a> -->
+  </div>
+</div>
+
+<!-- Content area -->
+<div class="content-area">
+  <div class="left-sidebar-block">
+    <h2>Templates</h2>
+    <ul class="folder-list">
+      <li *ngFor="let sidebar of sidebarData" [ngClass]="{'active folder-blue-ico':displayForm == sidebar.StatusName}"
+        class="active"><a href="javascript:void(0);"
+          (click)="setDisplay(sidebar.StatusName,sidebar.StatusId)">{{sidebar.StatusName}} <span
+            class="right-count">{{sidebar.Count}}</span></a></li>
+    </ul>
+  </div>
+
+  <section class="content-block">
+    <div class="filter-table users-table">
+      <div class="wrapper-status-groups">
+        <div class="d-flex-between-top search-area">
+          <div class="search-expanded">
+            <input type="search" name="" id="" [(ngModel)]="searchText" class="search-field" placeholder="Search title"
+              (keyup.enter)="searchTemplate(searchText)" />
+            <a (click)="searchTemplate(searchText)" title="search" class="srch-btn"></a>
+          </div>
+        </div>
+        <div class="select-box">
+          <ng-select [(ngModel)]="templateFilter.selectedGroup"
+            [placeholder]="templateFilter.selectedGroup ? '' : ''" (change)="groupChange($event)">
+            <ng-option value=''>All groups</ng-option>
+            <ng-option *ngFor="let grp of activeGroups" [value]=grp.Id>{{grp.Name}}</ng-option>
+          </ng-select>
+        </div>
+        <!-- <select [(ngModel)]="templateFilter.selectedGroup" (change)="groupChange($event.target.value)">
+          <option value =''>All groups</option>
+          <option *ngFor="let grp of activeGroups" [value]=grp.Id>{{grp.Name}}</option>
+        </select> -->
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Title <span [ngClass]="templateFilter.title ? 'dropup-arrow' : 'dropdown-arrow'"
+                (click)="filterBy('Title')"></span></th>
+            <!-- <th class="txt-center">Permission <span [ngClass]="templateFilter.isLocked ? 'dropup-arrow' : 'dropdown-arrow'"  (click)="filterBy('IsLocked')"></span></th> -->
+            <th>Created <span [ngClass]="templateFilter.created ? 'dropup-arrow' : 'dropdown-arrow'"
+                (click)="filterBy('Created')"></span></th>
+            <th>Modified <span [ngClass]="templateFilter.modified ? 'dropup-arrow' : 'dropdown-arrow'"
+                (click)="filterBy('Modified')"></span></th>
+            <th>Groups </th>
+            <th>Status <span [ngClass]="templateFilter.status ? 'dropup-arrow' : 'dropdown-arrow'"
+                (click)="filterBy('Status')"></span></th>
+            <th class="txt-center">Permission <span
+                [ngClass]="templateFilter.isLocked ? 'dropup-arrow' : 'dropdown-arrow'"
+                (click)="filterBy('IsLocked')"></span></th>
+            <th class="padding-r8">Linked</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let template of dataSource;let j = index" class="pointer">
+            <!-- <td [ngClass]="(template.IsLocked)?'locked':'unlocked'" *ngIf="template.Title" (click)="editTemplate(template.Id)">{{template.Title}}</td> -->
+            <td *ngIf="template.Title" (click)="editTemplate(template.Id)">
+              <p class="title_brk">{{template.Title}}</p>
+            </td>
+            <!-- <td class="centerLock" (click)="editTemplate(template.Id)" [ngClass]="(template.IsLocked)?'locked':''" ></td> -->
+            <!-- <td *ngIf="!template.Title"></td> -->
+            <td (click)="editTemplate(template.Id)">
+              <time *ngIf="template.CreatedAt">{{template.CreatedAt}}</time>
+              <time *ngIf="!template.CreatedAt"></time>
+              <span>{{template.CreatedUser}}</span>
+            </td>
+            <td (click)="editTemplate(template.Id)">
+              <time *ngIf="template.ModifiedAt">{{template.ModifiedAt}}</time>
+              <time *ngIf="!template.ModifiedAt"></time>
+              <span>{{template.ModifiedUser}}</span>
+            </td>
+            <td class="default-cursor">
+              <ng-container *ngFor="let grp of template.Groups;let i=index">
+                <span *ngIf="i == 0 || i == 1" class="numbers group g{{i+1}}">{{firstCharecter(grp.Name)}}</span>
+                <span *ngIf="i == 2" class="numbers group g{{i+1}}"> +{{template.Groups.length - 2}}</span>
+              </ng-container>
+              <!-- <span class="numbers group g2">P</span>
+              <span class="numbers group g3">13</span> -->
+              <ul class="group-popup">
+                <li *ngFor="let group of template.Groups">{{group.Name}}</li>
+                <!-- <li>Group 2</li>
+                <li>Group 3</li> -->
+              </ul>
+            </td>
+            <!-- <td *ngIf="!template.Groups"></td> -->
+            <td (click)="editTemplate(template.Id)">
+              <span class="status-report" *ngIf="template.TemplateStatus">{{template.TemplateStatus}}</span>
+              <span *ngIf="!template.TemplateStatus"></span>
+            </td>
+            <td class="centerLock" (click)="editTemplate(template.Id)"
+              [ngClass]="(template.IsLocked)?'locked':''"></td>
+            <td>
+              <div class="info-popup-wrap setting-wrap" (clickOutside)="onClickedOutside(j)">
+                <!-- <a *ngIf="template.IsLinked" href="javascript:void(0);" class="link"></a> -->
+                <a href="javascript:void(0);" *ngIf="template.IsLinked" [class.disableImg]="propertyMeStatus == false" class="link">
+                    <img src="assets/images/propertyme-link.png" class="img-fluid" alt="" />
+                  </a>
+                <a *ngIf="propertyMeStatus == true" class="setting-dots pointer" (click)="selectOption(j)"></a>
+                <a *ngIf="propertyMeStatus == false && template.IsLinked !== true" class="setting-dots pointer"
+                  (click)="selectOption(j)"></a>
+
+                <ul class="info-popup-sm" *ngIf="template.dropdown">
+                  <li *ngIf="template.IsLocked" (click)="editTemplate(template.Id)"><a
+                      href="javascript:void(0);" class="pointer">View</a></li>
+                  <li *ngIf="!template.IsLocked" class="edit-doc"
+                    (click)="editTemplate(template.Id)"><a href="javascript:void(0);"
+                      class="pointer">Edit</a></li>
+                  <li
+                    *ngIf="!template.IsLocked && (template.TemplateStatus == 'Archive' || template.TemplateStatus == 'Archived' || template.TemplateStatus == 'Draft') && (userProfile.Id == template.Author)"
+                    class="delete" (click)="deletePopupChange(template.Id)"><a href="javascript:void(0);"
+                      class="pointer">Delete</a></li>
+                  <li class="duplicate" (click)="duplicateTemplate(template.Id)"><a href="javascript:void(0);"
+                      class="pointer">Duplicate</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="allTemplate.length == 0">
+            <td *ngIf="!isLoading" colspan="7" style="text-align: center;">No records found</td>
+            <td *ngIf="isLoading" colspan="7" style="text-align: center;">Loading your data</td>
+          </tr>
+
+          <!-- <tr>
+            <td class="locked">Property agreement xyz</td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <span class="numbers group g1">D</span>
+              <span class="numbers group g2">P</span>
+              <span class="numbers group g3">13</span>
+              <ul class="group-popup">
+                <li>Group 1</li>
+                <li>Group 2</li>
+                <li>Group 3</li>
+              </ul>
+            </td>
+            <td>
+              <span class="status-report">Published</span>
+             </td>
+            <td><a href="#" class="link"></a></td>
+          </tr>
+
+          <tr>
+            <td class="locked">Property agreement xyz</td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <span class="numbers group g1">D</span>
+              <ul class="group-popup">
+                <li>Group 1</li>
+              </ul>
+            </td>
+            <td>
+              <span class="status-report">Archived</span>
+             </td>
+            <td><a href="#" class="link"></a></td>
+          </tr>
+
+          <tr>
+            <td>Property agreement xyz</td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <span class="numbers group g1">D</span>
+              <span class="numbers group g2">P</span>
+              <ul class="group-popup">
+                <li>Group 1</li>
+                <li>Group 2</li>
+              </ul>
+            </td>
+            <td>
+              <span class="status-report">Draft</span>
+             </td>
+            <td><a href="#" class="link"></a></td>
+          </tr>
+
+          <tr>
+            <td class="locked">Property agreement xyz</td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
+            </td>
+            <td>
+              <span class="numbers group g1">D</span>
+              <span class="numbers group g2">P</span>
+              <span class="numbers group g3">13</span>
+              <ul class="group-popup">
+                <li>Group 1</li>
+                <li>Group 2</li>
+                <li>Group 3</li>
+              </ul>
+            </td>
+            <td>
+              <span class="status-report">Archived</span>
+             </td>
+            <td><a href="#" class="link"></a></td>
+          </tr> -->
+        </tbody>
+      </table>
+
+      <mat-paginator #paginator [length]="allTemplate.length"
+          showFirstLastButtons
+          [pageSize]="pageSize"
+          [pageIndex]="currentPage"
+          [hidePageSize]="true"
+          (page)="handlePage($event)">
+      </mat-paginator>
+      <!-- <div>
+        <div class="right" *ngIf="numberArray.length > 0">
+          <div class="pagination pagination-sm">
+            <a href="javascript:void(0);" (click)="leftArrow()">&laquo;</a>
+            <a href="javascript:void(0);" *ngFor = "let number of numberArray" (click)="pageNoClick($event,number)" [ngClass]="{'active' : number == activePage }">{{number}}</a>
+            <a href="javascript:void(0);" (click)="rightArrow()">&raquo;</a>
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <div *ngIf="clickedCreateTemp" class="site-search-wrapper template-settings-wrapper">
+      <div (click)="closeCreatetemplate()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+      <div class="card" *ngIf="doc_vis" @slideInOut>
+        <div class="container">
+          <button class="close" (click)="closeCreatetemplate()"></button>
+          <h2>Template settings</h2>
+          <form class="setting-form template-settings" #createTemplateForm="ngForm"
+            (ngSubmit)="createTemplateForm.form.valid && createTemplate()">
+            <fieldset class="title-setting">
+              <label>Title</label>
+              <input type="text" id="" class="form-control" maxlength="70"
+                [(ngModel)]="template.Title"
+                [ngClass]="(createTemplateForm.submitted || Title.touched || Title) && Title.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || Title.touched || !template.Title) && !Title.valid ?'border-bottom-red': ''"
+                #Title="ngModel" name="Title" required pattern="(?!^ +$)^.+$" />
+              <span class="error" *ngIf="createTemplateForm.submitted && Title.invalid">
+                <span *ngIf="Title.errors.required">Title name is required</span>
+                <span *ngIf="Title.errors.pattern">Enter valid title name</span>
+              </span>
+            </fieldset>
+
+
+            <fieldset>
+              <label>Status</label>
+              <div class="btn-group form-control button-wrapper">
+                <ng-container *ngFor="let status of allPartyStatus">
+                  <button class="btn-active" type="button" *ngIf="status.Id == 1"
+                    [ngClass]="{'btn-active':status.Id == statusSet}" (click)="statusChange(status.Id)"
+                    [(ngModel)]="template.StatusId" #StatusId="ngModel" name="StatusId"
+                    ngDefaultControl>{{status.Name}}</button>
+                </ng-container>
+              </div>
+            </fieldset>
+
+            <fieldset *ngIf="activeApp">
+              <label>Linked</label>
+              <div class="custom-select form-control st"
+              [ngClass]="(createTemplateForm.submitted || link.touched || link) && link.valid ? 'border-bottom-green' :
+              (createTemplateForm.submitted || link.touched || !link) && !link.valid ?'border-bottom-red': ''">
+
+                <ng-select [(ngModel)]="template.IsLinked"
+                  [placeholder]="template.IsLinked == null || template.IsLinked == undefined ? 'Select' : ''" #link="ngModel"
+                  name="link" required (change)="changeLink($event)">
+                  <ng-option *ngFor="let apps of allApps;let i = index" [value]="apps?.Id" [disabled]="!apps?.Active">
+                    {{apps?.Name}}</ng-option>
+                  <ng-option [value]=0>Not selected</ng-option>
+
+
+                </ng-select>
+              </div>
+              <span class="error" *ngIf="createTemplateForm.submitted && link.invalid">
+                <span *ngIf="link.errors.required">Please select link</span>
+              </span>
+            </fieldset>
+
+            <fieldset *ngIf="template.IsLinked == 1">
+              <label>Section</label>
+              <div class="custom-select form-control"
+                [ngClass]="(createTemplateForm.submitted || PropertyMeTypeId.touched || PropertyMeTypeId) && PropertyMeTypeId.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || PropertyMeTypeId.touched) && !PropertyMeTypeId.valid ?'border-bottom-red': ''">
+                <ng-select
+                  [placeholder]="template.PropertyMeTypeId == '' ||template.PropertyMeTypeId == null || template.PropertyMeTypeId == undefined ? 'Select' : ''"
+                  (change)="changeSection($event)" [(ngModel)]="template.PropertyMeTypeId" #PropertyMeTypeId="ngModel"
+                  name="PropertyMeTypeId" required>
+                  <ng-option *ngFor="let prprty of allPropertyMeTypes" [value]="prprty.Id">{{prprty.Type}}</ng-option>
+                </ng-select>
+
+              </div>
+              <span class="error" *ngIf="createTemplateForm.submitted && PropertyMeTypeId.invalid">
+                <span *ngIf="PropertyMeTypeId.errors.required">Please select section</span>
+              </span>
+            </fieldset>
+
+            <fieldset *ngIf="template.PropertyMeTypeId">
+              <label>Roles</label>
+              <div class="custom-select form-control"
+                [ngClass]="(createTemplateForm.submitted || PartyTypeId.touched || PartyTypeId) && PartyTypeId.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || PartyTypeId.touched) && !PartyTypeId.valid ?'border-bottom-red': ''">
+
+                <ng-select [(ngModel)]="template.PartyTypeId"
+                  [placeholder]="template.PartyTypeId == null || template.PartyTypeId == undefined ? 'Select' : ''"
+                  #PartyTypeId="ngModel" name="PartyTypeId" required>
+                  <ng-option *ngFor="let rl of allRoles" [value]="rl.Id">{{rl.Type}}</ng-option>
+                </ng-select>
+              </div>
+              <span class="error" *ngIf="createTemplateForm.submitted && PartyTypeId.invalid">
+                <span *ngIf="PartyTypeId.errors.required">Please select roles</span>
+              </span>
+            </fieldset>
+
+            <fieldset class="groups-block">
+              <label>Groups</label>
+              <div class="checkbox-block groups-block form-control border-0"
+                [ngClass]="createTemplateForm.submitted && !checkGroupValidation() ? 'border-bottom-green' :
+                createTemplateForm.submitted && !checkGroupValidation() ?'border-bottom-red': ''">
+                <div class="checklist">
+                  <div class="custom-checkbox active" *ngFor="let grps of activeGroupsArray,let i = index">
+
+                    <mat-checkbox [checked]="grps.checked" (change)="changeGroups(i)" required="required">
+                      {{grps.Name}}
+                    </mat-checkbox>
+
+                  </div>
+                </div>
+              </div>
+
+              <span class="error" *ngIf="createTemplateForm.submitted && !checkGroupValidation()">
+                <span>Please select minimum one group</span>
+              </span>
+
+            </fieldset>
+
+            <fieldset>
+              <h3>Notifications</h3>
+            </fieldset>
+
+            <fieldset class="notifications">
+              <label>Expires in</label>
+              <div class="btn-group form-control" >
+                <input type="number" name="ExpirationDays" value="00" [(ngModel)]="template.ExpirationDays"
+                [ngClass]="(createTemplateForm.submitted || ExpirationDays.touched || ExpirationDays) && ExpirationDays.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || ExpirationDays.touched) && !ExpirationDays.valid ?'border-bottom-red': ''"
+                #ExpirationDays="ngModel" [customMin]="1" required>
+                <span>days</span>
+              </div>
+              <span *ngIf="createTemplateForm.submitted && ExpirationDays.invalid">
+                <!-- <span class="error" *ngIf="ExpirationDays.errors.required">Please enter expiration days</span> -->
+                <span class="error" *ngIf="ExpirationDays.errors?.customMin">Minimum required expiration day is
+                  1.</span>
+              </span>
+            </fieldset>
+
+            <fieldset class="notifications">
+              <label>Reminder</label>
+              <div class="btn-group form-control">
+                <input type="number" name="ReminderDays" value="00" [(ngModel)]="ReminderDay"
+                [ngClass]="(createTemplateForm.submitted || ReminderDays.touched || ReminderDays) && ReminderDays.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || ReminderDays.touched) && !ReminderDays.valid ?'border-bottom-red': ''"
+                  #ReminderDays="ngModel" [customMin]="1" required>
+                <span>days prior to expiry</span>
+              </div>
+              <span *ngIf="createTemplateForm.submitted && ReminderDays.invalid">
+                <!-- <span class="error" *ngIf="ReminderDays.errors.required">Please enter reminder days</span> -->
+                <span class="error" *ngIf="ReminderDays.errors?.customMin">Minimum required reminder day is 1.</span>
+              </span>
+            </fieldset>
+
+            <fieldset class="notifications">
+              <span>An automatic reminder is send 24 hours prior to expiration</span>
+            </fieldset>
+
+            <fieldset class="notifications permissions"
+              *ngIf="currentUser.role == 'Standard' || currentUser.role == 'SuperAdmin'">
+              <label>Permissions</label>
+              <div class="btn-group form-control">
+                <a href="javascript:void(0)" class="locked" (click)="changePermission(0)"
+                  *ngIf="template.IsLocked == 1"></a>
+                <a href="javascript:void(0)" class="unlocked" (click)="changePermission(1)"
+                  *ngIf="template.IsLocked == 0"></a>
+                <ul class="wrapper-status-groups template-set-tooltip">
+                  <li>
+                    <a href="javascript:void(0)" class="info "></a>
+                    <span class="tooltip">Set the permission to clone/duplicate template</span>
+                  </li>
+                </ul>
+
+              </div>
+            </fieldset>
+
+
+            <fieldset class="form-footer">
+              <button type="button" (click)="closeCreatetemplate()">Cancel</button>
+              <button type="submit" class="save pastel-green">Save</button>
+            </fieldset>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<div *ngIf="deletePopup" class="unsaved-changes-pop-up fixed-popup">
+  <div>
+    <div class="unsaved-changes-info">
+      <p>Are you sure you want to delete this template forever?</p>
+    </div>
+    <div class="unsaved-changes-btns">
+      <button class="uni-button pg-border green-border" (click)="deletePopupChange(null)">Cancel</button>
+      <button class="uni-button pastel-green" (click)="deleteTemplate()">Delete</button>
+    </div>
+  </div>
+</div>

@@ -8,6 +8,7 @@
 
 .sidebar-footer .user-info ul {
   z-index: 1 !important;
+  /* position: fixed !important; */
 }
 .sidebar.sidebar-collapsed{color: #000;}
 .sidebar .sidebar-logo a.logomini{
@@ -18,6 +19,27 @@
 }
 .sidebar.sidebar-collapsed .sidebar-logo a.logo{
   display: none;
+}
+
+.sidebar-collapsed .sidebar-links ul li:hover,
+.sidebar-collapsed .sidebar-links ul li.active {
+  width: 0px !important;
+}
+
+.large {
+  font-size: 5em;
+  background: #ed5d7d;
+  font-size: 17px;
+  width: 30px;
+  height: 30px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
 }
 
 

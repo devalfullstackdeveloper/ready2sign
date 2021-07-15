@@ -9,5 +9,6 @@ export class User {
     is_enabled : number;
     updated_at : string;
     token?: string;
+    role : string;
     access_token: string;
 }

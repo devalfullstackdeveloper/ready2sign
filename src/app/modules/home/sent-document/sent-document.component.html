@@ -1,0 +1,482 @@
+
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+
+<div class="page-header">
+  <div class="header-left">
+    <div class="collapse-sidebar">
+      <button type="button" class="sidebar-toggle" (click)="toggleSidebar()"></button>
+    </div>
+
+    <span class="user-name">{{companyProfileData.Name}}</span>
+  </div>
+
+  <div class="header-right">
+    <button class="uni-button withdraw-btn" (click)="approveDocument()" *ngIf="approveBtn && sendDocumentDetails.DocumentExpiryDaysLeft">Approve</button>
+    <button class="uni-button withdraw-btn" (click)="openRejectModel()" *ngIf="approveBtn && sendDocumentDetails.DocumentExpiryDaysLeft">Reject</button>
+    <button class="uni-button withdraw-btn" (click)="openWithdrawModel()" *ngIf="!approveBtn && withdrawBtn && (sendDocumentDetails.StatusId == 2 || sendDocumentDetails.StatusId == 6) && sendDocumentDetails.DocumentExpiryDaysLeft">Withdraw</button>
+    <!-- <a href="javascript:void(0);" class="search-btn"></a> -->
+  </div>
+</div>
+<!-- Content area -->
+<div class="content-area">
+  <div class="main-content-section pb-0">
+    <div class="left-sidebar-block editing-block">
+      <h2>
+        Document
+        <span *ngIf="sendDocumentDetails.StatusId == 1">Draft</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 2">Sent</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 3">withdrawn</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 4">Completed</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 5">Expired</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 6">Approval</span>
+        <span *ngIf="sendDocumentDetails.StatusId == 7">Draft (approval rejected)</span>
+      </h2>
+      <div class="template-title">
+        <label for="edit-title">Title</label>
+        <input maxlength="70" type="search" name="edit-title" id="edit-title" placeholder="Document name here" [(ngModel)]="createDoc.Title">
+      </div>
+      <!-- <div class="template-editor "> -->
+        <div class="prvw" *ngIf="sendDocumentDetails.Content">
+          <!-- <iframe class="preview" allowtransparency="true" style="background-color: #FFFFFF;" src="{{documentContent}}" id="showContent" name="showContent" type="application/pdf" width="100%" height="100%"></iframe> -->
+
+          <div [innerHtml]="sendDocumentDetails.Content |safeHtml"></div>
+        </div>
+
+      <!-- </div> -->
+    </div>
+    <!-- <div appStickyHeader>
+      <h2 >Second header</h2>
+    </div> -->
+    <section class="right-block content-block template-controls doc-activity" >
+      <ul class="wrapper-status-groups">
+        <li class="fields" [ngClass]="{'selected' : selectedSection == 'Activity'}" (click)="selectSection('Activity')">
+          <a href="javascript:void(0);">
+            <img src="assets/images/filter-icon.svg" alt="" title="">
+          </a>
+          <label>Activity</label></li>
+
+        <li class="parties" [ngClass]="{'selected' : selectedSection == 'parties'}" (click)="selectSection('parties')">
+          <a href="javascript:void(0);">
+            <img src="assets/images/people.svg" alt="" title="">
+          </a>
+          <label>Parties</label></li>
+      </ul>
+      <form class="template-table">
+        <fieldset class="people-block activity-section" *ngIf="selectedSection == 'parties'">
+          <!-- <div class="activity-info">
+            <p><label>Name</label> <strong>Full Name</strong></p>
+            <p><label>Status</label> <a class="activity-status green" href="javascript:void(0);" title="">Opened</a>0.00pm | dd/mm/yyyy</p>
+            <p><label>Party</label> Sender</p>
+            <p><label>Email</label> email@domain.com</p>
+            <p><label>Mobile</label> 0000 000 000</p>
+          </div>
+          <div class="activity-info">
+            <p><label>Name</label> <strong>Full Name</strong></p>
+            <p><label>Status</label> <a class="activity-status blue" href="javascript:void(0);" title="">Sent</a></p>
+            <p><label>Party</label> Tenant</p>
+            <p><label>Email</label> email@domain.com</p>
+            <p><label>Mobile</label> 0000 000 000</p>
+            <div class="btns-sec"><a href="javascript:void(0);" title="" class="sign-in-btn">Sign in person</a><a href="javascript:void(0);" title=""
+                class="resend-btn">Resend</a></div>
+            <a href="javascript:void(0);" title="" class="edit-link"></a>
+          </div>
+          <div class="activity-info">
+            <p><label>Name</label> <strong>Full Name</strong></p>
+            <p><label>Status</label> <a class="activity-status pink" href="javascript:void(0);" title="">Faild</a></p>
+            <p><label>Party</label> Sender</p>
+            <p><label>Email</label> email@domain.com</p>
+            <p><label>Mobile</label> 0000 000 000</p>
+          </div> -->
+
+          <ng-container *ngFor="let party of sendDocumentDetails.Parties;let i = index">
+            <div class="activity-info">
+              <p><label>Name</label> <strong>{{party.ContactName | titlecase}}</strong></p>
+              <p><label>Status</label>
+                <!-- <a class="activity-status blue" href="javascript:void(0);" title="">Sent</a> -->
+                <a class="activity-status blue" href="javascript:void(0);" *ngIf="party.Status == 1">Draft</a>
+                <a class="activity-status sent" href="javascript:void(0);" *ngIf="party.Status == 2">Sent</a>
+                <a class="activity-status withdrawn" href="javascript:void(0);" *ngIf="party.Status == 3">Withdrawn</a>
+                <a class="activity-status completed" href="javascript:void(0);" *ngIf="party.Status == 4 || party.Status == 8 || party.Status == 11">Completed</a>
+                <a class="activity-status expired" href="javascript:void(0);" *ngIf="party.Status == 5">Expired</a>
+                <a class="activity-status approval" href="javascript:void(0);" *ngIf="party.Status == 6">Approval</a>
+                <a class="activity-status rejected" href="javascript:void(0);" *ngIf="party.Status == 7">Approval Rejected</a>
+                <!-- <a class="activity-status approved" href="javascript:void(0);" *ngIf="party.Status == 8">Approved</a> -->
+                <a class="activity-status blue" href="javascript:void(0);" *ngIf="party.Status == 9 && (sendDocumentDetails.StatusId !== 3 && sendDocumentDetails.StatusId !== 7)">In queue</a>
+                <a class="activity-status pending" href="javascript:void(0);" *ngIf="party.Status == 10">Pending for approval</a>
+                <!-- <a class="activity-status signed" href="javascript:void(0);" *ngIf="party.Status == 11">Signed</a> -->
+                <a class="activity-status sent" href="javascript:void(0);" *ngIf="party.Status == 12">Sent</a>
+                <a class="activity-status created" href="javascript:void(0);" *ngIf="party.Status == 13">Created</a>
+                <a class="activity-status signed" href="javascript:void(0);" *ngIf="party.Status == 14">Expiry Changed</a>
+                <a class="activity-status approved" href="javascript:void(0);" *ngIf="party.Status == 15">Sent Deilvered</a>
+                <a class="activity-status rejected" href="javascript:void(0);" *ngIf="party.Status == 16">Sent Failed</a>
+                <a class="activity-status sms-authenticated" href="javascript:void(0);" *ngIf="party.Status == 17">SMS Verification Sent</a>
+                <a class="activity-status sms-authenticated" href="javascript:void(0);" *ngIf="party.Status == 18">SMS Authenticated</a>
+                <a class="activity-status viewed" href="javascript:void(0);" *ngIf="party.Status == 20">Viewed</a>
+              </p>
+              <p><label>Party</label> <span *ngIf="party.Name">{{party.Name | titlecase}}</span>   <span *ngIf="!party.Name">N/A</span></p>
+              <p><label>Email</label>
+                <span *ngIf="editPartyIndex !== (i+1) && party.Email">{{party.Email}}</span>
+                <span *ngIf="editPartyIndex !== (i+1) && !party.Email">N/A</span>
+
+                <span *ngIf="editPartyIndex == (i+1)"><input type="text" name="email_{{i}}" [(ngModel)]="party.Email" placeholder="N/A" /> </span>
+              </p>
+
+              <p><label>Mobile</label>
+                <span *ngIf="editPartyIndex !== (i+1) && party.Mobile">{{party.Mobile}}</span>
+                <span *ngIf="editPartyIndex !== (i+1) && !party.Mobile">N/A</span>
+
+                <span *ngIf="editPartyIndex == (i+1)"><input type="text" name="phone_{{i}}" (keypress)="numberOnly($event)" [(ngModel)]="party.Mobile" placeholder="N/A" /> </span>
+              </p>
+
+              <!-- For Sign In and Resend -->
+              <ng-container *ngIf="editPartyIndex !== (i+1)">
+                <div class="btns-sec" *ngIf="party.PartyTypeId !== 9 && party.PartyTypeId !== 8 && party.IsSigned && sendDocumentDetails.DocumentExpiryDaysLeft">
+                  <a href="javascript:void(0);" title="" class="sign-in-btn" (click)="signInPerson(party.Id)">Sign in person</a>
+                  <a *ngIf="party.Status == 2 || party.Status == 12" href="javascript:void(0);" title="" class="resend-btn" (click)="resendDocument(party.Id, sendDocumentDetails.Id)">Resend</a>
+                </div>
+              </ng-container>
+
+              <!-- For Update and Cancel -->
+              <ng-container *ngIf="editPartyIndex == (i+1)">
+                <div class="btns-sec" *ngIf="party.PartyTypeId !== 9 && party.PartyTypeId !== 8 && party.IsSigned ">
+                  <a href="javascript:void(0);" title="" class="sign-in-btn" (click)="UpdatePartyContact(party)">Update</a>
+                  <a href="javascript:void(0);" title="" class="resend-btn" (click)="cancelPartyContact()">Cancel</a>
+                </div>
+              </ng-container>
+
+              <a href="javascript:void(0);" (click)="editBtnClick(i+1,party)" title="" class="edit-link" *ngIf="party.PartyTypeId !== 9 && party.PartyTypeId !== 8 && party.IsSigned && sendDocumentDetails.DocumentExpiryDaysLeft"></a>
+            </div>
+          </ng-container>
+        </fieldset><!-- people-block -->
+
+        <fieldset class="fields-block filter-section" *ngIf="selectedSection == 'Activity'">
+          <!-- <div class="client-info">
+            <p><label>Sender </label>Full Name</p>
+            <p><label>Created </label>dd/mm/yyyy <span class="time">0:00 pm</span></p>
+            <p><label>Sent </label>dd/mm/yyyy <span class="time">0:00 pm</span></p>
+            <p><label>Expiry </label>dd/mm/yyyy <a class="change-link" href="javascript:void(0);" (click)="changeExpiryDate()">change</a></p>
+          </div> -->
+
+          <div class="client-info">
+            <p><label>Sender </label> <span>{{sendDocumentDetails.Sender |titlecase}} </span></p>
+            <p><label>Created </label><span>{{sendDocumentDetails.CreatedDate |date : 'dd/MM/yyyy'}} <span class="time">{{sendDocumentDetails.CreatedDate |date : 'hh:mm a'}}</span> </span></p>
+            <p><label>Sent </label> <span>{{sendDocumentDetails.SentDate |date : 'dd/MM/yyyy'}} <span class="time"> {{sendDocumentDetails.SentDate |date : 'hh:mm a'}} </span></span></p>
+            <p><label>Expiry </label>
+              <span *ngIf="sendDocumentDetails.DocumentExpiryDate && !expireDate"><span *ngIf="ExpireDate">{{ExpireDate |date : 'dd/MM/yyyy'}}</span></span>
+              <!-- <span *ngIf="sendDocumentDetails.ExpiryDates?.length == 0">N/A</span> -->
+
+              <dp-date-picker [theme]="'dp-material'" name="datePicker" [config]="YY_MM_DD_config" [ngModel]="ExpireDate | date:'yyyy-MM-dd'" *ngIf="expireDate" (onChange)="dateChange($event)"></dp-date-picker>
+              <a *ngIf="sendDocumentDetails.StatusId !== 4 && !expireDate" class="change-link" href="javascript:void(0);" [ngClass]="{'disabled' : sendDocumentDetails.StatusId == 4}" (click)="changeExpiryDate()">Change</a>
+
+              <a *ngIf="expireDate" class="change-link" href="javascript:void(0);" [ngClass]="{'disabled' : sendDocumentDetails.StatusId == 4}" (click)="changeExpiryDate()">Update</a>
+            </p>
+
+
+          </div>
+
+          <!-- <ul class="list-of-changes">
+            <li>
+              <div class="changes-status created">
+                <p class="changes-status-heading"><span> <strong>Created</strong></span> </p>
+                <p class="changes-status-info">{{ sendDocumentDetails.Sender }} <span> &nbsp; <small>{{sendDocumentDetails.CreatedDate |date : 'dd/MM/yyyy'}} {{sendDocumentDetails.CreatedDate |date : 'hh:mm a'}}</small></span></p>
+                <p>{{ sendDocumentDetails.SenderEmail }} </p>
+              </div>
+            </li>
+            <li>
+              <div class="changes-status sent">
+                <p class="changes-status-heading"><span><strong>Sent</strong></span> </p>
+
+                <div class="tenant-recipient-sec" *ngFor="let recipient of sendDocumentDetails.Approver">
+                  <p *ngIf="recipient.ApproverName">Approver <strong>{{recipient.PartyName}}</strong> &nbsp; &nbsp; <small>{{recipient.DateTime |date : 'dd/MM/yyyy'}}  {{recipient.DateTime |date : 'hh:mm a'}}</small></p>
+                  <p *ngIf="recipient.ContactName">Recipient <strong>{{recipient.PartyName}}</strong> &nbsp; &nbsp; <small>{{recipient.DateTime |date : 'dd/MM/yyyy'}}  {{recipient.DateTime |date : 'hh:mm a'}}</small></p>
+                  <p>{{recipient.ApproverName ? recipient.ApproverName : recipient.ContactName}}</p>
+                  <p>{{recipient.Email}}</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="changes-status signed">
+                <p class="changes-status-heading"><span><strong>Signed</strong></span></p>
+
+                <div class="tenant-recipient-sec" *ngFor="let signed of sendDocumentDetails.Signed">
+                  <p><strong>{{signed.PartyName}}</strong> &nbsp; &nbsp;  <small>{{signed.DateTime |date : 'dd/MM/yyyy'}}  {{signed.DateTime |date : 'hh:mm a'}}</small></p>
+                  <p>{{signed.ContactName}} <span *ngIf="signed.PartyTypeId == 8"> (Approved)</span></p>
+                  <p>{{signed.Email}}</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="changes-status expiry">
+                <p class="changes-status-heading">
+                  <span><strong>Expiry changes</strong></span>
+                </p>
+
+                <div class="tenant-recipient-sec" *ngFor="let expireDate of sendDocumentDetails.ExpiryDates;let i=index">
+                  <p>
+                    <label>
+                      {{expireDate.ExpiryDate |date : 'dd/MM/yyyy'}} {{expireDate.ExpiryDate |date : 'hh:mm a'}}
+                      <p class="changes-status-info">{{expireDate?.ModifiedByname}} - <small>{{expireDate.ExpiryDateModifiedOn |date : 'dd/MM/yyyy'}} {{expireDate.ExpiryDateModifiedOn |date : 'hh:mm a'}}</small></p>
+                    </label>
+                  </p>
+                </div>
+              </div>
+            </li>
+            <li *ngIf="sendDocumentDetails.StatusId == 3">
+              <div class="changes-status created">
+                <p class="changes-status-heading"><span><strong>Withdrawn</strong></span>  {{sendDocumentDetails.WithdrawnDetail.DateTime |date : 'dd/MM/yyyy'}} &nbsp; {{sendDocumentDetails.WithdrawnDetail.DateTime |date : 'hh:mm a'}}</p>
+                <p><strong>{{sendDocumentDetails.WithdrawnDetail.PartyName}}</strong> &nbsp; &nbsp; {{sendDocumentDetails.WithdrawnDetail.UserName}}</p>
+                <p class="changes-status-info"><strong>Reason</strong> &nbsp; &nbsp; {{sendDocumentDetails.WithdrawnDetail.Reason}}</p>
+              </div>
+            </li>
+
+            <li *ngIf="sendDocumentDetails.StatusId == 7">
+              <div class="changes-status created">
+                <p class="changes-status-heading"><span><strong>Rejected by Approver</strong></span>
+                  {{sendDocumentDetails.WithdrawnDetail?.DateTime |date : 'dd/MM/yyyy'}} &nbsp; {{sendDocumentDetails.WithdrawnDetail?.DateTime |date : 'hh:mm a'}}</p>
+                <p><strong>{{sendDocumentDetails.WithdrawnDetail?.PartyName}}</strong> &nbsp; &nbsp; {{sendDocumentDetails.WithdrawnDetail?.UserName}}</p>
+                <p class="changes-status-info">{{sendDocumentDetails.WithdrawnDetail?.Reason}}</p>
+              </div>
+            </li>
+          </ul> -->
+
+
+          <!-- New Activity Log -->
+          <ul class="list-of-changes">
+            <li *ngFor="let log of sendDocumentDetails.DocPartyHistory;let l = index;">
+
+              <!-- For Sent -->
+              <div *ngIf="log.ContactName && log.Status == 2" class="changes-status sent">
+                <p class="changes-status-heading"><span><strong>Sent</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small> </p>
+              </div>
+
+              <!-- For Withdraw -->
+              <div *ngIf="log.ContactName && log.Status == 3" class="changes-status withdraw">
+                <p class="changes-status-heading"><span><strong>Withdrawn</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>Reason</strong>&nbsp;{{log.Reason}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- Completed -->
+              <div *ngIf="log.Status == 4" class="changes-status completed">
+                <p class="changes-status-heading"><span><strong>Document Completed</strong></span> &nbsp;</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- Expired -->
+              <div *ngIf="log.ExpiryDate && log.Status == 5" class="changes-status expiry">
+                <p class="changes-status-heading"><span><strong>Expired</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ModifiedByname}} </strong><span>&nbsp; </span></p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <!-- <p>{{log.ExpiryDate}}</p> -->
+                <p><strong>When</strong>&nbsp; <small>{{log.ExpiryDateModifiedOn |date : 'dd/MM/yyyy'}} {{log.ExpiryDateModifiedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Approval -->
+              <div *ngIf="log.ContactName && log.Status == 6" class="changes-status approval">
+                <p class="changes-status-heading"><span><strong>Approval</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Reject -->
+              <div *ngIf="log.ContactName && log.Status == 7" class="changes-status approval-reject">
+                <p class="changes-status-heading"><span><strong>Approval rejected</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>Reason</strong>&nbsp;{{log.Reason}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Approval -->
+              <div *ngIf="log.ContactName && log.Status == 8" class="changes-status approval">
+                <p class="changes-status-heading"><span><strong>Approved</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Approval Pending-->
+              <div *ngIf="log.ContactName && log.Status == 10" class="changes-status approval">
+                  <p class="changes-status-heading"><span><strong>Approval Pending</strong></span></p>
+                  <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                  <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                  <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+                </div>
+
+              <!-- For Sign -->
+              <div *ngIf="log.ContactName && log.Status == 11" class="changes-status signed">
+                <p class="changes-status-heading"><span><strong>Signed</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName}}</strong>&nbsp;</p>
+                <p><span *ngIf="log.PartyTypeId == 8"> (Approved)</span></p>
+                <p><strong>Email</strong>&nbsp;{{log.Email}}</p>
+                <p><strong>When</strong>&nbsp; <small>{{log.DateTime |date : 'dd/MM/yyyy'}} {{log.DateTime |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Created -->
+              <div *ngIf="log.Sender && log.Status == 13" class="changes-status created">
+                <p class="changes-status-heading"><span> <strong>Created</strong></span> </p>
+                <p class="changes-status-info"><strong>{{ log.Sender }}</strong><span> &nbsp; </span></p>
+                <p><strong>Email</strong>&nbsp;{{ log.Email }} </p>
+                <p><strong>When</strong>&nbsp; <small>{{log.SentDate |date : 'dd/MM/yyyy'}} {{log.SentDate |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Expiry change-->
+              <div *ngIf="log.ExpiryDate && log.Status == 14" class="changes-status expiry">
+                <p class="changes-status-heading"><span><strong>Expiry changed</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ModifiedByname}}</strong><span>&nbsp; </span></p>
+                <p><strong>Changed Date</strong>&nbsp; {{log.ExpiryDate}}</p>
+                <!-- <p><strong>Email</strong>&nbsp;{{ log.Email }} </p> -->
+                <p><strong>When</strong>&nbsp; <small>{{log.ExpiryDateModifiedOn |date : 'dd/MM/yyyy'}} {{log.ExpiryDateModifiedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Sent Deilvered-->
+              <div *ngIf="log.Status == 15" class="changes-status sent">
+                <p class="changes-status-heading"><span><strong>Sent (Deilvered)</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName ? log.ContactName : ''}}</strong><span>&nbsp; </span></p>
+                <p><strong>Email</strong>&nbsp;{{ log.Email }} </p>
+                <p><strong>When</strong>&nbsp; <small>{{log.CreatedOn |date : 'dd/MM/yyyy'}} {{log.CreatedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Sent Failed-->
+              <div *ngIf="log.Status == 16" class="changes-status signed">
+                <p class="changes-status-heading"><span><strong>Sent (Delivery Failed)</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName ? log.ContactName : ''}}</strong><span>&nbsp; </span></p>
+                <p><strong>Email</strong>&nbsp;{{ log.Email }} </p>
+                <p><strong>When</strong>&nbsp; <small>{{log.CreatedOn |date : 'dd/MM/yyyy'}} {{log.CreatedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For SMS Verification Sent-->
+              <div *ngIf="log.Status == 17" class="changes-status sms-authenticated">
+                <p class="changes-status-heading"><span><strong>SMS Verification Sent</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName ? log.ContactName : ''}}</strong> <span>&nbsp;</span></p>
+                <p><strong>Phone</strong>&nbsp;<small>{{log.Phone ? log.Phone : ''}}</small></p>
+                <p><strong>When</strong>&nbsp; <small>{{log.CreatedOn |date : 'dd/MM/yyyy'}} {{log.CreatedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For SMS Authenticated-->
+              <div *ngIf="log.Status == 18" class="changes-status sms-authenticated">
+                <p class="changes-status-heading"><span><strong>SMS Authenticated</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName ? log.ContactName : ''}}</strong> <span>&nbsp;</span></p>
+                <p><strong>Phone</strong>&nbsp;<small>{{log.Phone ? log.Phone : ''}}</small></p>
+                <p><strong>When</strong>&nbsp; <small>{{log.CreatedOn |date : 'dd/MM/yyyy'}} {{log.CreatedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+              <!-- For Viewed-->
+              <div *ngIf="log.Status == 20" class="changes-status viewed">
+                <p class="changes-status-heading"><span><strong>Viewed</strong></span></p>
+                <p class="changes-status-info"><strong>{{log.ContactName ? log.ContactName : ''}}</strong> <span>&nbsp; </span></p>
+                <p><strong>Email</strong>&nbsp;{{ log.Email }} </p>
+                <p><strong>When</strong>&nbsp; <small>{{log.CreatedOn |date : 'dd/MM/yyyy'}} {{log.CreatedOn |date : 'hh:mm a'}}</small></p>
+              </div>
+
+            </li>
+          </ul>
+
+          <!-- <a href="javascript:void(0);" title="" class="save update-btn" *ngIf="expireDate">update</a> -->
+          <a href="javascript:void(0);" title="" class="print-activity-link" (click)="printDocument()" *ngIf="!expireDate">Print activity</a>
+        </fieldset><!-- fields-block -->
+      </form>
+    </section>
+
+    <div class="send-document-block-wrapper add-user-block" *ngIf="withdrawModelOpen">
+      <div (click)="closeWithdrawModel()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+      <div class="card" *ngIf="withdrawModelOpen_anim" @slideInOut>
+        <div class="contianer-sm">
+          <button class="close" (click)="closeWithdrawModel()"></button>
+          <h2> Withdraw document</h2>
+            <ul class="withdraw-points">
+              <li>By withdrawing a document the ability to sign the document will stop</li>
+              <li>Recipients will be sent an email notification of the withdrawal</li>
+            </ul>
+          <form class="send-document-form withdraw-document-form">
+            <fieldset>
+              <label for="reason">Reason</label>
+              <textarea class="form-control" id="reason" name="reason" [(ngModel)]="docData.Message">{{docData.Message}}</textarea>
+            </fieldset>
+            <fieldset>
+                  <div class="send-msg-sec">
+                <p>The above reason will be sent to all recipients.</p>
+                </div>
+            </fieldset>
+             <div class="bottom-buttons">
+               <button type="button" class="uni-button text-only" (click)="closeWithdrawModel()">Cancel</button>
+               <button type="button" class="uni-button pink" (click)="withdrwDoc()">Withdraw</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="send-document-block-wrapper add-user-block" *ngIf="approveModelOpen">
+      <div class="card">
+        <div class="contianer-sm">
+          <button class="close" (click)="closeApproveModel()"></button>
+          <h2>Approve</h2>
+            <ul class="withdraw-points">
+              <li>Recipients will be sent an email notification of the approve</li>
+            </ul>
+          <form class="send-document-form withdraw-document-form">
+            <fieldset>
+              <label for="reason">Reason</label>
+              <textarea class="form-control" id="reason" name="reason" [(ngModel)]="docData.Message" placeholder="Enter reason for Approve">{{docData.Message}}</textarea>
+            </fieldset>
+            <fieldset>
+                  <div class="send-msg-sec">
+                <p>The above reason will be sent to all recipients.</p>
+                </div>
+            </fieldset>
+             <div class="bottom-buttons">
+               <button type="button" class="uni-button text-only" (click)="closeApproveModel()">Cancel</button>
+               <button type="button" class="uni-button pink" (click)="approveDocument()">Approve</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="send-document-block-wrapper add-user-block" *ngIf="rejectModelOpen">
+      <div (click)="closeRejectModel()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+      <div class="card" *ngIf="rejectModelOpen_anim" @slideInOut>
+        <div class="contianer-sm">
+          <button class="close" (click)="closeRejectModel()"></button>
+          <h2>Reject</h2>
+            <ul class="withdraw-points">
+              <li>Recipients will be sent an email notification of the rejection</li>
+            </ul>
+          <form class="send-document-form withdraw-document-form">
+            <fieldset>
+              <label for="reason">Reason</label>
+              <textarea class="form-control" id="reason" name="reason" [(ngModel)]="docData.Message" placeholder="Enter reason for rejection">{{docData.Message}}</textarea>
+            </fieldset>
+            <fieldset>
+                  <div class="send-msg-sec">
+                <p>The above reason will be sent to all recipients.</p>
+                </div>
+            </fieldset>
+             <div class="bottom-buttons">
+               <button type="button" class="uni-button text-only" (click)="closeRejectModel()">Cancel</button>
+               <button type="button" class="uni-button pink" (click)="rejectDoc()">Reject</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="edit-party-footer flex-end" *ngIf="sendDocumentDetails.StatusId == 4">
+    <div>
+      <strong>Document ID: </strong> <span>{{sendDocumentDetails.DocumentNumber}}</span>
+    </div>
+    <!-- <button class="uni-button text-only">Close</button> -->
+    <div>
+        <button class="uni-button pg-border" (click)="downloadDocument(sendDocumentDetails.Id)">Download</button>
+    </div>
+
+  </section>
+</div>

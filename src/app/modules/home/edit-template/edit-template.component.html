@@ -1,0 +1,1237 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+
+<div class="page-header">
+  <div class="header-left">
+    <div class="collapse-sidebar">
+      <!-- <span class="icon-arrow-left"></span> -->
+      <button type="button" class="sidebar-toggle" (click)="toggleSidebar()"></button>
+    </div>
+
+    <span class="user-name">{{companyProfileData.Name}}</span>
+  </div>
+
+  <!-- <div class="header-right">
+    <a href="javascript:void(0)" class="search-btn"></a>
+  </div> -->
+</div>
+<div class="alert alert-warning" *ngIf="templateData.IsLocked && templateData.StatusId == 3">
+  This is a system template and cannot be edited. You can copy this template, which will provide you with ability to edit as required.
+</div>
+<div class="content-area pb-0">
+  <div class="main-content-section">
+    <div class="left-sidebar-block editing-block">
+
+        <h2>
+          <span *ngIf="templateData.IsLocked && templateData.StatusId !== 1">View</span>
+          <span *ngIf="!templateData.IsLocked || templateData.StatusId == 1">Edit</span>
+           Template</h2>
+
+           <span *ngIf="disableField == 1"class="warning-msg">Connected app is off</span>
+            <div class="template-title" id="leftfixheader">
+              <label for="edit-title">Title</label>
+              <input maxlength="70" type="search"[(ngModel)]="templateData.Title" [disabled]="templateData.StatusId == 3 || disableField == 1 ? true : false" name="edit-title" id="edit-title" placeholder="Editable template name here">
+            </div>
+            <!-- <div class="template-editor">
+              <div class="row">
+                <img src="assets/images/edit-controls.png" width="100%" height="auto">
+              </div>
+              <textarea></textarea>
+            </div> -->
+            <!-- <div class="template-editor" [froalaEditor] [(froalaModel)]="editorContent"></div> -->
+            <div *ngIf="!preview" class="froala" #froalaEditor>
+              <textarea id="froalaEditor"
+              (froalaInit)="initializeLink($event)"
+              (focus)="focusFunction()"
+              [froalaEditor]="config"
+
+              [(froalaModel)]="templateData.Content"></textarea>
+            </div>
+
+            <!-- <iframe *ngIf="preview" class="preview" id="convertToPdf" type="application/pdf" width="100%"></iframe> -->
+
+
+            <div *ngIf="preview && previewContent" class="preview" [innerHtml]="previewContent |safeHtml"></div>
+    </div>
+
+    <section class="right-block content-block template-controls">
+      <div class="right-title">
+        <h2 *ngIf="templateData.StatusId == 1" style="float: right;margin-top: -45px;">Draft</h2>
+        <h2 *ngIf="templateData.StatusId == 2" style="float: right;margin-top: -45px;">Published</h2>
+        <h2 *ngIf="templateData.StatusId == 3" style="float: right;margin-top: -45px;">Archived</h2>
+      </div>
+
+      <ul class="wrapper-status-groups" id="rightfixheader">
+          <li class="parties" [ngClass]="{'selected' : selectedSection == 'parties'}" (click)="selectSection('parties')">
+            <a (click)="selectSection('parties')">
+              <img src="assets/images/people.svg">
+            </a>
+            <label>Parties</label></li>
+
+            <li class="fields" [ngClass]="{'selected' : selectedSection == 'fields'}" (click)="selectSection('fields')">
+              <a >
+                <img src="assets/images/edit-icon.svg">
+              </a>
+              <label>Fields</label></li>
+          <li class="clauses" [ngClass]="{'selected' : selectedSection == 'clauses'}" (click)="selectSection('clauses')">
+            <a >
+              <img src="assets/images/clauses-icon.svg">
+            </a>
+            <label>Clauses</label></li>
+          <li class="attachments" [ngClass]="{'selected' : selectedSection == 'attach'}" (click)="selectSection('attach')">
+            <a >
+              <img src="assets/images/attach-icon.svg">
+            </a>
+            <label>Attach</label></li>
+          <li class="mail" [ngClass]="{'selected' : selectedSection == 'mail'}" (click)="selectSection('mail')">
+            <a >
+              <img src="assets/images/mail-icon.svg">
+            </a>
+            <label>Mail</label></li>
+          <li class="settings" [ngClass]="{'selected' : selectedSection == 'settings'}" (click)="selectSection('settings')">
+            <a >
+              <img src="assets/images/gear-icon.svg">
+            </a>
+            <label>Settings</label></li>
+        </ul>
+
+
+        <form class="template-table" >
+          <!-- Parties Section -->
+          <fieldset class="people-block" *ngIf="selectedSection == 'parties'">
+            <div class="add-party-block flex-center" *ngIf="selectedSubSection == 'partyList'">
+              <a *ngIf="disableField == true" class="add-party">Add Party</a>
+              <a *ngIf="disableField == false" (click)="changeSubSection('addParty')" class="add-party">Add Party</a>
+            </div>
+
+
+            <!-- Add Party -->
+            <form #partyAddForm="ngForm" *ngIf="selectedSubSection == 'addParty'" (ngSubmit)="partyAddForm.form.valid && partySave()">
+              <div class="insert-name" *ngIf="selectedSubSection == 'addParty'">
+                <h2>Add Party</h2>
+                <div class="form-group"
+                [ngClass]="(partyAddForm.submitted || partyName.touched || partyName) && partyName.valid ? 'border-bottom-green' :
+                (partyAddForm.submitted || partyName.touched || !addParty.PartyName) && !partyName.valid ?'border-bottom-red': ''">
+                  <label>Role name</label>
+                  <input type="text" class="roleName" name="partyName" [(ngModel)]="addParty.PartyName" #partyName="ngModel" [placeholder]="addParty.PartyTypeId == 8 ? 'Ex. QA, Manager' : 'Ex. Customer or Purchasers'" required pattern="(?!^ +$)^.+$">
+                </div>
+                <span *ngIf="partyAddForm.submitted && partyName.invalid" class="error">
+                  <span *ngIf="partyName.errors?.required">Role name is required</span>
+                  <span *ngIf="partyName.errors.pattern">Enter valid role name</span>
+                  <!-- <span *ngIf="partyName.errors.pattern">Enter valid first name</span> -->
+                </span>
+              </div>
+
+
+              <div class="btn-group form-control button-wrapper" *ngIf="selectedSubSection == 'addParty'" style="opacity: 1; display: block;">
+                <button type="button" class="recipient"
+                [ngClass]="{'btn-active' : addParty.PartyTypeId !== 8, 'btn-disable': (templateData.PropertyMeTypeId && (addParty.PartyTypeId == constant.PartyTypeId_Rentals_Owner || addParty.PartyTypeId == constant.PartyTypeId_Rentals_Tenant || addParty.PartyTypeId == constant.PartyTypeId_Sales_Buyer || addParty.PartyTypeId == constant.PartyTypeId_Sales_Seller )) && addParty.edit}"
+                [disabled]="(templateData.PropertyMeTypeId && (addParty.PartyTypeId == constant.PartyTypeId_Rentals_Owner || addParty.PartyTypeId == constant.PartyTypeId_Rentals_Tenant || addParty.PartyTypeId == constant.PartyTypeId_Sales_Buyer || addParty.PartyTypeId == constant.PartyTypeId_Sales_Seller )) && addParty.edit ? true : false"
+                (click)="changeReciApprove(7)">Recipient</button>
+
+
+                <button type="button" class="approver"
+                [ngClass]="{'btn-active' : addParty.PartyTypeId == 8, 'btn-disable': (templateData.PropertyMeTypeId && (addParty.PartyTypeId == constant.PartyTypeId_Rentals_Owner || addParty.PartyTypeId == constant.PartyTypeId_Rentals_Tenant || addParty.PartyTypeId == constant.PartyTypeId_Sales_Buyer || addParty.PartyTypeId == constant.PartyTypeId_Sales_Seller )) && addParty.edit}"
+                [disabled]="(templateData.PropertyMeTypeId && (addParty.PartyTypeId == constant.PartyTypeId_Rentals_Owner || addParty.PartyTypeId == constant.PartyTypeId_Rentals_Tenant || addParty.PartyTypeId == constant.PartyTypeId_Sales_Buyer || addParty.PartyTypeId == constant.PartyTypeId_Sales_Seller )) && addParty.edit ? true : false"
+                (click)="changeReciApprove(8)">Approver</button>
+                <span class="type-selection-error" *ngIf="addParty.PartyTypeId == 8">An approver party can only be assigned to your team members</span>
+                <span class="type-selection-error" *ngIf="addParty.PartyTypeId !== 8">Recipient's are non team member parties that will interact with the document</span>
+              </div>
+
+              <div class="btn-group groups-block form-control" *ngIf="selectedSubSection == 'addParty' && addParty.PartyTypeId !== 8" style="opacity: 1; display: block;">
+                <div class="custom-checkbox active">
+                  <input type="checkbox" id="1" [checked]="addParty.Mandatory" (change)="checkboxChange('Mandatory')"/>
+                  <label for="1">Mandatory</label>
+                </div>
+
+                <div class="custom-checkbox active">
+                  <input type="checkbox" id="2" [checked]="addParty.HasSignature" (change)="checkboxChange('HasSignature')" />
+                  <label for="2">Signature required</label>
+                  <div class="child-selection" *ngIf="addParty.HasSignature">
+                    <div class="custom-checkbox ">
+                      <input type="checkbox" id="21" [checked]="addParty.HasInitial" (change)="checkboxChange('HasInitial')" />
+                      <label for="21">Initial required</label>
+                    </div>
+                    <div class="custom-checkbox ">
+                      <input type="checkbox" id="22" [checked]="addParty.HasIntitialDate" (change)="checkboxChange('HasIntitialDate')" />
+                      <label for="22">Show initial date</label>
+                    </div>
+                    <div class="custom-checkbox ">
+                      <input type="checkbox" id="23" [checked]="addParty.SMSVerificationRequired" (change)="checkboxChange('SMSVerificationRequired')" />
+                      <label for="23">SMS verification required</label>
+                    </div>
+                    <div class="custom-checkbox ">
+                      <input type="checkbox" id="24" [checked]="addParty.MaskEmail" (change)="checkboxChange('MaskEmail')" />
+                      <label for="24">Mask recipient’s email address <a href="javascript:void(0)"><img src="assets/images/info-icon.svg"></a></label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- <div class="custom-checkbox">
+                    <input type="checkbox" id="3" [checked]="addParty.ProofOfIdentity" (change)="checkboxChange('ProofOfIdentity')" />
+                    <label for="3">Proof of identity</label>
+                    <div class="child-selection" *ngIf="addParty.ProofOfIdentity">
+                      <div class="custom-checkbox ">
+                        <input type="checkbox" id="31" [checked]="addParty.DriverLicence" (change)="checkboxChange('DriverLicence')" />
+                        <label for="31">Driver licence</label>
+                      </div>
+                      <div class="custom-checkbox " >
+                        <input type="checkbox" id="32" [checked]="addParty.Passport" (change)="checkboxChange('Passport')" />
+                        <label for="32">Passport</label>
+                      </div>
+                      <div class="custom-checkbox ">
+                        <input type="checkbox" id="33" [checked]="addParty.MedicalCard" (change)="checkboxChange('MedicalCard')" />
+                        <label for="33">Health card</label>
+                      </div>
+
+                      <ng-select [searchable]="false" [(ngModel)]="addParty.SelectProofOfIdentity" name="proofOfIdentity" (change)="changeSelectProofOfIdentity($event)">
+                        <ng-option value="DriverLicence">Driver Licence only</ng-option>
+                        <ng-option value="Passport">Passport only</ng-option>
+                        <ng-option value="MedicalCard">Health card only</ng-option>
+                        <ng-option value="DriverLicence & Passport">Driver Licence & Passport</ng-option>
+                        <ng-option value="DriverLicence & MedicalCard">Driver Licence & Health card</ng-option>
+                        <ng-option value="Passport & MedicalCard">Passport & Health card</ng-option>
+                      </ng-select>
+                    </div>
+                  </div> -->
+              </div>
+              <div class="form-footer" *ngIf="selectedSubSection == 'addParty'">
+                <button (click)="resetAddParty();changeSubSection('partyList')" class="uni-button text-only">Cancel</button>
+                <button class="uni-button save pastel-green">Save</button>
+              </div>
+            </form>
+              <!-- List of Partys -->
+              <div class="list-block" *ngIf="selectedSubSection == 'partyList'">
+                <span class="order">Sending order</span>
+                <table>
+                  <thead>
+                    <tr>
+                      <th><a href="javascript:void(0)"><span class="share"></span></a></th>
+                      <th></th>
+                      <th><input [disabled]="true" type="search" name="sender-search" placeholder="Sender"></th>
+                      <th></th>
+                      <th>
+                        <!-- <span class="locked"></span> -->
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody #table *ngIf="templateData.TemplateParties?.length > 0" cdkDropList [cdkDropListData]="templateData.TemplateParties" (cdkDropListDropped)="dropTable($event)">
+                    <tr *ngFor="let party of templateData.TemplateParties;let i = index" cdkDrag [cdkDragData]="party" [cdkDragDisabled]="templateData.IsLocked && templateData.StatusId == 3">
+                      <ng-container *ngIf="party.PartyTypeId !== 9">
+                        <td>{{i}}</td>
+                        <td ><a href="javascript:void(0)"><span class="rearrange"></span></a></td>
+                        <td><span *ngIf="party.PartyTypeId === 8;else other_content">{{party.PartyName}} (Approver)</span>
+                          <ng-template #other_content>{{party.PartyName}}</ng-template>
+                        </td>
+                        <td class="actionIcon">
+                          <a *ngIf="party.Mandatory">
+                            <span class="mandatory "></span>
+                            <!-- <span class="hover-tooltip">Mandatory</span> -->
+                          </a>
+                          <a *ngIf="party.HasSignature">
+                            <span class="signature"></span>
+                            <!-- <span class="hover-tooltip">Has Signature</span> -->
+                          </a>
+                          <a *ngIf="party.SMSVerificationRequired">
+                            <span class="sms"></span>
+                            <!-- <span class="hover-tooltip">SMS Verification Required</span> -->
+                          </a>
+                          <a *ngIf="party.HasInitial">
+                            <span class="ab"></span>
+                            <!-- <span class="hover-tooltip">Has Initial</span> -->
+                          </a>
+                          <a *ngIf="party.ProofOfIdentity">
+                            <span class="headshot-icon"></span>
+                            <!-- <span class="hover-tooltip">Proof Of Identity</span> -->
+                          </a>
+                        </td>
+                        <td>
+                          <a (click)="editPartys(party,i)">
+                            <span class="edit"></span>
+                          </a>
+                        </td>
+                      </ng-container>
+                    </tr>
+                  </tbody>
+
+                  <!-- <tbody *ngIf="templateData.TemplateParties?.length == 0">
+                    <tr *ngFor="let party of templateData.Parties;let i = index">
+                      <td>{{i+1}}</td>
+                      <td><a ><span class="rearrange"></span></a></td>
+                      <td>{{party.Name}}</td>
+                      <td>
+                      </td>
+                      <td>
+                        <a href="javascript:void(0)">
+                          <span class="edit"></span>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody> -->
+                </table>
+
+                <div class="firstRecipient" *ngIf="templateData.TemplateParties?.length <= 1">
+                  <a class="pointer addReci" (click)="changeSubSection('addParty')">+ Add your first recipient</a>
+                </div>
+              </div>
+              <!-- <div class="form-footer" *ngIf="selectedSubSection == 'partyList'">
+                <button class="uni-button text-only">Cancel</button>
+                <button class="uni-button save pastel-green">Save</button>
+              </div> -->
+          </fieldset>
+
+          <!-- Field Section (Edit Parties) -->
+          <fieldset class="fields-block" *ngIf="selectedSection == 'fields'">
+            <div class="add-party-block flex-center" *ngIf="selectedSubSection == 'fieldList'">
+              <a *ngIf="!disableField" (click)="resetaddFieldInParties();changeSubSection('addField');" class="add-party">Add field</a>
+              <a *ngIf="disableField" class="add-party">Add field</a>
+            </div>
+            <!-- Field Type List -->
+            <div class="fields-selection" *ngIf="selectedSubSection == 'addField'">
+                <h2>Add field</h2>
+                <div class="flex-space-between">
+                  <div class="tile sl-text-type" (click)="changeSubSection('singleLine');setFieldId(constant.SingleLineFieldTypeId);">
+                    <div>
+                      <img src="assets/images/sl-text-icon.png">
+                    </div>
+                    <span>Single line text</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile ml-text-type" (click)="changeSubSection('multiLine');setFieldId(constant.MultiLineFieldTypeId);">
+                    <div>
+                      <img src="assets/images/ml-text-icon.png">
+                    </div>
+                    <span>Multi line text</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile dd-list-type" (click)="changeSubSection('dropdown');setFieldId(constant.DropdownFieldTypeId);">
+                    <div>
+                      <img src="assets/images/dropdown-list-icon.png">
+                    </div>
+                    <span>Dropdown list</span>
+                  </div>
+                  <div class="tile number-type" (click)="changeSubSection('number');setFieldId(constant.NumberFieldTypeId);">
+                    <div>
+                      <span style="color:#fff;font-size:20px;font-weight: bold;">1,2,3</span>
+                    </div>
+                    <span>Number</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile currency-type" (click)="changeSubSection('currency');setFieldId(constant.CurrencyFieldTypeId);">
+                    <div>
+                      <img src="assets/images/currency-icon.png">
+                    </div>
+                    <span>Currency</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile date-type" (click)="changeSubSection('date');setFieldId(constant.DateFieldTypeId);">
+                    <div>
+                      <img src="assets/images/date-icon.png">
+                    </div>
+                    <span>Date</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile time-type" (click)="changeSubSection('time');setFieldId(constant.TimeFieldTypeId);">
+                    <div>
+                      <img src="assets/images/time-icon.png">
+                    </div>
+                    <span>Time</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile checkbox-type" (click)="changeSubSection('checkbox');setFieldId(constant.CheckboxFieldTypeId);">
+                    <div>
+                      <img src="assets/images/checkbox-icon.png">
+                    </div>
+                    <span>Checkbox</span>
+                  </div>
+                  <!-- TILE-->
+                  <div class="tile"></div>
+                  <!-- <div class="tile image-type" (click)="changeSubSection('image');setFieldId(constant.ImageFieldTypeId);">
+                    <div>
+                      <img src="assets/images/image-icon.png">
+                    </div>
+                    <span>Image</span>
+                  </div> -->
+
+                  <!-- <div class="tile image-type">
+                    <div>
+                      <img src="assets/images/image-icon.png">
+                    </div>
+                    <span>Image</span>
+                  </div> -->
+                  <!-- TILE-->
+                </div>
+              </div>
+
+              <!-- Add Field Form -->
+              <form #fieldAddForm="ngForm" (ngSubmit)="fieldAddForm.form.valid && addFieldInParties()">
+                <div class="fields-detail date-field" *ngIf="selectedSubSection == 'singleLine' || selectedSubSection == 'multiLine'
+                || selectedSubSection == 'dropdown' || selectedSubSection == 'number' || selectedSubSection == 'currency'
+                || selectedSubSection == 'date' || selectedSubSection == 'time' || selectedSubSection == 'checkbox'
+                || selectedSubSection == 'image'">
+                  <!-- <h2>New {{selectedSubSection | titlecase}} field</h2> -->
+                  <h2 class="singleline" *ngIf="selectedSubSection == 'singleLine'">Single line text</h2>
+                  <h2 class="multiline" *ngIf="selectedSubSection == 'multiLine'">Multi line text</h2>
+                  <h2 class="dropdown" *ngIf="selectedSubSection == 'dropdown'">Dropdown</h2>
+                  <h2 class="number" *ngIf="selectedSubSection == 'number'">Number</h2>
+                  <h2 class="currency" *ngIf="selectedSubSection == 'currency'">Currency</h2>
+                  <h2 class="date" *ngIf="selectedSubSection == 'date'">Date</h2>
+                  <h2 class="time" *ngIf="selectedSubSection == 'time'">Time</h2>
+                  <h2 class="checkbox" *ngIf="selectedSubSection == 'checkbox'">Checkbox</h2>
+                  <h2 class="image" *ngIf="selectedSubSection == 'image'">Image</h2>
+                  <div class="form-group"
+                    [ngClass]="(fieldAddForm.submitted || fieldName.touched || fieldName) && fieldName.valid ? 'border-bottom-green' :
+                    (fieldAddForm.submitted || fieldName.touched || !newField.Name) && !fieldName.valid ?'border-bottom-red': ''">
+                    <!-- <label>Field name</label> -->
+                    <input type="text" name="name" placeholder="Field name" #fieldName="ngModel" [(ngModel)]="newField.Name" required pattern="(?!^ +$)^.+$">
+                  </div>
+                  <!-- <span *ngIf="fieldAddForm.submitted && fieldName.invalid" class="error">
+                    <span *ngIf="fieldName.errors?.required">Field name is required</span>
+                    <span *ngIf="fieldName.errors.pattern">Enter valid field name</span>
+                  </span> -->
+
+                  <!-- Input singleline  -->
+
+                  <!-- <div class="form-group" *ngIf="selectedSubSection == 'singleLine'">
+                    <label>Format</label>
+                    <input type="text" name="singleLine" placeholder="Format" [(ngModel)]="newField.Format">
+                  </div> -->
+
+                  <!-- Input multiline  -->
+
+                  <!-- <div class="form-group" *ngIf="selectedSubSection == 'multiLine'">
+                    <label>Format</label>
+                    <textarea type="text" name="multiLine" placeholder="Format" [(ngModel)]="newField.Format" cols="50" rows="5"></textarea>
+                  </div> -->
+
+                  <!-- Input number  -->
+
+                  <!-- <div class="form-group" *ngIf="selectedSubSection == 'number'">
+                    <label>Format</label>
+                    <input type="text" name="number" placeholder="Format" [(ngModel)]="newField.Format">
+                  </div> -->
+
+                  <!-- Input currency  -->
+
+                  <div class="form-group" *ngIf="selectedSubSection == 'currency'"
+                  [ngClass]="(fieldAddForm.submitted || format.touched || format) && format.valid ? 'border-bottom-green' :
+                    (fieldAddForm.submitted || format.touched || !newField.Format) && !format.valid ?'border-bottom-red': ''">
+                    <!-- <label>Format</label> -->
+                    <!-- <select name="currency" [(ngModel)]="newField.Format">
+                      <option hidden>Select Currency</option>
+                      <option>N/A</option>
+                      <option>N/A</option>
+                    </select>
+                    <input type="text" name="number" placeholder="Format" [(ngModel)]="newField.Format"> -->
+
+                    <ng-select [(ngModel)]="newField.Format" [placeholder]=" newField.Format ? '' : 'Select date format'" name="currency" #format="ngModel" required>
+                      <ng-option *ngFor="let currency of currencyList" [value]="currency.Code"> {{currency.Name}} ({{currency.Code}}) </ng-option>
+                    </ng-select>
+                  </div>
+
+                  <!-- Input date -->
+
+                  <ng-container *ngIf="selectedSubSection == 'date'">
+                    <div class="form-group"
+                    [ngClass]="(fieldAddForm.submitted || format.touched || format) && format.valid ? 'border-bottom-green' :
+                    (fieldAddForm.submitted || format.touched || !newField.Format) && !format.valid ?'border-bottom-red': ''">
+                      <!-- <label>Format</label> -->
+
+                      <ng-select [(ngModel)]="newField.Format" [placeholder]=" newField.Format ? '' : 'Select date format'" name="date" #format="ngModel" required>
+                          <ng-option *ngFor="let option of dateFormat" [value]="option.value"> {{option.label}} </ng-option>
+                      </ng-select>
+
+                      <!-- <select class="select-ico" name="selectedQuantity" id="aantal" [(ngModel)]="newField.Format">
+                        <option selected hidden value="" >Select date format</option>
+                        <option *ngFor="let option of dateFormat" [value]="option.value" >{{option.label}}</option>
+                      </select> -->
+                    </div>
+                    <span *ngIf="fieldAddForm.submitted &&  format.invalid" class="error">
+                      <span *ngIf="format.errors?.required">Please select date format</span>
+                    </span>
+                  </ng-container>
+
+
+
+                  <!-- Input time -->
+                  <ng-container *ngIf="selectedSubSection == 'time'">
+                    <div class="form-group"
+                    [ngClass]="(fieldAddForm.submitted || format.touched || format) && format.valid ? 'border-bottom-green' :
+                    (fieldAddForm.submitted || format.touched || !newField.Format) && !format.valid ?'border-bottom-red': ''">
+                      <ng-select [(ngModel)]="newField.Format" [placeholder]=" newField.Format ? '' : 'Select time format'" name="selectedQuantity" name="time" #format="ngModel" required>
+                        <ng-option value="12">12 Hour</ng-option>
+                        <ng-option value="24">24 Hour</ng-option>
+                      </ng-select>
+
+                      <!-- <select class="select-ico" name="selectedQuantity" [(ngModel)]="newField.Format">
+                        <option selected hidden value="" >Select time format</option>
+                        <option value="12">12 Hour</option>
+                        <option value="24">24 Hour</option>
+                      </select> -->
+                    </div>
+                    <!-- <span *ngIf="fieldAddForm.submitted &&  format.invalid" class="error">
+                      <span *ngIf="format.errors?.required">Please select time format</span>
+                    </span> -->
+                  </ng-container>
+
+
+                  <!-- Input dropdown  -->
+
+                  <div class="form-group" *ngIf="selectedSubSection == 'dropdown'">
+                    <!-- <label>Format</label> -->
+                    <ng-container *ngFor="let dropValue of newField.Format; let p=index">
+                      <p>{{dropValue}}  <button class="close-btn" type="button" (click)="removeDropAndCheckBoxValue(p)">X</button></p>
+                    </ng-container>
+                    <input type="text" name="number" placeholder="Enter dropdown value" [(ngModel)]="dropDownEnterValue" (keyup)="verifyRegex(dropDownEnterValue)">
+                  </div>
+
+                  <p class="text-right"><button class="pastel-green add-btn" *ngIf="selectedSubSection == 'dropdown'" [disabled]="addButtonDisable"  type="button" (click)="addDropAndCheckBoxValue(dropDownEnterValue)">Add</button></p>
+
+                  <ng-container *ngIf="selectedSubSection == 'dropdown'" style="margin-top: 5px;">
+                    <span *ngIf="fieldAddForm.submitted && newField.Format.length == 0" class="dropdown-error">
+                      <span>Please add dropdown value</span>
+                    </span>
+                  </ng-container>
+
+
+                  <!-- Input checkbox -->
+
+                  <div class="form-group" *ngIf="selectedSubSection == 'checkbox'">
+                    <!-- <label>Format</label> -->
+                    <ng-container *ngFor="let dropValue of newField.Format; let p=index">
+                      <p>{{dropValue}}  <button class="float-right close-btn" type="button" (click)="removeDropAndCheckBoxValue(p)">X</button></p>
+                    </ng-container>
+                    <input type="text" name="number" placeholder="Enter checkbox value" [(ngModel)]="checkBoxEnterValue" (keyup)="verifyRegex(checkBoxEnterValue)">
+                  </div>
+                  <p class="text-right">
+                  <button class="pastel-green add-btn" *ngIf="selectedSubSection == 'checkbox'" [disabled]="addButtonDisable"  type="button" (click)="addDropAndCheckBoxValue(checkBoxEnterValue)">Add</button>
+                </p>
+                  <ng-container *ngIf="selectedSubSection == 'checkbox'">
+                    <span *ngIf="fieldAddForm.submitted && newField.Format.length == 0" class="dropdown-error">
+                      <span>Please add checkbox value</span>
+                    </span>
+                  </ng-container>
+
+                  <!-- <div class="form-group" *ngIf="selectedSubSection == 'checkbox'">
+                    <label>Format</label>
+                    <input type="text" name="checkbox" placeholder="Format" [(ngModel)]="newField.Format"><span>N/A</span>
+                  </div> -->
+
+                  <!-- Input checkbox -->
+
+                  <!-- <div class="form-group" *ngIf="selectedSubSection == 'image'">
+                    <label>Format</label>
+                    <input type="text" name="image" placeholder="Format" [(ngModel)]="newField.Format">
+                  </div> -->
+
+
+                  <div class="form-group"
+                    [ngClass]="(fieldAddForm.submitted || assign_party.touched || assign_party) && assign_party.valid ? 'border-bottom-green' :
+                    (fieldAddForm.submitted || assign_party.touched || !newField.Format) && !assign_party.valid ?'border-bottom-red': ''">
+                    <!-- <label>Assign party</label> -->
+
+                      <ng-select class="select-ico" [(ngModel)]="newField.Id" [placeholder]=" !newField.Id && newField.Id == null ? 'Assign party' : ''" #assign_party="ngModel" name="party" required>
+                          <ng-option *ngFor="let party of templateData.TemplateParties;let i = index;" [value]="i">{{party.PartyName}}</ng-option>
+                      </ng-select>
+
+                    <!-- <select class="select-ico" #assign_party="ngModel" [(ngModel)]="newField.Id" name="party" required>
+                      <option value=null hidden selected>Assign party</option>
+                      <option *ngFor="let party of templateData.TemplateParties;let i = index;" [value]="i">{{party.PartyName}}</option>
+                    </select> -->
+                  </div>
+                  <!-- <span *ngIf="fieldAddForm.submitted && assign_party.invalid" class="error">
+                    <span *ngIf="assign_party.errors?.required">Please select assign party</span>
+                  </span> -->
+
+
+                  <ng-container *ngIf="selectedSubSection == 'singleLine' || selectedSubSection == 'multiLine'">
+                    <div class="form-group">
+                      <input type="text" name="watermark" placeholder="Watermark" #watermark="ngModel" [(ngModel)]="newField.Watermark">
+                    </div>
+                    <!-- <span *ngIf="fieldAddForm.submitted && watermark.invalid" class="error">
+                      <span *ngIf="watermark.errors?.required">Field watermark is required</span>
+                      <span *ngIf="watermark.errors.pattern">Enter valid field watermark</span>
+                    </span> -->
+                  </ng-container>
+
+
+
+                  <div>
+                    <div class="btn-group groups-block form-control">
+                        <div class="custom-checkbox active">
+                          <input type="checkbox" id="f1" [checked]="newField.Mandatory" (change)="mandatoryCheckboxChange($event.target.checked)" name="mandatory"/>
+                          <label for="f1">Mandatory</label>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+
+                <div class="form-footer" *ngIf="selectedSubSection == 'singleLine' || selectedSubSection == 'multiLine'
+                || selectedSubSection == 'dropdown' || selectedSubSection == 'number' || selectedSubSection == 'currency'
+                || selectedSubSection == 'date' || selectedSubSection == 'time' || selectedSubSection == 'checkbox'
+                || selectedSubSection == 'image'">
+                  <!-- <button class="uni-button text-only" (click)="changeSubSection('addField')">Cancel</button>
+                  <button class="uni-button save pastel-green" (click)="addFieldInParties()">Save</button> -->
+                  <button class="uni-button text-only" type="button" (click)="resetaddFieldInParties();changeSubSection('addField')">Cancel</button>
+                  <button class="uni-button save pastel-green" type="submit">Save</button>
+                </div>
+              </form>
+              <!-- Party List For Fields -->
+            <div class="list-block" *ngIf="selectedSubSection == 'fieldList'">
+              <span class="order">Drag a field into the document or click to add in place</span>
+              <table class="field-order">
+                <tbody>
+
+                  <tr *ngIf="templateData.PropertyMeTypeId" class="blue">
+                    <td></td>
+                    <td><span class="color"></span></td>
+                    <td>
+                      <span class="field-type acc-expand">Property Me</span>
+                      <ul class="type-child acc-child">
+                        <li *ngFor="let propertyMe_field of templateData.PropertyMeFields;let k = index">
+                          <div id="{{propertyMe_field.Name}}-{{propertyMe_field.Id}}" draggable="true"
+                            dir="{{k}}"
+                            class="propertyMeFields"
+                            (dragstart)="propertyMeDragStart($event, k, propertyMe_field.Id, 'propertyMeFields', propertyMe_field.Key, 'blue', '#aed3ef')"
+                            (dragend)="propertyMeDragEnd($event)"
+                            (click)="onClickAddPropertyMeField(k, propertyMe_field.Id, 'propertyMeFields', propertyMe_field.Key, 'blue', '#aed3ef')">
+                            {{propertyMe_field.Name}}
+                          </div>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+
+                  <tr *ngFor="let party of templateData.TemplateParties;let i = index;" [ngClass]="party.Color">
+                    <td>
+                      <!-- <a href="javascript:void(0);"><span class="clauses"></span></a> -->
+                    </td>
+                    <td><span class="color"></span></td>
+                    <td>
+                      <span class="field-type acc-expand">{{party.PartyName}}</span>
+                      <ul class="type-child acc-child">
+                        <li *ngFor="let field of party.PartyFields;let j = index">
+                          <div id="{{party.PartyName}}-{{field.Name}}" draggable="true"
+                            dir="{{i}}-%n%-{{j}}"
+                            class="partyFields"
+                            (dragstart)="onDragStart($event,party.UUID,field.Id,'partyFields',party.PartyName,field.Name,party.Color,party.ColorCode,null)"
+                            (dragend)="onDragEnd($event)"
+                            (click)="onClickAddContent(party.UUID,field.Id,'partyFields',party.PartyName,field.Name,field,party.Color,party.ColorCode, null)">
+                          {{field.Name}}
+                          </div>
+                        </li>
+                        <li *ngFor="let field of party.TemplateCustomFields;let k = index">
+                          <div id="{{party.PartyName}}-{{field.Name}}" draggable="true"
+                            dir="{{i}}-%n%-{{k}}"
+                            class="customFields"
+                            (dragstart)="onDragStart($event,party.UUID,field.UUID,'customFields',party.PartyName,field.Name,party.Color,party.ColorCode,field.FieldTypeId)"
+                            (dragend)="onDragEnd($event)"
+                            (click)="onClickAddContent(party.UUID,field.UUID,'customFields',party.PartyName,field.Name,field,party.Color,party.ColorCode,field.FieldTypeId)">
+                            {{field.Name}}
+                          </div>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+          <!-- Clause Section -->
+          <fieldset class="clauses-block" *ngIf="selectedSection == 'clauses'">
+            <div *ngIf="selectedSubSection == 'clauseList'">
+              <div class="add-party-block flex-center">
+                <a *ngIf="disableField" class="add-party">New clause</a>
+                <a *ngIf="!disableField" (click)="newClause(true)" class="add-party">New clause</a>
+              </div>
+              <div class="list-block">
+                <!-- <div class="form-group" (click)="getAllClauses()"> -->
+                <!-- <div class="form-group">
+                <input type="search" name="clauseSearch" [(ngModel)]="searchText" placeholder="Search Clauses..." (focus)="checkfocus()" (focusout)="checkFocusOut()" (keyup)="searchClause($event)">
+                <ul class="searchSuggestions" *ngIf="clauseList?.length > 0  && focus">
+                  <li *ngFor = "let clause of clauseList,let j = index">
+                    <span>{{clause.Name}}</span>
+                    <span>
+                      <a href="javascript:void(0)" class="edit" (click)="editClauseFromSearch(clause)"></a>
+                    </span>
+                  </li>
+                </ul>
+                <ul class="searchSuggestions" *ngIf="clauseList?.length == 0 && focus">
+                  <li>
+                    <span>Clause not found</span>
+                  </li>
+                </ul>
+                </div> -->
+                <div *ngFor="let section of templateData.TemplateSections;let i = index;">
+                  <mat-checkbox [checked]="section.IsAdded" [disabled]="templateData.IsLocked || templateData.StatusId == 3 || disableField == 1" (change)="sectionCheckboxChange($event.checked,i,section)"></mat-checkbox>
+                  <label class="clause-list-title"
+                  draggable="true"
+                  dir="{{i}}"
+                  id="{{section.Name}}-{{i}}"
+                  (dragstart)="sectionDragStart($event,i,'sections',section.Name,section.UUID)"
+                  >
+                  <!-- {{section.Index}}. -->
+                  {{section.Name}}
+                  </label>
+                  <div class="dlt-section" style="display: flex">
+                    <a href="javascript:void(0)" (click)="setEditSection(section)"><span class="edit"></span></a>
+                    <a href="javascript:void(0)" (click)="deleteSection(i)"><span class="delete"></span></a>
+                  </div>
+
+                  <!-- <a class="del-file dlt-section" (click)="deleteSection(i)"></a> -->
+                  <table>
+                    <tbody cdkDropList [cdkDropListData]="section.TemplateClauses" (cdkDropListDropped)="clauseDropTable(i,$event)">
+                      <tr *ngFor="let clause of section.TemplateClauses;let j = index;" cdkDrag [cdkDragData]="clause" [cdkDragDisabled]="templateData.IsLocked && templateData.StatusId == 3">
+                        <td
+                        draggable="true"
+                        (dragstart)="clauseDragStart($event, i,j,'clauses',section.UUID,clause.UUID, section.Name, clause.Name)"
+                        >
+                          <!-- <a href="javascript:void(0)"><span class="clauses"></span></a> -->
+                        </td>
+                        <td>
+                          <div>
+                            <!-- <mat-checkbox [checked]="clause.IsAdded" [disabled]="templateData.IsLocked || templateData.StatusId !== 1 || disableField == 1" (change)="clauseCheckboxChange($event.checked,i,j,section,clause)"></mat-checkbox> -->
+
+                              <!-- <label class="field-type"
+                              draggable="true"
+                              id="{{clause.UUID}}"
+                              (dragstart)="clauseDragStart($event, i,j,'clauses',section.UUID,clause.UUID, section.Name, clause.Name)"
+                              (click)="addClauseInFroala(i,j,'clauses',section.UUID,clause.UUID, section.Name, clause.Name)">
+                              {{clause.Name}}
+                              </label> -->
+                              <label class="field-type"
+                              draggable="true"
+                              id="{{clause.UUID}}"
+                              >
+                              {{clause.Name}}
+                              </label>
+                          </div>
+
+                        </td>
+                        <td class="clause-action">
+                          <a href="javascript:void(0)" (click)="multiClause(clause,i,j)"><span class="multi-add"></span></a>
+                          <a href="javascript:void(0)" (click)="editClause(i,j)"><span class="edit"></span></a>
+                          <a href="javascript:void(0)" (click)="deleteClause(i,j)"><span class="delete"></span></a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+
+                <div class="section-divider" style="cursor: pointer;">
+                  <!-- <span *ngIf="!disableField" (click)="newSection()"> New section</span>
+                  <span *ngIf="disableField"> New section</span> -->
+
+                  <span *ngIf="!disableField" (click)="changeSubSection('addSection')"> New section</span>
+                  <span *ngIf="disableField"> New section</span>
+                </div>
+              </div>
+              <div class="form-footer">
+                <button *ngIf="!disableField" class="uni-button save navy-blue" (click)="insertAllSectionToFroala()">Insert all</button>
+                <button *ngIf="disableField" class="uni-button save navy-blue" >Insert all</button>
+              </div>
+            </div>
+
+            <!-- Add section -->
+            <div *ngIf="selectedSubSection == 'addSection'">
+              <form #addSectionForm="ngForm" (ngSubmit)="addSectionForm.form.valid && addSectionNewFunction()">
+                  <div class="insert-name">
+                      <h2>Add Section</h2>
+                      <div class="form-group"
+                      [ngClass]="sectionName.valid ? 'border-bottom-green' : 'border-bottom-red'">
+                          <!-- <label>Section name</label> -->
+                          <input type="text" class="roleName" name="sectionName" [(ngModel)]="addSection.Name" #sectionName="ngModel" placeholder="Enter section name" required pattern="(?!^ +$)^.+$">
+                      </div>
+
+                      <div class="form-group"
+                      [ngClass]="sectionNumber.valid ? 'border-bottom-green' : 'border-bottom-red'">
+                        <!-- <label>Starting Number</label> -->
+                        <input type="number" class="roleName" name="sectionNumber" [(ngModel)]="addSection.Index" #sectionNumber="ngModel" [customMin]="1" placeholder="Enter section number">
+                      </div>
+                  </div>
+
+                  <div class="form-footer" *ngIf="selectedSubSection == 'addSection'">
+                      <button (click)="resetAddSection();changeSubSection('clauseList')" class="uni-button text-only">Cancel</button>
+                      <button *ngIf="!addSection.edit" class="uni-button save pastel-green">Save</button>
+                      <button *ngIf="addSection.edit" class="uni-button save pastel-green">Update</button>
+                    </div>
+              </form>
+            </div>
+          </fieldset>
+
+          <!-- Attach Section -->
+          <fieldset class="attach-block" *ngIf="selectedSection == 'attach'" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <!-- <input type="file" id="hide" (change)="attachPdf($event.target.files)"/>
+              <div class="drag-file-sec border" (fileDropped)="onFileDropped($event)">
+                <div class="file-icon"><img src="assets/images/pdf-icon.svg"/></div>
+                <div class="file-text"><p>Drag PDF file here or click to upload <br>(10mb max file size)</p></div>
+              </div> -->
+              <!-- file upload -->
+              <ngx-file-drop id="fileDrop" [disabled]="templateData.IsLocked || templateData.StatusId == 3 || disableField == 1 ? true : false" dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)"
+                (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="drag-file-sec" accept=".pdf">
+                    <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                      <div *ngIf="!uploding" class="file-icon" (click)="openFileSelector()"><img src="assets/images/pdf-icon.svg"/></div>
+                      <div *ngIf="!uploding" class="file-text" (click)="openFileSelector()"><p>Drag & drop or click to upload your PDF <br><span>Limited to 10MB in total files</span></p></div>
+                    </ng-template>
+                </ngx-file-drop>
+
+              <p class="attached-files">PDF attached</p>
+              <div class="files-list" *ngFor="let file of templateData.Attachments;let i=index">
+                <p>{{file.FileName}} </p>
+                  <span>
+                    <strong>{{calculateKbToMb(file.Size)}} MB</strong>
+                    <a class="del-file pointer" (click)="deleteFile(i)">&times;</a>
+                    <!-- <div class="0"></div> -->
+                  </span>
+              </div>
+              <div class="no-pdf" *ngIf="templateData.Attachments.length == 0">
+                No PDFs uploaded
+              </div>
+              <!-- <div class="files-list">
+                <p>file name </p>
+                <span>
+                  <strong>11 MB</strong>
+                  <a class="del-file pointer" (click)="deleteFile(i)">&times;</a><div class="0"></div>
+                </span>
+              </div> -->
+          </fieldset>
+
+          <!-- Email Builder Section -->
+          <fieldset class="mail-block" *ngIf="selectedSection == 'mail'">
+              <h2>Email builder</h2>
+              <div class="form-control subject-div">
+                <!-- <label>Subject Line</label> -->
+                <input [attr.disabled] = "disableField === 1 ? 'disabled' : null" type="text" [disabled]="templateData.IsLocked || templateData.StatusId == 3 || disableField == 1" name="Subject" value="" placeholder="Email subject" [(ngModel)]="emailField.Subject" #Subject="ngModel" pattern="(?!^ +$)^.+$" required class="subject-field"/>
+                <div *ngIf="updateEmail && Subject.invalid" class="error">
+                  <span style="color:  #ff808b;font-size: 14px" *ngIf="Subject.errors?.required">Subject is required</span>
+                  <span style="color:  #ff808b;font-size: 14px" *ngIf="Subject.errors.pattern">Enter valid subject</span>
+                </div>
+              </div>
+              <div class="form-control">
+                <label for="message">Message</label>
+                <div class="message-box">
+                  <!-- <img src="assets/images/edit-controls.png" width="100%" height="auto"> -->
+                <textarea id="message"
+                [froalaEditor]="emailBuildorConfig"
+                (froalaInit)="emailFroalaInit($event)"
+                [(froalaModel)]="emailField.Body"
+                placeholder="Edit email body copy-WYSIWYG editor">
+              </textarea>
+                </div>
+              </div>
+              <!-- <label>Drag merge data into the email field above</label> -->
+
+                <!-- <button id="Sender name" draggable="true" (dragstart)="builderDragStart($event,'Sender name')" (click)="addToEmailBuilder('Sender name')">Sender name</button> -->
+
+                <!-- <div class="form-control button-wrapper mail-block-buttons">
+                  <button id="Document name" draggable="true" (dragstart)="builderDragStart($event,'Document name')" (click)="addToEmailBuilder('Document name')">Document name</button>
+                  <button id="Sender first name" draggable="true" (dragstart)="builderDragStart($event,'Sender first name')" (click)="addToEmailBuilder('Sender first name')">Sender first name</button>
+                  <button id="Sender last name" draggable="true" (dragstart)="builderDragStart($event,'Sender last name')" (click)="addToEmailBuilder('Sender last name')">Sender last name</button>
+                </div>
+
+                <div class="form-control button-wrapper mail-block-buttons">
+                  <button id="Sender email" draggable="true" (dragstart)="builderDragStart($event,'Sender email')" (click)="addToEmailBuilder('Sender email')">Sender email</button>
+                  <button id="Sender position" draggable="true" (dragstart)="builderDragStart($event,'Sender position')" (click)="addToEmailBuilder('Sender position')">Sender position</button>
+                  <button id="Sender mobile" draggable="true" (dragstart)="builderDragStart($event,'Sender mobile')" (click)="addToEmailBuilder('Sender mobile')">Sender mobile</button>
+                </div>
+
+                <div class="form-control button-wrapper mail-block-buttons">
+                  <button id="Recipient first name" draggable="true" (dragstart)="builderDragStart($event,'Recipient first name')" (click)="addToEmailBuilder('Recipient first name')">Recipient first name</button>
+                  <button id="Recipient last name" draggable="true" (dragstart)="builderDragStart($event,'Recipient last name')" (click)="addToEmailBuilder('Recipient last name')">Recipient last name</button>
+                  <button id="Recipient mobile" draggable="true" (dragstart)="builderDragStart($event,'Recipient mobile')" (click)="addToEmailBuilder('Recipient mobile')">Recipient mobile</button>
+                </div>
+
+                <div class="form-control button-wrapper mail-block-buttons">
+                  <button id="Recipient email" draggable="true" (dragstart)="builderDragStart($event,'Recipient email')" (click)="addToEmailBuilder('Recipient email')">Recipient email</button>
+                  <button id="Recipient company" draggable="true" (dragstart)="builderDragStart($event,'Recipient company')" (click)="addToEmailBuilder('Recipient company')">Recipient company</button>
+                  <button id="Recipient position" draggable="true" (dragstart)="builderDragStart($event,'Recipient position')" (click)="addToEmailBuilder('Recipient position')">Recipient position</button>
+                </div> -->
+
+                <!-- <div class="wrapper-status-groups"> -->
+
+                  <ng-select [(ngModel)]="emailPlaceholder" [placeholder]="emailPlaceholder ? '' : 'Insert Placeholder'" name="emailPlaceholder" (change)="addToEmailBuilder($event)">
+                    <ng-option value="Document name">Document name</ng-option>
+                    <ng-option value="Sender first name">Sender first name</ng-option>
+                    <ng-option value="Sender last name">Sender last name</ng-option>
+                    <ng-option value="Sender email">Sender email</ng-option>
+                    <ng-option value="Sender position">Sender position</ng-option>
+                    <ng-option value="Sender mobile">Sender mobile</ng-option>
+                    <ng-option value="Recipient first name">Recipient first name</ng-option>
+                    <ng-option value="Recipient last name">Recipient last name</ng-option>
+                    <ng-option value="Recipient mobile">Recipient mobile</ng-option>
+                    <ng-option value="Recipient email">Recipient email</ng-option>
+                    <ng-option value="Recipient company">Recipient company</ng-option>
+                    <ng-option value="Recipient position">Recipient position</ng-option>
+                  </ng-select>
+                <!-- </div> -->
+
+                <div class="sender-message">
+                  <p><strong>[Sender Name]</strong> has sent you a document - <strong>[Document Title]</strong> to review and sign</p>
+                </div>
+                <label>The above statement is automatically applied to your email content.</label>
+                <div class="bottom-buttons">
+                  <button class="uni-button text-only">Cancel</button>
+                  <button class="uni-button pastel-green" type="button" (click)="updateEmailBuilder()">Update</button>
+                </div>
+              </fieldset>
+        </form>
+
+        <!-- Create Clause -->
+        <div class="site-search-wrapper template-settings-wrapper" *ngIf="createClause">
+          <div (click)="closeClause()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+            <div class="card" *ngIf="createClause_anim" @slideInOut>
+              <div class="container">
+                <button class="close" (click)="closeClause()"></button>
+                <h2>Clause details</h2>
+                <form #addClauseForm="ngForm" (ngSubmit)="addClauseForm.form.valid && addClauseSubmit()"  class="setting-form template-settings clause-settings">
+                    <fieldset class="title-setting">
+                      <label>Name</label>
+                      <input
+                        type="text"
+                        name="clauseName"
+                        id="clauseName"
+                        class="form-control"
+                        placeholder=""
+                        pattern="(?!^ +$)^.+$"
+                        [ngClass]="(addClauseForm.submitted || clauseName.touched || clauseName) && clauseName.valid ? 'border-bottom-green' :
+                        (addClauseForm.submitted || clauseName.touched || !addClause.Name) && !clauseName.valid ?'border-bottom-red': ''"
+                        [(ngModel)]="addClause.Name" #clauseName="ngModel" required
+                      />
+                      <span *ngIf="addClauseForm.submitted && clauseName.invalid" class="error">
+                        <span *ngIf="clauseName.errors?.required">Clause name is required</span>
+                        <span *ngIf="clauseName.errors.pattern">Enter valid clause name</span>
+                      </span>
+                    </fieldset>
+
+                    <fieldset>
+                      <label>Clause</label>
+                      <div class="form-control clause-editor">
+                        <!-- <div class="clause-controls">
+                          <img src="assets/images/edit-controls.png" width="100%" height="auto">
+                        </div>
+                        <textarea>This is where the clause text is inserted. This screen wasn’t previewed on the demo video, please let me know if/what other fields need to go on this modal</textarea> -->
+                        <textarea
+                        [froalaEditor]="clauseConfig"
+                        (froalaInit)="initializeClauseLink($event)"
+                        [(froalaModel)]="addClause.Description"
+                        ></textarea>
+                      </div>
+                    </fieldset>
+
+                    <fieldset>
+                      <label>Section</label>
+                      <div class="custom-select section-select form-control w-100"
+                      [ngClass]="(addClauseForm.submitted || clauseSection.touched || clauseSection) && clauseSection.valid ? 'border-bottom-green' :
+                      (addClauseForm.submitted || clauseSection.touched || !addClause.section) && !clauseSection.valid ?'border-bottom-red': ''">
+
+                        <ng-select [(ngModel)]="addClause.section" [placeholder]="templateData.TemplateSections.length > 0 ? '' : 'Select section'" #clauseSection="ngModel" name="clauseSection" (change)="sectionChange($event)" required>
+                          <ng-option *ngFor="let section of templateData.TemplateSections,let i = index" [value]="i">{{section.Name}}</ng-option>
+                        </ng-select>
+
+                        <!-- <select [(ngModel)]="addClause.section" #clauseSection="ngModel" name="clauseSection" (change)="sectionChange($event.target.value)" required>
+                          <option hidden selected value="undefined">select section</option>
+                          <option *ngFor="let section of templateData.TemplateSections,let i = index" [value]="i">{{section.Name}}</option>
+                        </select> -->
+
+                        <br />
+
+                        <!-- <a href="javascript:void(0)" class="add-party add-section" (click)="newSection()">New Section</a> -->
+                      </div>
+                      <span *ngIf="addClauseForm.submitted && clauseSection.invalid" class="error">
+                        <span *ngIf="clauseSection.errors?.required">Select section</span>
+                      </span>
+                    </fieldset>
+
+                  <!-- <fieldset class="notifications">
+                    <label>Numbering <br> start</label>
+                    <div class="btn-group form-control">
+                      <input type="number" name="exp-days" value="000" [customMin]="1" [customMax]="addClause.indexMax"
+                      [ngClass]="(addClauseForm.submitted || clauseIndex.touched || clauseIndex) && clauseIndex.valid ? 'border-bottom-green' :
+                      (addClauseForm.submitted || clauseIndex.touched || !addClause.Index) && !clauseIndex.valid ?'border-bottom-red': ''"
+                      [(ngModel)]="addClause.Index" #clauseIndex="ngModel" name="clauseIndex" required>
+
+                      <input type="number" name="exp-days" value="000"
+                      [ngClass]="(addClauseForm.submitted || clauseIndex.touched || clauseIndex) && clauseIndex.valid ? 'border-bottom-green' :
+                      (addClauseForm.submitted || clauseIndex.touched || !addClause.Index) && !clauseIndex.valid ?'border-bottom-red': ''"
+                      [(ngModel)]="addClause.Index" #clauseIndex="ngModel" name="clauseIndex" required>
+                    </div>
+                    <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                      <span *ngIf="clauseIndex.errors?.required" style="color: #ff808b;">Numbering start is required</span>
+                    </span>
+                    <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                      <span *ngIf="clauseIndex.errors?.customMin" style="color: #ff808b;">Minimum required numbering start is 1.</span>
+                    </span>
+                    <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                      <span *ngIf="clauseIndex.errors?.customMax" style="color: #ff808b;">Maximum required numbering start is {{ addClause.indexMax}}.</span>
+                    </span>
+
+                    <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                      <span *ngIf="clauseIndex.errors?.required" style="color: #ff808b;">Numbering start is required</span>
+                    </span>
+                  </fieldset> -->
+
+                  <fieldset>
+                    <label>Sender can edit &nbsp; before sending</label>
+                    <div class="btn-group form-control button-wrapper">
+                      <button type="button" [ngClass]="{'btn-active' : addClause.IsSenderEdit == true}" (click)="senderEdit(true)">Yes</button>
+                      <button type="button" [ngClass]="{'btn-active' : addClause.IsSenderEdit == false}" (click)="senderEdit(false)">No</button>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="form-footer">
+                    <button type="button" (click)="closeClause()">Cancel</button>
+                    <button type="submit" *ngIf="!clauseEdit" class="save pastel-green">Add</button>
+                    <!-- <button type="submit" *ngIf="clauseEdit" class="save pastel-green" (click)="updateClause()">Update</button> -->
+                    <button type="submit" *ngIf="clauseEdit" class="save pastel-green">Update</button>
+
+                  </fieldset>
+                  </form>
+
+              </div>
+            </div>
+          </div>
+    </section>
+  </div>
+
+  <!-- <div *ngIf="clickedCreateTemp" class="site-search-wrapper template-settings-wrapper"> -->
+  <div *ngIf="clickedUpdateTemp" class="site-search-wrapper template-settings-wrapper">
+    <div (click)="closeUpdatetemplate()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+    <div class="card" *ngIf="clickedUpdateTemp_anim" @slideInOut>
+      <div class="container">
+        <button class="close" (click)="closeUpdatetemplate()"></button>
+        <h2>Template settings</h2>
+        <form class="setting-form template-settings" #createTemplateForm="ngForm" (ngSubmit)="createTemplateForm.form.valid && updateTemplate()">
+            <fieldset class="title-setting" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+              <label>Title</label>
+              <!-- <input
+                type="text"
+                id=""
+                class="form-control" [ngClass]="{ 'focused': createTemplateForm.submitted && Title.invalid }"
+                [(ngModel)]="templateData.Title"
+                #Title = "ngModel"
+                name="Title"
+                [disabled]="templateData.IsLocked && templateData.StatusId !== 1"
+                required
+                pattern="(?!^ +$)^.+$"
+              /> -->
+              <input
+                type="text"
+                id=""
+                class="form-control"
+                [ngClass]="(createTemplateForm.submitted || Title.touched || Title) && Title.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || Title.touched || !templateData.Title) && !Title.valid ?'border-bottom-red': ''"
+                [(ngModel)]="templateData.Title"
+                #Title = "ngModel"
+                name="Title"
+                [disabled]="templateData.StatusId == 3 || disableField == 1 ? true : false"
+                required
+                pattern="(?!^ +$)^.+$"
+              />
+              <span class="error" *ngIf="createTemplateForm.submitted && Title.invalid">
+                <span *ngIf="Title.errors.required">Title name is required</span>
+                <span *ngIf="Title.errors.pattern">Enter valid title name</span>
+              </span>
+            </fieldset>
+
+
+            <!-- <fieldset [attr.disabled] = "disableField === 1 ? 'disabled' : null"> -->
+              <fieldset>
+              <label>Status</label>
+              <!-- <div class="btn-group form-control button-wrapper" >
+                      <button class="btn-active" type="button"
+                      [ngClass]="{'btn-active':status.Id == templateData.StatusId}" *ngFor="let status of allPartyStatus;let t = index"
+                      (click)="statusChange(status.Id)"
+                      [disabled]="templateData.IsLocked && initialTemplateStatus !== 1"
+                      [(ngModel)]="templateData.StatusId"
+                      #StatusId="ngModel"
+                      name="StatusId_{{t}}"
+                      ngDefaultControl>{{status.Name}}</button>
+              </div> -->
+              <!-- [disabled]="status.Id < initialTemplateStatus && status.Id == 1" -->
+              <div class="btn-group form-control button-wrapper" >
+                <button class="btn-active" type="button"
+                [ngClass]="{'btn-active':status.Id == templateData.StatusId}" *ngFor="let status of allPartyStatus;let t = index"
+                (click)="statusChange(status.Id)"
+
+                [(ngModel)]="templateData.StatusId"
+                #StatusId="ngModel"
+                name="StatusId_{{t}}"
+                ngDefaultControl>{{status.Name}}</button>
+        </div>
+            </fieldset>
+
+            <fieldset *ngIf="activeApp" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+              <label>Link</label>
+              <div class="custom-select form-control"
+              [ngClass]="(createTemplateForm.submitted || link.touched || link) ? 'border-bottom-green' :
+              (createTemplateForm.submitted || link.touched || !link) && !link.valid ?'border-bottom-red': ''">
+
+                <ng-select [(ngModel)]="templateData.IsLinked" [disabled]="initialTemplateStatus > 1 || disableField == 1" [placeholder]="templateData.IsLinked  == null || templateData.IsLinked == undefined ? 'Select' : ''" (change)="changeLink($event)" #link="ngModel" name="link" required>
+                  <!-- <ng-option [value]="1">PropertyMe</ng-option> -->
+                  <ng-option *ngFor="let apps of allApps;let i = index" [value]="apps?.Id" [disabled]="!apps?.Active">{{apps?.Name}}</ng-option>
+                  <ng-option [value]="0">Not selected</ng-option>
+                </ng-select>
+
+                <!-- <select [(ngModel)]="templateData.link" [disabled]="initialTemplateStatus > 1" (change)="changeLink($event.target.value)" #link="ngModel" name="link" required>
+                  <option value="undefined" selected disabled hidden>Select</option>
+                  <option value="1">PropertyMe</option>
+                  <option value="0">Disable</option>
+                </select> -->
+              </div>
+
+              <span class="error" *ngIf="createTemplateForm.submitted && link.invalid">
+                <span *ngIf="link.errors.required">Please select link</span>
+              </span>
+            </fieldset>
+
+            <fieldset *ngIf="templateData.IsLinked == 1" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+              <label>Section</label>
+              <div class="custom-select form-control"
+              [ngClass]="(createTemplateForm.submitted || PropertyMeTypeId.touched || PropertyMeTypeId) && PropertyMeTypeId.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || PropertyMeTypeId.touched || !templateData.PropertyMeTypeId) && !PropertyMeTypeId.valid ?'border-bottom-red': ''">
+
+                <ng-select (change)="changeSection($event)" [(ngModel)]="templateData.PropertyMeTypeId" [placeholder]="templateData.PropertyMeTypeId == 0 || templateData.PropertyMeTypeId  == null || templateData.PropertyMeTypeId == undefined ? 'Select' :'' " [disabled]="initialTemplateStatus > 1 || disableField == 1" #PropertyMeTypeId="ngModel" name="PropertyMeTypeId" required>
+                  <ng-option *ngFor="let prprty of allPropertyMeTypes" [value]="prprty.Id">{{prprty.Type}}</ng-option>
+                </ng-select>
+
+                <!-- <select (change)="changeSection($event.target.value)" [(ngModel)]="templateData.PropertyMeTypeId" [disabled]="initialTemplateStatus > 1" #PropertyMeTypeId="ngModel" name="PropertyMeTypeId" required>
+                  <option [value]="null" selected disabled hidden>Select</option>
+                  <option *ngFor="let prprty of allPropertyMeTypes" [value]="prprty.Id">{{prprty.Type}}</option>
+                </select> -->
+              </div>
+              <span class="error" *ngIf="createTemplateForm.submitted && PropertyMeTypeId.invalid">
+                <span *ngIf="PropertyMeTypeId.errors.required">Please select section</span>
+              </span>
+            </fieldset>
+
+            <fieldset *ngIf="templateData.PropertyMeTypeId" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+              <label>Roles</label>
+              <div class="custom-select form-control"
+                [ngClass]="(createTemplateForm.submitted || PartyTypeId.touched || PartyTypeId) && PartyTypeId.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || PartyTypeId.touched || !templateData.PartyTypeId) && !PartyTypeId.valid ?'border-bottom-red': ''">
+
+                <ng-select [(ngModel)]="templateData.PartyTypeId" [placeholder]="templateData.PartyTypeId  == null || templateData.PartyTypeId == undefined ? 'Select' :''" [disabled]="initialTemplateStatus > 1 || disableField == 1" #PartyTypeId="ngModel" name="PartyTypeId" required>
+                  <ng-option *ngFor="let rl of allRoles" [value]="rl.Id">{{rl.Type}}</ng-option>
+                </ng-select>
+
+                <!-- <select [(ngModel)]="templateData.PartyTypeId" [disabled]="initialTemplateStatus > 1" #PartyTypeId="ngModel" name="PartyTypeId" required>
+                  <option [value]="null" selected hidden>Select</option>
+                  <option *ngFor="let rl of allRoles" [value]="rl.Id">{{rl.Type}}</option>
+                </select> -->
+              </div>
+              <span class="error" *ngIf="createTemplateForm.submitted && PartyTypeId.invalid">
+                <span *ngIf="PartyTypeId.errors.required">Please select roles</span>
+              </span>
+            </fieldset>
+
+            <fieldset class="groups-block" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <label>Groups</label>
+            <!-- <div class="form-control checkbox-block" >
+              <div class="checklist">
+              <div class="custom-checkbox active" *ngFor="let grps of activeGroupsArray,let i = index">
+                <input name="{{'group'+i}}" id="{{'group'+i}}" [disabled]="templateData.IsLocked && templateData.StatusId !== 1" type="checkbox" [checked]="grps.checked" (change)="changeGroups(i)">
+                <label for="{{'group'+i}}">{{grps.Name}}</label>
+              </div>
+              </div>
+            </div> -->
+
+            <div class="form-control checkbox-block border-0"
+              [ngClass]="createTemplateForm.submitted && checkGroupValidation() ? 'border-bottom-green' :
+              createTemplateForm.submitted && !checkGroupValidation() ?'border-bottom-red': ''">
+              <div class="checklist">
+              <div class="custom-checkbox active" *ngFor="let grps of activeGroupsArray,let i = index">
+                <!-- <input name="{{'group'+i}}" id="{{'group'+i}}" [disabled]="initialTemplateStatus > 1" type="checkbox" [checked]="grps.checked" (change)="changeGroups(i)">
+                <label for="{{'group'+i}}">{{grps.Name}}</label> -->
+
+                <mat-checkbox [disabled]="templateData.StatusId == 3 || disableField == 1" [checked]="grps.checked" (change)="changeGroups(i)">
+                  {{grps.Name}}
+                </mat-checkbox>
+              </div>
+              </div>
+            </div>
+
+            <span class="error" *ngIf="createTemplateForm.submitted && !checkGroupValidation()">
+              <span>Please check one groups</span>
+            </span>
+          </fieldset>
+
+          <fieldset [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <h3>Notifications</h3>
+          </fieldset>
+
+          <fieldset class="notifications" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <label>Expires in</label>
+            <div class="btn-group form-control"  [ngClass]="{ 'focused': createTemplateForm.submitted && ExpirationDays.invalid }" >
+              <!-- <input type="number" name="ExpirationDays" [disabled]="templateData.IsLocked && templateData.StatusId !== 1" value="00" [(ngModel)]="templateData.ExpirationDays" #ExpirationDays="ngModel" [customMin]="1" required> -->
+              <input type="number" name="ExpirationDays" [disabled]="templateData.StatusId == 3 || disableField == 1" value="00" [(ngModel)]="templateData.ExpirationDays"
+              [ngClass]="(createTemplateForm.submitted || ExpirationDays.touched || ExpirationDays) && ExpirationDays.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || ExpirationDays.touched || !templateData.ExpirationDays) && !ExpirationDays.valid ?'border-bottom-red': ''"
+                 #ExpirationDays="ngModel" [customMin]="1" required>
+              <span>days</span>
+            </div>
+            <div class="padding-top3" *ngIf="createTemplateForm.submitted && ExpirationDays.invalid">
+              <!-- <span class="error" *ngIf="ExpirationDays.errors.required">Please enter expiration days</span> -->
+              <span class="error" *ngIf="ExpirationDays.errors?.customMin">Minimum required expiration day is 1.</span>
+            </div>
+          </fieldset>
+
+          <fieldset class="notifications" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <label>Reminder</label>
+            <div class="btn-group form-control" >
+              <!-- <input type="number" name="ReminderDays" [disabled]="templateData.IsLocked && templateData.StatusId !== 1" value="00" [(ngModel)]="templateData.ReminderDays" #ReminderDays="ngModel" [customMin]="1" required> -->
+              <input type="number" name="reminderDays" [disabled]="templateData.StatusId == 3 || disableField == 1" value="00" [(ngModel)]="ReminderDays"
+              [ngClass]="(createTemplateForm.submitted || reminderDays.touched || reminderDays) && reminderDays.valid ? 'border-bottom-green' :
+                (createTemplateForm.submitted || reminderDays.touched || !ReminderDays) && !reminderDays.valid ?'border-bottom-red': ''"
+                #reminderDays="ngModel" [customMin]="1" required>
+              <span>days prior to expiry</span>
+            </div>
+            <div class="padding-top3" *ngIf="createTemplateForm.submitted && reminderDays.invalid">
+              <!-- <span class="error" *ngIf="reminderDays.errors.required">Please enter reminder days</span> -->
+              <span class="error" *ngIf="reminderDays.errors?.customMin">Minimum required reminder day is 1.</span>
+            </div>
+          </fieldset>
+
+          <fieldset class="notifications" [attr.disabled] = "disableField === 1 ? 'disabled' : null">
+            <span>An automatic reminder is send 24 hours prior to expiration</span>
+          </fieldset>
+
+          <fieldset [attr.disabled] = "disableField === 1 ? 'disabled' : null" class="notifications permissions" *ngIf="currentUser.role == 'Standard' || currentUser.role == 'SuperAdmin'">
+            <label>Permissions</label>
+            <div class="btn-group form-control" >
+              <a href="javascript:void(0)" class="locked" (click)="changePermission(0)" *ngIf="templateData.IsLocked == 1"></a>
+              <a href="javascript:void(0)" class="unlocked" (click)="changePermission(1)" *ngIf="templateData.IsLocked == 0"></a>
+              <!-- <a href="javascript:void(0)" (click)="changePermission(1)" *ngIf="templateData.IsLocked == 0"></a> -->
+              <!-- <a href="javascript:void(0)" class="info"></a> -->
+              <i class="info" title="Do you like my fa-coq icon?"></i>
+            </div>
+          </fieldset>
+
+
+            <fieldset class="form-footer" >
+              <button type="button" (click)="closeUpdatetemplate()">Cancel</button>
+              <!-- <button [disabled]="templateData.IsLocked && initialTemplateStatus !== 1" type="submit" class="save pastel-green">Save</button> -->
+              <button [attr.disabled] = "disableField === 1 ? 'disabled' : null" type="submit" class="save pastel-green">Save</button>
+            </fieldset>
+          </form>
+
+       </div>
+    </div>
+  </div>
+
+  <section class="edit-party-footer flex-end">
+    <div></div>
+    <div>
+      <button class="uni-button text-only" [routerLink]="['/admin/templates']">Close</button>
+      <button *ngIf="!preview" id="show-preview" class="uni-button pg-border" (click)="showPreview()">Preview</button>
+      <button *ngIf="preview" id="show-preview" class="uni-button pg-border" (click)="closePreview()">Close Preview</button>
+      <button *ngIf="(!templateData.IsLocked || !disableField) && initialTemplateStatus !== 3" class="uni-button pastel-green" (click)="saveTemplate()">Save</button>
+      <button *ngIf="(!templateData.IsLocked || !disableField) && initialTemplateStatus == 3" class="uni-button pastel-green" (click)="restoreTemplate()">Restore</button>
+    </div>
+  </section>
+
+
+
+</div>
+

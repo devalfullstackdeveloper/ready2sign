@@ -8,21 +8,21 @@
       <button (click)="signOut()">Sign-Out</button>
     </div>
 </div> -->
-
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
 <div class="page-header">
   <div class="header-left">
-      <div class="collapse-sidebar">
+      <div class="collapse-sidebar" (click)="toggleSidebar()">
           <span class="icon-arrow-left"></span>
-          <button type="button" class="sidebar-toggle"></button>
+          <button type="button" class="sidebar-toggle" ></button>
       </div>
-
-      <span class="user-name">Hocking Stuart</span>
+      <span class="user-name">{{companyProfileData.Name}}</span>
   </div>
 
   <div class="header-right">
-      <a href="#" class="btn btn-green create-doc">Create document</a>
+      <a href="javascript:void(0);" class="btn btn-green create-doc" (click)="openSelectTemplate()">Create document</a>
 
       <!-- <a href="#" class="search-btn"></a> -->
+
   </div>
 </div>
 
@@ -34,330 +34,890 @@
 <div class="content-area">
   <div class="left-sidebar-block">
       <h2>Documents</h2>
+
       <ul class="folder-list">
-          <li [ngClass]="(selectedType == 'draft') ? 'active folder-blue-ico' : ''" ><a class="pointer" (click)="documentChange('draft')">Drafts (5)</a></li>
-          <li [ngClass]="(selectedType == 'approval') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('approval')">Approval (2)</a></li>
-          <li [ngClass]="(selectedType == 'sent') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('sent')">Sent (200)</a></li>
-          <li [ngClass]="(selectedType == 'withdrawn') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('withdrawn')">Withdrawn (40)</a></li>
-          <li [ngClass]="(selectedType == 'completed') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('completed')">Completed (120)</a></li>
-          <li [ngClass]="(selectedType == 'expired') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('expired')">Expired (10)</a></li>
-          <li [ngClass]="(selectedType == 'all') ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="documentChange('all')">All (240)</a></li>
+        <!-- <li *ngFor="let side_data of sidebarData" [ngClass]="(selectedSidebar == side_data.Id) ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="setDisplay(side_data.Id,side_data.Status)">{{side_data.Status}} ({{side_data.Count}})</a></li> -->
+        <li *ngFor="let side_data of sidebarData" [ngClass]="(selectedSidebar == side_data.Id) ? 'active folder-blue-ico' : ''"><a class="pointer" (click)="setDisplay(side_data.Id,side_data.Status)">{{side_data.Status}}  <span class="right-count">{{side_data.Count}}</span> </a></li>
       </ul>
   </div>
 
   <section class="content-block">
       <div class="d-flex-between-top search-area">
-        <div class="search-expanded">
-          <input type="search" name="" id="" class="search-field" placeholder="Search..">
-          <!-- <div class="icons-wrap">
-              <button class="search-ico"></button>
-              <button class="arrow-right"></button>
+        <!-- <div class="search-expanded">
+          <input type="search" name="" id=""
+          class="search-field"
+          placeholder="Search"
+          [(ngModel)]="searchText"
+          (keyup.enter)="documentSearchTemplate(searchText)" >
+        </div> -->
+
+        <div class="max-search">
+          <div class="search-expanded">
+            <input type="search" name="" id=""
+            class="search-field"
+            placeholder="Search"
+            [(ngModel)]="searchText"
+            (keyup.enter)="documentSearchTemplate(searchText)" >
+            <a class="srch-btn" title="search" (click)="documentSearchTemplate(searchText)"></a>
+          </div>
+
+          <!-- <div *ngIf="advanceDom" class="searchbar-expanded-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Creator/editor</th>
+                  <th>Date range</th>
+                  <th>Email</th>
+                  <th>Linked</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span> <input type="text" name="creater" placeholder="Placeholder" /> </span></td>
+                  <td><span><input type="date" name="fromDate" /> &ndash; <input type="date" name="toDate" /> </span></td>
+                  <td>
+                    <span> <input type="email" name="advEmail" placeholder="example@gmail.com"/></span>
+                  </td>
+                  <td>
+                    <div class="custom-checkbox">
+                      <input type="checkbox" id="1" />
+                      <label for="1"></label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div> -->
         </div>
-          <h2>Advanced</h2>
+          <!-- <h2 class="pointer" (click)="clickAdvance()">Advanced</h2> -->
       </div>
 
       <!-- Draft -->
-      <div class="filter-table" *ngIf="selectedType == 'draft'">
+      <div class="filter-table home-table">
           <table>
               <thead>
                   <tr>
-                      <th>Title <span class="dropdown-arrow"></span></th>
-                      <th>Title <span class="dropdown-arrow"></span></th>
-                      <th>Modified <span class="dropdown-arrow"></span></th>
-                      <th>Recipient <span class="dropdown-arrow"></span></th>
-                      <th>Status <span class="dropdown-arrow"></span></th>
-                      <th>Linked <span class="dropdown-arrow"></span></th>
+                      <th>Title <span [ngClass]="filter.Title ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('Title')"></span></th>
+                      <th>Created <span [ngClass]="filter.Created ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('CreatedOn')"></span></th>
+                      <th>Sender <span [ngClass]="filter.Sender ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('Sender')"></span></th>
+                      <th>Recipient <span [ngClass]="filter.Recepient ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('Recepient')"></span></th>
+                      <th>Status <span [ngClass]="filter.Status ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('Status')"></span></th>
+                      <th *ngIf="selectedSidebar !== 1">Sent <span [ngClass]="filter.Days ? 'dropup-arrow' : 'dropdown-arrow'" class="dropdown-arrow" (click)="docFilterBy('Days')"></span></th>
+                      <th class="padding-r8">Linked <span></span></th>
                   </tr>
               </thead>
 
               <tbody>
-                  <tr *ngFor="let draft of drafts;let i = index" [ngClass]="(selectedDraft == draft.id) ? 'selected-doc-row' : ''" (click)="selectDraft(draft.id)">
-                      <td>{{draft.title}}</td>
-                      <td><a href="#">{{draft.email}}</a></td>
-                      <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                      <td>
-                          <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                          <a href="#">{{draft.recipient_email}}</a>
+                  <!-- <tr *ngFor="let draft of allDocument;let i = index" [ngClass]="(selectedDraft == draft.Id) ? 'selected-doc-row' : ''" (mouseover)="selectDraft(draft.Id)"> -->
+                      <tr *ngFor="let draft of dataSource;let i = index" class="selected-doc-row pointer" [ngClass]="draft.IsLinked && propertyMeDisable && draft.Status == 'Draft' ? 'disabledRow' : ''" [attr.disabled]="draft.IsLinked && propertyMeDisable && draft.Status ? 'disabled' : null" (mouseover)="selectDraft(draft.Id)">
+                      <!-- <td (click)="editDoucment(draft)" *ngIf="draft.Title">{{draft.Title | slice:0:20}}<ng-container *ngIf="draft.Title.length > 21">...</ng-container></td> -->
+                      <td (click)="editDoucment(draft)" >
+                        <p class="title_brk" *ngIf="draft.Title">{{draft.Title}}</p>
                       </td>
-                      <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                      <td class="info-popup-wrap setting-wrap">
-                        <a href="#" class="link"></a>
-                        <a class="setting-dots pointer" (click)="selectOption(i)"></a>
-                        <ul class="info-popup-sm" *ngIf="draft.options">
-                          <li class="delete" (click)="deleteDraft(i)"><a href="#">delete</a></li>
-                          <li class="duplicate" (click)="addDuplicate(i,draft)"><a class="pointer">Duplicate</a></li>
-                        </ul>
+                      <td *ngIf="!draft.Title"> </td>
+                      <td (click)="editDoucment(draft)">
+                        <span>{{draft.CreatedOn ? draft.CreatedOn : '' }}</span>
+                      </td>
+                      <td (click)="editDoucment(draft)">
+                        <a href="javascript:void(0);" >{{draft.Sender ? draft.Sender : ''}}</a>
+                      </td>
+                      <td (click)="editDoucment(draft)">
+                          <span>{{draft.RecepientDate ? draft.RecepientDate : ''}}</span>
+                          <a class="brk-word" href="javascript:void(0);">{{draft.Recepient ? draft.Recepient : ''}}</a>
                       </td>
 
+                      <td (click)="editDoucment(draft)">
+                        <!-- <span class="status-report">{{draft.Status}}</span> -->
+                        <span *ngIf="draft.Status == 'Sent'" class="status-report status-sent">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-circle-fill" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                          </svg> Sent</span>
+                        <span *ngIf="draft.Status == 'Completed'" class="status-report status-completed">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-circle-fill" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                          </svg> Completed</span>
+                        <span *ngIf="draft.Status == 'Approval'" class="status-report status-approval">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        </svg> Approval</span>
+                        <span *ngIf="draft.Status == 'Withdrawn'" class="status-report status-withdraw">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-circle-fill" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                          </svg> Withdrawn</span>
+                        <span *ngIf="draft.Status == 'Approval rejected'" class="status-report status-rejected">
+                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="currentColor" version="1.1" id="Layer_1" x="0px" y="0px" width="10px" height="10px" viewBox="0 0 16 16" xml:space="preserve">
+                            <path d="M8,0C3.6,0,0,3.6,0,8s3.6,8,8,8s8-3.6,8-8S12.4,0,8,0z M1,8c0-3.9,3.1-7,7-7c1.8,0,3.3,0.6,4.6,1.7l-9.9,9.9  C1.6,11.3,1,9.8,1,8z M8,15c-1.8,0-3.3-0.6-4.6-1.7l9.9-9.9C14.4,4.7,15,6.2,15,8C15,11.9,11.9,15,8,15z"/>
+                            </svg> Draft (approval rejected)</span>
+
+                        <span *ngIf="draft.Status == 'Draft'" class="status-report status-draft">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-circle-fill" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="8"/>
+                          </svg> Draft</span>
+
+
+
+
+                        <!-- <div class="info-popup-wrap">
+                          <span *ngIf="draft.Status == 'Sent'" class="numbers orange-border" [ngClass]="{'active' : selectedDaysId == draft.Id}" (mouseover)="daysHover(draft.Id)" (mouseleave)="daysMouseLeave()">{{draft.Days}}</span>
+                          <div class="info-popup-sm days-popup" *ngIf="selectedDaysId == draft.Id">
+                            <span>Days since sent</span>
+                          </div>
+                        </div> -->
+                      </td>
+
+                      <td *ngIf="selectedSidebar !== 1" (click)="editDoucment(draft)">
+                        <div class="info-popup-wrap">
+                          <!-- <span *ngIf="draft.Status == 'Sent' && draft.Days > 0" class="numbers" [ngClass]="{'orange-border' : (draft.Days > 0 && draft.Days <= 14), 'red-border' : (draft.Days > 14) , 'active' : selectedDaysId == draft.Id}" (mouseover)="daysHover(draft.Id)" (mouseleave)="daysMouseLeave()">{{draft.Days}}</span>
+                          <div class="info-popup-sm days-popup" *ngIf="selectedDaysId == draft.Id">
+                            <span>Days since sent</span>
+                          </div> -->
+
+                          <span *ngIf="draft.Status == 'Sent' && draft.Days == 0" style="color: #25cc51; font-size: 13px;">Today</span>
+                          <span *ngIf="draft.Status == 'Sent' && draft.Days == 1" style="color: orange; font-size: 13px;">{{draft.Days}} day ago</span>
+                          <span *ngIf="draft.Status == 'Sent' && draft.Days > 1 && draft.Days <= 14" style="color: orange; font-size: 13px;">{{draft.Days}} days ago</span>
+                          <span *ngIf="draft.Status == 'Sent' && draft.Days > 14" style="color: red; font-size: 13px;">{{draft.Days}} days ago</span>
+                        </div>
+                      </td>
+
+                      <!-- <td>
+                        <ng-container *ngIf="draft.Status"> {{draft.Status}}</ng-container>
+                        <ng-container *ngIf="!draft.Status"> </ng-container> -->
+                        <!-- <span *ngIf="draft.Days <= 7" class="numbers orange-border">{{draft.Days}}</span> <span *ngIf="draft.number >= 8" class="numbers red-border">{{draft.Days}}</span></td> -->
+                        <!-- <span *ngIf="draft.Status == 'Sent'" class="numbers orange-border">{{draft.Days}}</span></td> -->
+                      <td>
+                        <div class="info-popup-wrap setting-wrap" (clickOutside)="onClickedOutside(i)">
+                          <a href="#" *ngIf="draft.IsLinked" [class.disableImg] = "propertyMe == false" class="link">
+                            <img src="../../../../assets/images/propertyme-link.png" class="img-fluid" alt="" />
+                          </a>
+                          <a class="setting-dots pointer" (click)="selectOption(i,draft)"></a>
+                          <ul class="info-popup-sm" *ngIf="draft.options">
+                            <li *ngIf="draft.Status == 'Draft'" class="edit-doc" (click)="editDoucment(draft)"><a href="javascript:void(0);" class="pointer">Edit</a></li>
+                            <li *ngIf="draft.Status == 'Draft'" class="" (click)="deleteDocument(draft.Id)"><a href="javascript:void(0);" class="pointer">Delete</a></li>
+                            <li *ngIf="draft.Status !== 'Draft'" class="duplicate" (click)="addDuplicateDocument(draft.Id)"><a href="javascript:void(0);" class="pointer">Duplicate</a></li>
+                          </ul>
+                        </div>
+                      </td>
                   </tr>
-
-                  <!-- <tr>
-                      <td>Property agreement xyz</td>
-                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
-                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
-                      <td>
-                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
-                          <a href="#">adam.richards&#64;r2s.co</a>
-                      </td>
-                      <td>Sent <span class="numbers orange-border">7</span></td>
-                      <td><a href="#" class="link"></a></td>
+                  <tr *ngIf="allDocument.length == 0">
+                    <td *ngIf="!isLoading"colspan="7" style="text-align: center;width: 100%;">No records found</td>
+                    <td *ngIf="isLoading" colspan="7" style="text-align: center;width: 100%;">Loading your data</td>
                   </tr>
-
-                  <tr>
-                      <td>Property agreement xyz</td>
-                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
-                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
-                      <td>
-                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
-                          <a href="#">adam.richards&#64;r2s.co</a>
-                      </td>
-                      <td>Sent <span class="numbers red-border">8</span></td>
-                      <td><a href="#" class="link"></a></td>
-                  </tr>
-
-                  <tr>
-                      <td>Property agreement xyz</td>
-                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
-                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
-                      <td>
-                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
-                          <a href="#">adam.richards&#64;r2s.co</a>
-                      </td>
-                      <td>Draft</td>
-                      <td><a href="#" class="link"></a></td>
-                  </tr>
-
-                  <tr>
-                      <td>Property agreement xyz</td>
-                      <td><a href="#">adam.richards&#64;r2s.co</a></td>
-                      <td><time datetime="2020-05-23 14:23">23/05/2020 14:23</time></td>
-                      <td>
-                          <time datetime="2020-05-23 14:23">23/05/2020 14:23</time>
-                          <a href="#">adam.richards&#64;r2s.co</a>
-                      </td>
-                      <td>Completed</td>
-                      <td><a href="#" class="link"></a></td>
-                  </tr> -->
               </tbody>
           </table>
 
-
-
-          <!-- <table class="table table-striped" [mfData]="data" #mf="mfDataTable" [mfRowsOnPage]="5">
-            <thead>
-            <tr>
-                <th style="width: 20%">
-                    <mfDefaultSorter by="name">Name</mfDefaultSorter>
-                </th>
-                <th style="width: 50%">
-                    <mfDefaultSorter by="email">Email</mfDefaultSorter>
-                </th>
-                <th style="width: 10%">
-                    <mfDefaultSorter by="age">Age</mfDefaultSorter>
-                </th>
-                <th style="width: 20%">
-                    <mfDefaultSorter by="city">City</mfDefaultSorter>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let item of mf.data">
-                <td>{{item.name}}</td>
-                <td>{{item.email}}</td>
-                <td class="text-right">{{item.age}}</td>
-                <td>{{item.city | uppercase}}</td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="4">
-                    <mfBootstrapPaginator [rowsOnPageSet]="[5,10,25]"></mfBootstrapPaginator>
-                </td>
-            </tr>
-            </tfoot>
-        </table> -->
+          <mat-paginator #paginator [length]="allDocument.length"
+              showFirstLastButtons
+              [pageSize]="pageSize"
+              [pageIndex]="currentPage"
+              [hidePageSize]="true"
+              (page)="handlePage($event)">
+          </mat-paginator>
         </div>
-
-    <!-- Approval -->
-    <div class="filter-table" *ngIf="selectedType == 'approval'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-    <!-- Sent -->
-    <div class="filter-table" *ngIf="selectedType == 'sent'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-    <!-- Withdrawn -->
-    <div class="filter-table" *ngIf="selectedType == 'withdrawn'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-    <!-- Completed -->
-    <div class="filter-table" *ngIf="selectedType == 'completed'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-    <!-- Expired -->
-    <div class="filter-table" *ngIf="selectedType == 'expired'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-    <!-- All -->
-    <div class="filter-table" *ngIf="selectedType == 'all'">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Title <span class="dropdown-arrow"></span></th>
-                    <th>Modified <span class="dropdown-arrow"></span></th>
-                    <th>Recipient <span class="dropdown-arrow"></span></th>
-                    <th>Status <span class="dropdown-arrow"></span></th>
-                    <th>Linked <span class="dropdown-arrow"></span></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr *ngFor="let draft of drafts">
-                    <td>{{draft.title}}</td>
-                    <td><a href="#">{{draft.email}}</a></td>
-                    <td><time datetime="2020-05-23 14:23">{{draft.modified}}</time></td>
-                    <td>
-                        <time datetime="2020-05-23 14:23">{{draft.recipient_date}}</time>
-                        <a href="#">{{draft.recipient_email}}</a>
-                    </td>
-                    <td>{{draft.status}} <span *ngIf="draft.number == 7" class="numbers orange-border">7</span> <span *ngIf="draft.number == 8" class="numbers red-border">8</span></td>
-                    <td><a href="#" class="link"></a></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
   </section>
+</div>
+
+
+<!-- Document details -->
+
+<div class="property-details-block-wrapper add-user-block" *ngIf="openPage == 'createDocument'">
+  <div (click)="closeCreateDocPage('selectTemplate')" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+    <div class="card" *ngIf="create_doc_anim" @slideInOut>
+        <div class="contianer-sm">
+            <!-- <button class="close" (click)="closeCreateDocument()"></button> -->
+            <button class="close" (click)="closeCreateDocPage('selectTemplate')"></button>
+            <h2>
+              <!-- <span class="icon-arrow-left"></span> -->
+              Create Document
+            </h2>
+
+            <form class="property-details-form" name="form" #propertyDetailsFrom="ngForm" (ngSubmit)="propertyDetailsFrom.form.valid && nextEdit()">
+                <div class="property-details-form-sec-1">
+                    <!-- <p>Property details</p> -->
+                    <fieldset>
+                        <label for="title">Title</label>
+                        <input maxlength="70" type="text" value="Example title" id="title" class="form-control" placeholder="Example title"
+                        [(ngModel)]="createDoc.Title" name="title" #title="ngModel"
+                        pattern="(?!^ +$)^.+$" [disabled]="true" required/>
+                        <div *ngIf="propertyDetailsFrom.submitted && title.invalid" class="error">
+                            <span *ngIf="title.errors?.required">Title is required</span>
+                            <span *ngIf="title.errors.pattern">Enter valid title</span>
+                        </div>
+                    </fieldset>
+
+
+                    <fieldset *ngIf="templateData.PropertyMeTypeId">
+                        <label for="property">Property</label>
+                        <!-- <input autocomplete="off" type="text" id="property" class="form-control search-field search-border" value="Darren Middleton" placeholder="Search PropertyMe"
+                        [ngModel]="createDoc.Property" name="property" #property="ngModel"
+                        (focus)="propertyFocusIn()" (focusout)="propertyFocusOut()" (keyup)="searchPropertyMe($event.target.value)" required/> -->
+
+                        <input autocomplete="off" type="text" id="property" class="form-control search-field" value="Darren Middleton" placeholder="Search PropertyMe"
+                        [ngModel]="createDoc.Property" name="property" #property="ngModel"
+                        [ngClass]="(property.touched || propertyDetailsFrom.submitted || !createDoc.Property) && !property.valid ? 'border-bottom-red' : createDoc.Property && !property.valid ? '' : ''"
+                        [ngClass]="(property.touched || propertyDetailsFrom.submitted || createDoc.Property) && property.valid ? 'border-bottom-green' : ''"
+                        (focus)="propertyFocusIn()" (focusout)="propertyFocusOut()" (keyup)="searchPropertyMe($event.target.value)" required/>
+                        <div *ngIf="(propertyDetailsFrom.submitted && !createDoc.Property)" class="error">
+                            <span *ngIf="property.errors?.required">Property is required</span>
+                        </div>
+
+                        <ul class="searchSuggestions searchList" *ngIf="propertyFocus && createDoc.propertyEnterName && propertyMeList?.length > 0">
+                          <li *ngFor="let property of propertyMeList;let j=index" (click)="setProperty(property)">
+                              <span class="pointer">{{property.AddressText}}</span>
+                          </li>
+                        </ul>
+
+                        <ul class="searchSuggestions searchList" *ngIf="propertyFocus && createDoc.propertyEnterName && propertyMeList?.length == 0">
+                          <li>
+                            <span>Not Found</span>
+                          </li>
+                        </ul>
+                    </fieldset>
+
+                    <fieldset *ngIf="templateData.PropertyMeTypeId && (templateData.PartyTypeId == '12' || templateData.PartyTypeId == '14')">
+                        <label for="tenancy">Tenancy</label>
+                        <input type="select" autocomplete="off" value="" id="tenancy" class="form-control" placeholder=""
+                        [ngModel]="createDoc.Tenancy" name="tenancy" #tenancy="ngModel"
+                        [ngClass]="(tenancy.touched || propertyDetailsFrom.submitted || !createDoc.Tenancy) && !tenancy.valid ? 'border-bottom-red' : ''"
+                        [ngClass]="(tenancy.touched || propertyDetailsFrom.submitted || createDoc.Tenancy) && tenancy.valid ? 'border-bottom-green' : ''"
+                        (focus)="tenancyFocusIn()" (focusout)="tenancyFocusOut()" (keyup)="searchTenancy($event.target.value)"required/>
+                        <div *ngIf="propertyDetailsFrom.submitted && tenancy.invalid" class="error">
+                            <span *ngIf="tenancy.errors?.required">Tenancy is required</span>
+                        </div>
+
+                        <ul class="searchSuggestions searchList" *ngIf="tenancyFocus && tenancyList?.length > 0">
+                          <li *ngFor="let tenancy of tenancyList;let j=index" (click)="setTenancy(tenancy)">
+                              <span class="pointer">{{tenancy.Label}}</span>
+                          </li>
+                        </ul>
+
+                        <ul class="searchSuggestions searchList" *ngIf="tenancyFocus && createDoc.tenancyEnterName && tenancyList?.length == 0">
+                          <li>
+                            <span>Not Found</span>
+                          </li>
+                        </ul>
+                    </fieldset>
+                </div>
+
+
+                <!-- New Changes -->
+                <div class="property-details-form-sec-2">
+                  <ng-container *ngFor="let party of templateData.TemplateParties;let i = index">
+
+                    <!-- UserList -->
+
+                    <ng-container *ngIf="party.PartyTypeId == 8 || party.PartyTypeId == 9">
+                      <fieldset>
+                        <label for="sender">{{party.PartyName}}</label>
+                        <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" value="Darren Middleton" class="form-control"
+                        [ngClass]="(partyNamefield.touched || propertyDetailsFrom.submitted || !createDoc[party.PartyName]) && !partyNamefield.valid ? 'border-bottom-red' : ''"
+                        [ngClass]="(partyNamefield.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName]) && partyNamefield.valid ? 'border-bottom-green' : ''"
+                          (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changeApprover($event.target.value,i, party.PartyName)" placeholder="Search users" required/>
+
+                        <div *ngIf="(propertyDetailsFrom.submitted && !createDoc[party.PartyName] )" class="error">
+                            <span>{{party.PartyName}} is required</span>
+                        </div>
+
+                        <ul class="searchSuggestions searchList" *ngIf="party.focus && allUsers?.length > 0">
+                          <li *ngFor="let user of allUsers;let j=index" class="pointer" (click)="partyContactSelected(user,i,party.PartyName, party.PartyTypeId)">
+                              <!-- <span>{{user.FirstName |boldSpan :createDoc[party.PartyName]}} {{user.LastName |boldSpan :createDoc[party.PartyName]}}</span>
+                              <span *ngIf="user.Email"><img src="../../../../assets/images/email.png" alt="" />{{user.Email}}</span> -->
+
+                            <span class="fsearch"> <span [innerHTML]="user.FirstName |boldSpan:createDoc[party.PartyName]"></span>&nbsp;<span [innerHTML]="user.LastName |boldSpan :createDoc[party.PartyName]"></span> </span>
+                            <span *ngIf="user.Email">
+                              <!-- <img src="../../../../assets/images/email.png" alt="" />  -->
+                              <span [innerHTML]="user.Email |boldSpan :createDoc[party.PartyName]"></span></span>
+                          </li>
+                        </ul>
+
+                        <ul class="searchSuggestions searchList" *ngIf="party.focus && party.EnterName && allUsers?.length == 0">
+                          <li>
+                            <span style="text-transform: none;">Users not found</span>
+                          </li>
+                        </ul>
+                        <span class="pointer" *ngIf="party.PartyTypeId == 9" (click)="assignMeAsSender(i,party.PartyName)">Assign to me</span>
+                      </fieldset>
+                    </ng-container>
+
+
+                    <!-- ContactList -->
+                    <ng-container *ngIf="party.PartyTypeId !== 8 && party.PartyTypeId !== 9">
+                      <fieldset>
+                        <label  for="owner1">{{party.PartyName}}</label>
+
+                        <ng-container *ngIf="party.Mandatory">
+                          <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" value="Darren Middleton" class="form-control"
+                          [ngClass]="(partyNamefield.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName]) && partyNamefield.valid && createDoc[party.PartyName+'-details']?.detailAdded ? 'border-bottom-green' : 'border-bottom-red'"
+                          (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changePartyName($event.target.value,i, party.PartyName)" placeholder="Search contacts" required/>
+                          <div *ngIf="propertyDetailsFrom.submitted" class="error">
+                            <span *ngIf="partyNamefield.errors?.required">{{party.PartyName}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!party.Mandatory">
+                          <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" value="Darren Middleton" class="form-control"
+                          (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changePartyName($event.target.value,i, party.PartyName)" placeholder="Search contacts"/>
+                        </ng-container>
+                        <a *ngIf="createDoc[party.PartyName+'-details']?.detailAdded" (click)="setPartyIndex(i+1, party.PartyName)" class="edit-icon" title=""></a>
+                        <a *ngIf="createDoc[party.PartyName+'-details']?.detailAdded" (click)="clearPartyData(i,party.PartyName)" class="close-icon" title=""></a>
+
+                        <ul class="searchSuggestions searchList" *ngIf="party.focus && party.EnterName && contactList?.length > 0">
+                          <li *ngFor="let contact of contactList;let j=index" class="pointer" (click)="partyContactSelected(contact,i,party.PartyName, party.PartyTypeId)">
+                              <!-- <span>{{contact.FirstName}} {{contact.LastName}}</span>
+                              <span *ngIf="contact.Email"><img src="../../../../assets/images/email.png" alt="" />{{contact.Email}}</span>
+                              <span *ngIf="contact.Phone"><img src="../../../../assets/images/phone.png" alt="" />{{contact.Phone}}</span> -->
+
+                              <span class="fsearch"><span [innerHTML]="contact.FirstName |boldSpan:createDoc[party.PartyName]"></span>&nbsp;<span [innerHTML]="contact.LastName |boldSpan:createDoc[party.PartyName]"></span></span>
+                              <span *ngIf="contact.Email"><img src="../../../../assets/images/email.png" alt="" /> <span [innerHTML]="contact.Email |boldSpan:createDoc[party.PartyName]"></span></span>
+                              <span *ngIf="contact.Phone"><img src="../../../../assets/images/phone.png" alt="" /> <span [innerHTML]="contact.Phone |boldSpan:createDoc[party.PartyName]"></span> </span>
+                          </li>
+                        </ul>
+
+                        <ul class="searchSuggestions searchList" *ngIf="party.focus && party.EnterName && contactList?.length == 0">
+                          <li>
+                            <span style="text-transform: none;">Contacts not found</span>
+                          </li>
+
+                          <li>
+                            <a class="new-contact-btn pointer" (click)="clickNewContact(i)" title="">New contact</a>
+                          </li>
+                        </ul>
+                      </fieldset>
+
+                      <div class="owner-one-edit" *ngIf="selectedPartyIndex == i+1">
+                        <form class="property-details-form" name="form" #partyDetailsForm="ngForm" (ngSubmit)="partyDetailsForm.form.valid && partyDetailForm(party.PartyName, i)">
+                          <fieldset>
+                            <label  for="first-name">First name</label>
+                            <input type="text" name="first-name" value="Darren" id="first-name" class="form-control" placeholder=""
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['FirstName']" #FirstName="ngModel"
+                            [ngClass]="(FirstName.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['FirstName']) && FirstName.valid ? 'border-bottom-green' : 'border-bottom-red'" required />
+                            <div *ngIf="partyDetailsForm.submitted" class="error">
+                              <span *ngIf="FirstName.errors?.required">First Name is required</span>
+                            </div>
+                          </fieldset>
+
+                          <fieldset>
+                            <label  for="last-name">Last name</label>
+                            <input type="text" name="last-name" value="Middleton" id="last-name" class="form-control" placeholder=""
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['LastName']" #LastName="ngModel"
+                            [ngClass]="(LastName.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['LastName']) && LastName.valid ? 'border-bottom-green' : 'border-bottom-red'" required/>
+                            <div *ngIf="partyDetailsForm.submitted" class="error">
+                              <span *ngIf="LastName.errors?.required">Last Name is required</span>
+                            </div>
+                          </fieldset>
+
+                          <fieldset>
+                            <label  for="email">Email</label>
+                            <input type="email" name="email" value="daz@pf.com" id="email" class="form-control" placeholder=""
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['Email']" #Email="ngModel"
+                            [ngClass]="(Email.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['Email']) && Email.valid ? 'border-bottom-green' : 'border-bottom-red'" required/>
+
+                            <div *ngIf="partyDetailsForm.submitted" class="error">
+                              <span *ngIf="Email.errors?.required">Email is required</span>
+                            </div>
+                          </fieldset>
+
+                          <fieldset class="spanerror" *ngIf="createDoc[party.PartyName+'-details']['PhoneRequired']">
+                            <label  for="mobile">Mobile</label>
+                            <input type="tel" name="mobile" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au', utilsScript: 'node_modules/intl-tel-input/build/js/utils.js'}"
+                            (intlTelInputObject)="telInputObject($event)"
+                            (countryChange)="onCountryChange($event, party.PartyName)"
+                            placeholder=" "
+                            value="(08) 0000 0000" id="mobile" class="form-control"
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['Phone']" #Phone="ngModel"
+                            [ngClass]="(Phone.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['Phone']) && Phone.valid ? 'border-bottom-green' : 'border-bottom-red'" required/>
+
+                            <div *ngIf="partyDetailsForm.submitted" class="error">
+                              <span *ngIf="Phone.errors?.required">Mobile number is required</span>
+                            </div>
+                          </fieldset>
+
+                          <fieldset class="spanerror" *ngIf="!createDoc[party.PartyName+'-details']['PhoneRequired']">
+                            <label  for="mobile">Mobile</label>
+                            <input type="tel" name="mobile" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au', utilsScript: 'node_modules/intl-tel-input/build/js/utils.js'}"
+                            (intlTelInputObject)="telInputObject($event)"
+                            (countryChange)="onCountryChange($event, party.PartyName)"
+                            placeholder=" "
+                            value="(08) 0000 0000" id="mobile" class="form-control"
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['Phone']" #Phone="ngModel"/>
+
+                            <div *ngIf="partyDetailsForm.submitted" class="error">
+                              <span *ngIf="Phone.errors?.required">Mobile number is required</span>
+                            </div>
+                          </fieldset>
+
+                          <fieldset>
+                            <label  for="position">Position</label>
+                            <input type="tel" name="position" value="Lead Guitarist" id="position" class="form-control" placeholder=""
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['Position']" #Position="ngModel"/>
+                          </fieldset>
+                          <fieldset>
+                            <label  for="company">Company</label>
+                            <input type="text" name="company" value="Powderfinger" id="company" class="form-control" placeholder=""
+                            [(ngModel)]="createDoc[party.PartyName+'-details']['Company']" #Company="ngModel"/>
+                          </fieldset>
+                          <fieldset class="form-footer">
+
+                            <!-- <button *ngIf="partyDetailsForm.form.valid" type="button" (click)="setPartyIndex(0,null)">Cancel</button> -->
+                            <button *ngIf="createDoc[party.PartyName+'-details']?.detailAdded" type="button" (click)="setPartyIndex(0,null);cancelFormValidCheck(partyDetailsForm.form.valid, party.PartyName)">Cancel</button>
+                            <button *ngIf="!createDoc[party.PartyName+'-details']?.detailAdded" type="button" (click)="clearPartyData(i,party.PartyName)">Cancel</button>
+
+                            <button *ngIf="!clickedNewContact" type="submit" class="save update-btn">Update</button>
+                            <button *ngIf="clickedNewContact" type="submit" class="save update-btn">Add contact</button>
+                          </fieldset>
+                        </form>
+                      </div>
+                    </ng-container>
+
+
+                  </ng-container>
+                </div>
+
+
+                <!-- This is for Only Custom Fields -->
+                <div class="property-details-form-sec-6">
+                  <ng-container *ngFor="let party of templateData.TemplateParties;let i = index">
+
+                    <!-- Custom Field Only For Sender -->
+                    <ng-container *ngIf="party.PartyTypeId == 9">
+                      <ng-container *ngFor="let customField of party.TemplateCustomFields;let j = index">
+
+                        <!-- singleLine -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.SingleLineFieldTypeId">
+                            <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                            <ng-container *ngIf="customField.Mandatory">
+                              <input type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+                              [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                              [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required/>
+                              <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                  <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                              </div>
+                            </ng-container>
+
+                            <ng-container *ngIf="!customField.Mandatory">
+                              <input type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+                              [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"/>
+                            </ng-container>
+
+                        </fieldset>
+
+                        <!-- multiLine -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.MultiLineFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <textarea  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required>
+                            </textarea>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <textarea  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel">
+                            </textarea>
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- number -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.NumberFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <input  type="number" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter number"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <input  type="number" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter number"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" />
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- currancy -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.CurrencyFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <input  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter currancy"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <input  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter currancy"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" />
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Date -->
+                        <!-- Date yyyy/mm/dd  -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'yyyy/mm/dd'">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="YY_MM_DD_config"
+                            [theme]="'dp-material'"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                            #customFieldModel="ngModel" required
+                            ></dp-date-picker>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="YY_MM_DD_config"
+                            [theme]="'dp-material'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                            #customFieldModel="ngModel"
+                            ></dp-date-picker>
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Date mm/dd/yyyy -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'mm/dd/yyyy'">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="MM_DD_YY_config"
+                            [theme]="'dp-material'"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                            #customFieldModel="ngModel" required
+                            ></dp-date-picker>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="MM_DD_YY_config"
+                            [theme]="'dp-material'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                            #customFieldModel="ngModel"
+                            ></dp-date-picker>
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Date dd/mm/yyyy -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'dd/mm/yyyy'">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="DD_MM_YY_config"
+                            [theme]="'dp-material'"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                            #customFieldModel="ngModel" required
+                            ></dp-date-picker>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [config]="DD_MM_YY_config"
+                            [theme]="'dp-material'"
+                            [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                            (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                            #customFieldModel="ngModel"
+                            ></dp-date-picker>
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Time -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '12'">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control"
+                            [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" required  readonly>
+                            <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+
+                            <!-- <input  type="time" name="time" class="form-control" placeholder="Enter time"
+                            (ngModel)="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div> -->
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+
+                            <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control"
+                            [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"  readonly>
+                            <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+
+                            <!-- <input  type="time" name="time" class="form-control" placeholder="Enter time"
+                            (ngModel)="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" /> -->
+                          </ng-container>
+
+                        </fieldset>
+
+                        <fieldset *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '24'">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+
+                            <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format"
+                            #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [ngxTimepicker]="fullTime" [format]="24"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" required  readonly>
+                            <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+
+                            <!-- <input  type="time" name="time" class="form-control" placeholder="Enter time"
+                            (ngModel)="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div> -->
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+
+                            <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format"
+                            #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [ngxTimepicker]="fullTime" [format]="24"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"  readonly>
+                            <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+
+                            <!-- <input  type="time" name="time" class="form-control" placeholder="Enter time"
+                            (ngModel)="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" /> -->
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Checkbox -->
+                        <fieldset class="property-checkbox" *ngIf="customField.FieldTypeId == constant.CheckboxFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+                          <div class="setcheckbox">
+                            <ng-container *ngIf="customField.Mandatory">
+
+                              <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                                <mat-checkbox name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                              </ng-container>
+
+                              <div *ngIf="propertyDetailsFrom.submitted && parseInJSON(createDoc[party.PartyName+'-'+customField.Name]).length == 0" class="checkbox-error">
+                                <span>{{party.PartyName}} {{customField.Name}} is required</span>
+                              </div>
+                            </ng-container>
+
+                            <ng-container *ngIf="!customField.Mandatory">
+                              <!-- <input  type="text" name="checkbox" class="form-control" placeholder="Enter checkbox value"
+                              [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" /> -->
+
+                              <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                                <mat-checkbox name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                              </ng-container>
+                            </ng-container>
+                          </div>
+                        </fieldset>
+
+                        <!-- Dropdown -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.DropdownFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+
+                            <div class="select-box form-control"
+                            [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'">
+                              <ng-select class="w-100" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel" required (change)="checkDropDown(party.PartyName, customField.Name)">
+                                <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                              </ng-select>
+                            </div>
+
+                            <!-- <select name="dropdown" class="form-control" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required>
+                              <option value="" selected hidden>{{customField.Name}}</option>
+                              <option *ngFor="let op of parseInJSON(customField.Format)">{{op}}</option>
+                            </select> -->
+                            <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+
+                          <ng-container *ngIf="!customField.Mandatory">
+
+                            <div class="select-box form-control">
+                              <ng-select class="w-100" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel" (change)="checkDropDown(party.PartyName, customField.Name)">
+                                <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                              </ng-select>
+                            </div>
+
+                            <!-- <select name="dropdown" class="form-control" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel">
+                              <option value=null>{{customField.Name}}</option>
+                              <option *ngFor="let op of parseInJSON(customField.Format)">{{op}}</option>
+                            </select> -->
+                          </ng-container>
+
+                        </fieldset>
+
+                        <!-- Image -->
+                        <fieldset *ngIf="customField.FieldTypeId == constant.ImageFieldTypeId">
+                            <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                            <ng-container *ngIf="customField.Mandatory">
+                                <!-- <span class="file-name" *ngIf="templateData.TemplateParties[i].TemplateCustomFields[j].Format">{{templateData.TemplateParties[i].TemplateCustomFields[j].Format}}</span> -->
+                              <input type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control cust-image-file" placeholder="Upload Image" accept="image/*"
+                              [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"
+                              [ngClass]="(customFieldModel.touched || propertyDetailsFrom.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                              (change)="onImageChange($event, party.PartyName, customField.Name, i, j)" required />
+                             <span class="orfile">or</span>
+                             <span class="orMaxMsg">Max. size limit: 2MB</span>
+                              <div *ngIf="propertyDetailsFrom.submitted && customFieldModel.invalid" class="error">
+                                  <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                              </div>
+                              <span style="top: auto; color:black;font-size:14px">{{templateData.TemplateParties[i].TemplateCustomFields[j].Format}}</span>
+                            </ng-container>
+
+                            <ng-container *ngIf="!customField.Mandatory">
+
+                              <input type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control cust-image-file" placeholder="Upload Image" accept="image/*"
+                              [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"
+                              (change)="onImageChange($event, party.PartyName, customField.Name, i, j)" />
+                              <span class="orfile"></span>
+
+                              <span style="top: auto; color:black; font-size:14px">{{templateData.TemplateParties[i].TemplateCustomFields[j].Format}}</span>
+                            </ng-container>
+
+                          </fieldset>
+
+                      </ng-container>
+                    </ng-container>
+
+                  </ng-container>
+                </div>
+
+                <fieldset class="form-footer">
+                  <button type="button" (click)="closeCreateDocPage('selectTemplate')">Cancel</button>
+                  <!-- <button type="submit" class="save pastel-green" (click)="nextEdit()">Next</button> -->
+
+                  <!-- <button type="submit" class="save pastel-green dodger-blue">Done</button> -->
+                  <button type="submit" class="save pastel-green dodger-blue">Done</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- select template -->
+
+<div class="select-template-wrapper" *ngIf="openPage == 'selectTemplate'">
+  <div (click)="closePageChange()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+  <div class="card" *ngIf="doc_vis" @slideInOut>
+      <div class="contianer">
+        <button class="close" (click)="closePageChange()"></button>
+        <h2>Select Template</h2>
+          <div class="filter-table users-table">
+            <div class="wrapper-status-groups">
+              <div class="d-flex-between-top search-area select-tmp">
+                <div class="search-expanded">
+                  <input
+                    type="search"
+                    name=""
+                    id=""
+                    class="search-field"
+                    placeholder="Search"
+                    [(ngModel)]="searchText"
+                    (keyup.enter)="searchTemplate(searchText)"
+                  />
+                  <a class="srch-btn" title="search" (click)="searchTemplate(searchText)"></a>
+                </div>
+              </div>
+              <div class="select-box">
+                <ng-select [(ngModel)]="templateFilter.selectedGroup" [placeholder]="templateFilter.selectedGroup ? '':'All groups'" (change)="groupChange($event)">
+                  <ng-option *ngFor="let grp of activeGroups" [value]=grp.Id>{{grp.Name}}</ng-option>
+                </ng-select>
+              </div>
+
+              <!-- <select [(ngModel)]="templateFilter.selectedGroup" (change)="groupChange($event.target.value)">
+                  <option value =''>All groups</option>
+                  <option *ngFor="let grp of activeGroups" [value]=grp.Id>{{grp.Name}}</option>
+              </select> -->
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Title <span [ngClass]="templateFilter.title ? 'dropup-arrow' : 'dropdown-arrow'"  (click)="filterBy('Title')"></span></th>
+                  <th>Groups <span class="dropdown-arrow"></span></th>
+                  <th>Linked</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let template of allTemplate,let i = index">
+                  <!-- <td class="locked" (click)="createDocument();">{{template.Title}}</td> -->
+                  <td class="pointer" [ngClass]="{'locked' : template.IsLocked}" (click)="getTemplateDetail(template.Id);openSelectDocument();">{{template.Title}}</td>
+                  <td class="groud_td">
+                    <ng-container *ngFor="let grp of template.Groups;let i=index">
+                        <span *ngIf="i == 0 || i == 1" class="numbers group g{{i+1}}">{{firstCharecter(grp.Name)}}</span>
+                        <span *ngIf="i == 2" class="numbers group g{{i+1}}"> +{{template.Groups.length - 2}}</span>
+                      </ng-container>
+                      <ul class="group-popup">
+                        <li *ngFor="let group of template.Groups">{{group.Name}}</li>
+                    </ul>
+                  </td>
+                  <td><a href="javascript:void(0);" *ngIf="template.IsLinked" class="link">
+                    <img src="../../../../assets/images/propertyme-link.png" class="img-fluid" alt="" />
+                  </a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+</div>
+
+<!-- Warning Popup -->
+<div *ngIf="popupView" class="unsaved-changes-pop-up fixed-popup">
+  <div>
+      <div class="unsaved-changes-info">
+          <p>
+          Your access to this document is disabled.<br>
+          The link to PropertyMe is off. <br>
+          Refer to your System Administrator for assistance
+        </p>
+
+        <!-- <p>This document is disabled due to the connected app being disabled. Refer to your System Administrator to re-enable the connection.</p> -->
+      </div>
+    <div class="unsaved-changes-btns">
+      <button class="uni-button pg-border green-border" (click)="closePopup()">Close</button>
+      <!-- <button class="uni-button pastel-green" (click)="saveDocument()">Save and close</button> -->
+    </div>
+  </div>
 </div>

@@ -9,19 +9,27 @@ import { SignUpComponent } from './modules/sign-up/sign-up.component'
 import { TestComponent } from './test/test.component'
 import { AuthGuard } from './core/guard/auth.guard';
 import { HomeComponent } from './modules/home/home.component';
-
+import { SentSignInPersonComponent } from './sent-sign-in-person/sent-sign-in-person.component';
+import { ThankYouComponent } from './thank-you/thank-you.component';
+import { WithdrawThankYouComponent } from './withdraw-thank-you/withdraw-thank-you.component';
+import { Role } from './data/model/user/role';
+import { AppComponent } from './app.component';
 
 const routes: Routes = [
-  { path: '', redirectTo:'/admin',pathMatch:'full'},
-  { path:'test', component: TestComponent},
+  // { path: '', redirectTo:'/admin',pathMatch:'full'},
+  // { path: '', redirectTo:'/',pathMatch:'full'},
+  { path:'', component: TestComponent},
   { path: 'login', component: LoginComponent },
   // { path: 'sign-up/:id',component: SignUpComponent },
   { path: 'sign-up',component: SignUpComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'thank-you', component: ThankYouComponent },
+  { path: 'withdraw-thank-you', component: WithdrawThankYouComponent },
   // { path: 'password-confirmation/:id1/:id2/:id3', component: PasswordConformationComponent },
   { path: 'password-confirmation', component: PasswordConformationComponent },
-  { path: 'admin', component: HomeComponent ,canActivate :[AuthGuard], loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule)},
+  { path: 'sent-signin-person',component:SentSignInPersonComponent },
+  { path: 'admin', component: HomeComponent ,canActivate :[AuthGuard],data: { roles: [Role.Admin,Role.Manager,Role.Standard,Role.SuperAdmin, Role.Technical, Role.Sales, Role.Support] }, loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule)},
   // {
   //   path: '',
   //   component : HomeComponent,
@@ -45,6 +53,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [[RouterModule.forRoot(routes, { useHash: false })]],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [AuthGuard]
 })
 export class AppRoutingModule { }

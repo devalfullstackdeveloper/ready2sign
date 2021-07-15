@@ -1,9 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from 'src/app/core/service/authentication.service';
 import { MustMatch } from './must-match.validator'
 import { ToastrService } from 'ngx-toastr';
+
+export function patternValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } => {
+    if (!control.value) {
+      return null;
+    }
+
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
+    const valid = regex.test(control.value);
+    return valid ? null : { invalidPassword: true };
+  };
+}
 
 @Component({
   selector: 'app-reset-password',
@@ -14,6 +26,7 @@ export class ResetPasswordComponent implements OnInit {
 
   resetForm: FormGroup;
   submitted = false;
+  accountId: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,12 +38,13 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.resetForm = this.formBuilder.group({
-      oldPassword: ['', [Validators.required,Validators.minLength(6)]],
-      password: ['', [Validators.required,Validators.minLength(6)]],
+      oldPassword: ['', [Validators.required,Validators.minLength(8)]],
+      password: ['', [Validators.required,Validators.minLength(8), patternValidator()]],
       confirmPassword : ['', [Validators.required]]
     }, {
       validators : MustMatch('password', 'confirmPassword')
     });
+    this.getMyProfile();
   }
 
   // convenience getter for easy access to form fields
@@ -38,7 +52,6 @@ export class ResetPasswordComponent implements OnInit {
 
   resetPassword(){
     this.submitted = true;
-    console.log("Reset Password-----");
 
     // stop here if form is invalid
     if (this.resetForm.invalid) {
@@ -48,18 +61,23 @@ export class ResetPasswordComponent implements OnInit {
     var request = {
       OldPassword : this.f.oldPassword.value,
       Password : this.f.password.value,
-      confirmPassword : this.f.confirmPassword.value
+      confirmPassword : this.f.confirmPassword.value,
+      AccountId: this.accountId
     }
 
     this.authenticationService.changePassword(request).subscribe(res => {
-      console.log("Res----",res);
       this.toastr.success("Password changed successfully")
     },error => {
       this.toastr.error(error)
-      console.log("Error---",error);
     });
 
 
+  }
+
+  getMyProfile(){
+    this.authenticationService.getUserProfile().subscribe(res => {
+      this.accountId = res.AccountId;
+    })
   }
 
 }

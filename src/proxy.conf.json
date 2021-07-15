@@ -1,7 +1,7 @@
 {
-    "/admin": {
+    "/connect/*": {
         "target": "https://login.propertyme.com",
-        "secure": true,
-        "changeOrigin": true
+        "secure": false,
+        "logLevel": "debug"
     }
 }

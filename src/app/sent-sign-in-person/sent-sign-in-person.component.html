@@ -1,0 +1,818 @@
+
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+
+<div class="header">
+  <a class="logo signin"><img src="assets/images/logo.svg" alt="logo" title=""></a>
+  <div class="right-sec">
+    <!-- <p>Document ID: {{documentData.DocumentNumber}}</p> -->
+  </div>
+</div>
+<div class="sign-in-person-sec" *ngIf="showDiv == 'document'">
+  <div class="person-sec-left adjust_width">
+    <div class="person-sec-header">
+      <span class="title" id="docTitle">{{documentData.Title}} </span>
+      <!-- <div class="info-block">
+
+        <a><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 23.625 23.625" style="enable-background:new 0 0 23.625 23.625;" xml:space="preserve">
+          <g>
+            <path d="M11.812,0C5.289,0,0,5.289,0,11.812s5.289,11.813,11.812,11.813s11.813-5.29,11.813-11.813   S18.335,0,11.812,0z M14.271,18.307c-0.608,0.24-1.092,0.422-1.455,0.548c-0.362,0.126-0.783,0.189-1.262,0.189   c-0.736,0-1.309-0.18-1.717-0.539s-0.611-0.814-0.611-1.367c0-0.215,0.015-0.435,0.045-0.659c0.031-0.224,0.08-0.476,0.147-0.759   l0.761-2.688c0.067-0.258,0.125-0.503,0.171-0.731c0.046-0.23,0.068-0.441,0.068-0.633c0-0.342-0.071-0.582-0.212-0.717   c-0.143-0.135-0.412-0.201-0.813-0.201c-0.196,0-0.398,0.029-0.605,0.09c-0.205,0.063-0.383,0.12-0.529,0.176l0.201-0.828   c0.498-0.203,0.975-0.377,1.43-0.521c0.455-0.146,0.885-0.218,1.29-0.218c0.731,0,1.295,0.178,1.692,0.53   c0.395,0.353,0.594,0.812,0.594,1.376c0,0.117-0.014,0.323-0.041,0.617c-0.027,0.295-0.078,0.564-0.152,0.811l-0.757,2.68   c-0.062,0.215-0.117,0.461-0.167,0.736c-0.049,0.275-0.073,0.485-0.073,0.626c0,0.356,0.079,0.599,0.239,0.728   c0.158,0.129,0.435,0.194,0.827,0.194c0.185,0,0.392-0.033,0.626-0.097c0.232-0.064,0.4-0.121,0.506-0.17L14.271,18.307z    M14.137,7.429c-0.353,0.328-0.778,0.492-1.275,0.492c-0.496,0-0.924-0.164-1.28-0.492c-0.354-0.328-0.533-0.727-0.533-1.193   c0-0.465,0.18-0.865,0.533-1.196c0.356-0.332,0.784-0.497,1.28-0.497c0.497,0,0.923,0.165,1.275,0.497   c0.353,0.331,0.53,0.731,0.53,1.196C14.667,6.703,14.49,7.101,14.137,7.429z"/>
+          </g>
+          </svg>
+          </a>
+          <span class="title">{{documentData.Title}} </span>
+          <div class="dropdown-info">
+            <p><span>ID</span> {{documentData.DocumentNumber}}</p>
+            <p><span>Account Name</span> {{documentData.AccountName}}</p>
+            <p><span>Sender</span> {{senderData.FirstName}} {{senderData.LastName}}</p>
+            <p><span>Email</span> {{senderData.Email}}</p>
+          </div>
+      </div> -->
+      <!-- <span class="text-blue">Get started </span> -->
+    </div>
+
+
+     <div class="template-editor graybg">
+
+      <!--<div class="prvw">
+         <iframe class="preview" id="showContent" type="application/pdf" width="100%" height="700px"></iframe>
+       </div>-->
+
+      <div class="prvw preview-data" *ngIf="documentData.Content">
+      <div [innerHtml]="documentData.Content |safeHtml"></div>
+        </div>
+
+    </div>
+
+
+  </div>
+  <!-- <button class="uni-button withdraw-btn" (click)="openWithdrawnModel()">Withdraw</button> -->
+  <a href="javascript:void(0);" title="" class="person-details-edit" (click)="loadScript()">Start</a>
+  <div class="person-sec-right show_block">
+    <!-- <a href="javascript:void(0);" title="" class="person-details-edit" (click)="loadScript()"></a> -->
+
+    <form class="sign-in-person-details" #partyListForm="ngForm" (ngSubmit)="partyListForm.form.valid && opensignInModel()">
+      <h2>Please enter your details</h2>
+
+      <ng-container *ngFor="let party of documentData.Parties;let i = index">
+        <ng-container *ngIf="party.Id == partyId">
+
+          <!-- Basic Fields -->
+          <!-- <fieldset>
+            <label for="field-name-1">First Name</label>
+            <input type="text" name="FirstName" [(ngModel)]="createDoc[party.PartyName+'-details']['FirstName']" class="form-control" placeholder="Enter FirstName" required #FirstName="ngModel" [ngClass]="{'focus' : partyListForm.submitted && FirstName.errors?.required}"/>
+          </fieldset>
+
+          <fieldset>
+            <label for="field-name-1">Last Name</label>
+            <input type="text" name="LastName" [(ngModel)]="createDoc[party.PartyName+'-details']['LastName']" class="form-control" placeholder="Enter LastName" required #lastName="ngModel" [ngClass]="{'focus' : partyListForm.submitted && lastName.errors?.required}"/>
+          </fieldset>
+
+          <fieldset>
+            <label for="field-name-1">Email</label>
+            <input type="text" name="Email" [(ngModel)]="createDoc[party.PartyName+'-details']['Email']" class="form-control" placeholder="Enter Email" required #email="ngModel" [ngClass]="{'focus' : partyListForm.submitted && email.errors?.required}"/>
+          </fieldset>
+
+          <fieldset>
+            <label for="field-name-1">Phone</label>
+            <input type="text" name="Phone" [(ngModel)]="createDoc[party.PartyName+'-details']['Phone']" class="form-control" placeholder="Enter Phone" [required] ="createDoc[party.PartyName+'-details']['PhoneRequired']" #phone="ngModel" [ngClass]="{'focus' : partyListForm.submitted && phone.errors?.required}"/>
+          </fieldset>
+
+          <fieldset>
+            <label for="field-name-1">Company</label>
+            <input type="text" name="Company" [(ngModel)]="createDoc[party.PartyName+'-details']['Company']" class="form-control" placeholder="Enter Company" #company="ngModel" [ngClass]="{'focus' : partyListForm.submitted && company.errors?.required}"/>
+          </fieldset>
+
+          <fieldset>
+            <label for="field-name-1">Position</label>
+            <input type="text" name="Position" [(ngModel)]="createDoc[party.PartyName+'-details']['Position']" class="form-control" placeholder="Enter Position" #position="ngModel" [ngClass]="{'focus' : partyListForm.submitted && position.errors?.required}"/>
+          </fieldset> -->
+
+          <ng-container *ngFor="let customField of party.CustomFields;let j = index">
+
+            <!-- singleLine -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.SingleLineFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+              <input type="text" id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control focus" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+              [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required/>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <input type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"/>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- multiLine -->
+
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.MultiLineFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <textarea style="border-bottom: 1px solid;"  type="text" id="{{party.PartyName}}-{{customField.Name}}-custField" rows="5" cols="45" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required>
+                </textarea>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <textarea style="border-bottom: 1px solid;" type="text" id="{{party.PartyName}}-{{customField.Name}}-custField" rows="5" cols="45" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel">
+                </textarea>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- number -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.NumberFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <input  type="number" id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter number"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <input  type="number" id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter number"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" />
+              </ng-container>
+
+            </ng-container>
+
+
+            <!-- currancy -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.CurrencyFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <input style="border-bottom: 1px solid;" type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter currancy"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <input style="border-bottom: 1px solid;" type="text" id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" placeholder="Enter currancy"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"/>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Date -->
+            <!-- Date yyyy/mm/dd  -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'yyyy/mm/dd'">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <dp-date-picker class="form-control"  #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                style="border-bottom: 1px solid;"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [config]="YY_MM_DD_config"
+                [theme]="'dp-material'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                #customFieldModel="ngModel" required
+                ></dp-date-picker>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [config]="YY_MM_DD_config"
+                [theme]="'dp-material'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                #customFieldModel="ngModel"
+                ></dp-date-picker>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Date mm/dd/yyyy -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'mm/dd/yyyy'">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [config]="MM_DD_YY_config"
+                [theme]="'dp-material'"
+                [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                #customFieldModel="ngModel" required
+                ></dp-date-picker>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [config]="MM_DD_YY_config"
+                [theme]="'dp-material'"
+                [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                #customFieldModel="ngModel"
+                ></dp-date-picker>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Date dd/mm/yyyy -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'dd/mm/yyyy'">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [config]="DD_MM_YY_config"
+                [theme]="'dp-material'"
+                [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                #customFieldModel="ngModel" required
+                ></dp-date-picker>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [config]="DD_MM_YY_config"
+                [theme]="'dp-material'"
+                [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                #customFieldModel="ngModel"
+                ></dp-date-picker>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Time -->
+            <!-- Time 12 Hour -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '12'">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control"
+                style="border-bottom: 1px solid;"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" required  readonly>
+                <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+
+                <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"  readonly>
+                <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Time 24 Hour -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '24'">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+
+                <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                style="border-bottom: 1px solid;"
+                #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                [ngxTimepicker]="fullTime" [format]="24"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" required  readonly>
+                <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+
+                <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format"
+                style="border-bottom: 1px solid;"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [ngxTimepicker]="fullTime" [format]="24"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"  readonly>
+                <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Checkbox -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.CheckboxFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+
+                <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                  <mat-checkbox id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                </ng-container>
+
+                <div *ngIf="partyListForm.submitted && parseInJSON(createDoc[party.PartyName+'-'+customField.Name]).length == 0" class="checkbox-error">
+                  <span>{{party.PartyName}} {{customField.Name}} is required</span>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                  <mat-checkbox name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                </ng-container>
+
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Dropdown -->
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.DropdownFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                  <ng-select id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel" required
+                  style="border-bottom: 1px solid;"
+                  [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'">
+                    <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                  </ng-select>
+
+                <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                    <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                </div>
+              </ng-container>
+
+
+              <ng-container *ngIf="!customField.Mandatory">
+                  <ng-select style="border-bottom: 1px solid;" id="{{party.PartyName}}-{{customField.Name}}-custField" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel">
+                    <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                  </ng-select>
+
+              </ng-container>
+            </ng-container>
+
+
+            <!-- Image -->
+            <!-- <ng-container *ngIf="customField.FieldTypeId == constant.ImageFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                  <ngx-file-drop class="image-file" dropZoneLabel="Drop files here" id="fileDrop" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" required (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+                  [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'driverLicenceFront')">
+                    <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                      <button type="button" (click)="openFileSelector()">Browse Files</button>
+                    </ng-template>
+                  </ngx-file-drop>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <ngx-file-drop class="image-file" dropZoneLabel="Drop files here" id="fileDrop" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+                [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'driverLicenceFront')">
+                  <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                    <button type="button" (click)="openFileSelector()">Browse Files</button>
+                  </ng-template>
+                </ngx-file-drop>
+              </ng-container>
+            </ng-container> -->
+
+
+            <ng-container *ngIf="customField.FieldTypeId == constant.ImageFieldTypeId">
+              <label for="name1">{{customField.Name}}</label>
+              <ng-container *ngIf="customField.Mandatory">
+                  <span class="file-name" *ngIf="documentData.Parties[i].CustomFields[j].Format">{{documentData.Parties[i].CustomFields[j].Format}}</span>
+                <input  type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control cust-image-file" placeholder="Upload Image"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                [ngClass]="{'cust-image-file-red' : partyListForm.submitted && customFieldModel.errors?.required, 'cust-image-file-green': partyListForm.submitted && !customFieldModel.invalid}"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                [multiple]="false"
+                (change)="onImageChange($event, party.PartyName, customField.Name, i, j)" #customFieldModel="ngModel"
+                [required]="documentData.Parties[i].CustomFields[j].Format ? false : true" />
+                <span class="orfile">or</span>
+                <span class="orMaxMsg">Max. size limit: 2MB</span>
+              </ng-container>
+
+              <ng-container *ngIf="!customField.Mandatory">
+                <span class="file-name">{{documentData.Parties[i].CustomFields[j].Format}}</span>
+                <input  type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control cust-image-file" placeholder="Upload Image"
+                id="{{party.PartyName}}-{{customField.Name}}-custField"
+                [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                [multiple]="false"
+                (change)="onImageChange($event, party.PartyName, customField.Name, i, j)" #customFieldModel="ngModel" />
+                <span class="orfile">or</span>
+              </ng-container>
+            </ng-container>
+
+          </ng-container>
+
+          <ng-container *ngIf="party.CustomFields.length == 0">
+            <label>There is no custom fields so kindly proceed for the signature.</label>
+          </ng-container>
+
+        </ng-container>
+      </ng-container>
+
+      <div class="bottom-buttons">
+        <button *ngIf="isMobile" class="uni-button minimise-btn" type="button" (click)="loadScript()">Minimise menu</button>
+        <button id="btn-next" *ngIf="partyExist && !partyData.ProofOfIdentity && !documentData.IsExpired && !documentData.IsSigned" class="uni-button pastel-green" type="submit">Sign</button>
+        <button id="btn-next" *ngIf="partyExist && partyData.ProofOfIdentity && !documentData.IsExpired && !documentData.IsSigned" class="uni-button pastel-green" type="submit">Next Document Upload</button>
+
+        <!-- <button type="button" (click)="openWithdrawnModel()">Withdrawn</button> -->
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Upload Document -->
+<div class="send-document-block-wrapper sign-document-container" *ngIf="showUploadDocument">
+  <div (click)="closeUploadDocumentModel()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+  <div class="card" *ngIf="show_upload_document_anim" @slideInOut>
+    <div class="contianer-sm">
+      <button class="close" (click)="closeUploadDocumentModel()"></button>
+      <h2>ID Verification required</h2>
+
+      <!-- Driving Licence -->
+      <h4 *ngIf="partyData.DriverLicence">Driver Licence </h4>
+      <div class="sign-document-sec">
+        <div class="outer-sign" *ngIf="partyData.DriverLicence">
+          <div class="sign-doc-block">
+
+            <div class="sign-image">
+              <!-- <ngx-file-drop id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="handleImage($event, 'driverLicenceFront')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop> -->
+
+              <img src="assets/images/front-upload-card.svg" alt="" title="" *ngIf="!showWebCamdriverLicenceFront && !driverLicenceFront">
+
+              <img [src]="driverLicenceFront" *ngIf="driverLicenceFront && !showWebCamdriverLicenceFront">
+
+              <webcam [height]="300" [width]="200" [trigger]="triggerObservable" (imageCapture)="handleImage($event, 'driverLicenceFront')" *ngIf="showWebCamdriverLicenceFront"
+                [allowCameraSwitch]="true" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleInitError($event, 'showWebCamdriverLicenceFront')">
+              </webcam>
+
+            </div>
+            <h5>Front of Card</h5>
+            <div class="sign-doc-bttn btn-block ">
+              <ngx-file-drop class="brws-file" id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'driverLicenceFront')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop>
+              <button type="submit" *ngIf="!showWebCamdriverLicenceFront && !driverLicenceFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebCamdriverLicenceFront')">Take a picture</button>
+              <button type="submit" *ngIf="!showWebCamdriverLicenceFront && driverLicenceFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebCamdriverLicenceFront');">Retake a picture</button>
+              <button type="submit" *ngIf="showWebCamdriverLicenceFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="triggerSnapshot();">Snap Picture</button>
+              <button class="actionBtn" *ngIf="showWebCamdriverLicenceFront" (click)="showNextWebcam(true);" title="Switch Camera">🔁</button>
+            </div>
+          </div>
+
+          <div class="sign-doc-block">
+
+            <div class="sign-image">
+              <img src="assets/images/back-upload-card.svg" alt="" title="" *ngIf="!showWebcamdriverLicenceBack && !driverLicenceBack">
+
+              <img [src]="driverLicenceBack" *ngIf="driverLicenceBack && !showWebcamdriverLicenceBack">
+
+              <webcam [height]="300" [width]="200" [trigger]="triggerObservable" (imageCapture)="handleImage($event, 'driverLicenceBack')" *ngIf="showWebcamdriverLicenceBack"
+                [allowCameraSwitch]="true" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleInitError($event, 'showWebcamdriverLicenceBack')">
+              </webcam>
+
+            </div>
+            <h5>Back of Card</h5>
+            <div class="sign-doc-bttn btn-block">
+              <ngx-file-drop class="brws-file" id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'driverLicenceBack')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop>
+              <button type="submit" *ngIf="!showWebcamdriverLicenceBack && !driverLicenceBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamdriverLicenceBack')">Take a picture</button>
+              <button type="submit" *ngIf="!showWebcamdriverLicenceBack && driverLicenceBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamdriverLicenceBack');">Retake a picture</button>
+              <button type="submit" *ngIf="showWebcamdriverLicenceBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="triggerSnapshot();">Snap Picture</button>
+              <button class="actionBtn" *ngIf="showWebcamdriverLicenceBack" (click)="showNextWebcam(true);" title="Switch Camera">🔁</button>
+            </div>
+              <p class="end-text">Skip if there is no back image </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Helth Card -->
+      <h4 *ngIf="partyData.MedicalCard">Health Card</h4>
+      <div class="sign-document-sec" *ngIf="partyData.MedicalCard">
+        <div class="outer-sign">
+          <div class="sign-doc-block">
+            <div class="sign-image">
+              <img src="assets/images/front-upload-card.svg" alt="" title="" *ngIf="!showWebcamhealthCardFront && !healthCardFront">
+
+              <img [src]="healthCardFront" *ngIf="healthCardFront && !showWebcamhealthCardFront">
+
+              <webcam [height]="300" [width]="200" [trigger]="triggerObservable" (imageCapture)="handleImage($event, 'healthCardFront')" *ngIf="showWebcamhealthCardFront"
+                [allowCameraSwitch]="true" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleInitError($event, 'showWebcamhealthCardFront')">
+              </webcam>
+
+            </div>
+            <h5>Front of Card</h5>
+            <div class="sign-doc-bttn btn-block">
+
+              <ngx-file-drop class="brws-file" id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'healthCardFront')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop>
+
+              <button type="submit" *ngIf="!showWebcamhealthCardFront && !healthCardFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamhealthCardFront')">Take a picture</button>
+              <button type="submit" *ngIf="!showWebcamhealthCardFront && healthCardFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamhealthCardFront');">Retake a picture</button>
+              <button type="submit" *ngIf="showWebcamhealthCardFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="triggerSnapshot();">Snap Picture</button>
+              <button class="actionBtn" *ngIf="showWebcamhealthCardFront" (click)="showNextWebcam(true);" title="Switch Camera">🔁</button>
+            </div>
+          </div>
+
+          <div class="sign-doc-block">
+            <div class="sign-image">
+              <img src="assets/images/back-upload-card.svg" alt="" title="" *ngIf="!showWebcamhealthCardBack && !healthCardBack">
+
+              <img [src]="healthCardBack" *ngIf="healthCardBack && !showWebcamhealthCardBack">
+
+              <webcam [height]="300" [width]="200" [trigger]="triggerObservable" (imageCapture)="handleImage($event, 'healthCardBack')" *ngIf="showWebcamhealthCardBack"
+                [allowCameraSwitch]="true" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleInitError($event, 'showWebcamhealthCardBack')">
+              </webcam>
+
+            </div>
+            <h5>Back of Card</h5>
+            <div class="sign-doc-bttn btn-block">
+
+              <ngx-file-drop class="brws-file" id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'healthCardBack')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop>
+
+              <button type="submit" *ngIf="!showWebcamhealthCardBack && !healthCardBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamhealthCardBack')">Take a picture</button>
+              <button type="submit" *ngIf="!showWebcamhealthCardBack && healthCardBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcamhealthCardBack');">Retake a picture</button>
+              <button type="submit" *ngIf="showWebcamhealthCardBack" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="triggerSnapshot();">Snap Picture</button>
+              <button class="actionBtn" *ngIf="showWebcamhealthCardBack" (click)="showNextWebcam(true);" title="Switch Camera">🔁</button>
+            </div>
+              <p class="end-text">Skip if there is no back image </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passport -->
+      <h4 *ngIf="partyData.Passport">Passport</h4>
+      <div class="sign-document-sec" *ngIf="partyData.Passport">
+        <div class="outer-sign">
+          <div class="sign-doc-block">
+            <div class="sign-image">
+              <img src="assets/images/front-upload-card.svg" alt="" title="" *ngIf="!showWebcampassportFront && !passportFront">
+
+              <img [src]="passportFront" *ngIf="passportFront && !showWebcampassportFront">
+
+              <webcam [height]="300" [width]="200" [trigger]="triggerObservable" (imageCapture)="handleImage($event, 'passportFront')" *ngIf="showWebcampassportFront"
+                [allowCameraSwitch]="true" [switchCamera]="nextWebcamObservable" [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                (initError)="handleInitError($event, 'showWebcampassportFront')">
+              </webcam>
+            </div>
+            <!-- <h5>Front of Passport</h5> -->
+            <div class="sign-doc-bttn btn-block">
+
+              <ngx-file-drop class="brws-file" id="fileDrop" (onFileOver)="fileOver()" (onFileLeave)="fileLeave()"
+               [useDragEnter]="true" [multiple]="false" (onFileDrop)="uploadBrowseImage($event, 'passportFront')">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                  <button type="button" (click)="openFileSelector()">Browse Files</button>
+                </ng-template>
+              </ngx-file-drop>
+
+              <button type="submit" *ngIf="!showWebcampassportFront && !passportFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcampassportFront')">Take a picture</button>
+              <button type="submit" *ngIf="!showWebcampassportFront && passportFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="takeSnapShot('showWebcampassportFront');">Retake a picture</button>
+              <button type="submit" *ngIf="showWebcampassportFront" class=" sign-doc-bttn uni-button pastel-green dodger-blue" (click)="triggerSnapshot();">Snap Picture</button>
+              <button class="actionBtn" *ngIf="showWebcampassportFront" (click)="showNextWebcam(true);" title="Switch Camera">🔁</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-buttons doc-bottom-button">
+        <button class="uni-button minimise-btn" type="button" (click)="closeUploadDocumentModel()">Cancel</button>
+        <button class="uni-button pastel-green" type="button" (click)="openSignDocument()">Sign</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Sign Document Page -->
+<div class="send-document-block-wrapper sign-document-container" *ngIf="showSignDocument">
+  <div (click)="closeModel()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+  <div class="card" *ngIf="show_sign_document_anim" @slideInOut>
+    <div class="contianer-sm">
+      <button class="close" (click)="closeModel()"></button>
+      <h2>Sign document</h2>
+      <div class="sign-document-sec">
+        <ul class="wrapper-sign-groups">
+          <li><a href="javascript:void(0);" title="" class="draw-btn" [ngClass]="{'active' : divType == 'draw'}" (click)="toggleType('draw')">Draw</a></li>
+          <li><a href="javascript:void(0);" title="" class="type-btn" [ngClass]="{'active' : divType == 'type'}" (click)="toggleType('type')">Type</a></li>
+        </ul>
+
+        <div class="draw-sec" *ngIf="divType =='draw'">
+          <div class="left">
+            <label>Signature</label>
+            <div class="draw-signature">
+              <signature-pad #signatureCanvas [options]="signaturePadOptions" (onBeginEvent)="drawStart()" (onEndEvent)="drawComplete('signature')"></signature-pad>
+            </div>
+            <a href="javascript:void(0);" title="" class="clear-sig" (click)="clear()">Clear signature</a>
+
+
+            <!-- <div class="draw-signature">
+              <p>Draw signature here</p>
+            </div>
+            <a href="javascript:void(0);" title="" class="client-sign">Clear Signature</a> -->
+
+            <!-- <div class="draw-sign-info">
+              <p>By signing this document with an electronic signature, I agree that my electronic signature is the legal
+                equivalent of my written signature to the extent allowed by local laws.</p>
+            </div> -->
+          </div>
+
+          <div class="right">
+              <label>Initial</label>
+            <div class="draw-signature">
+              <signature-pad #initialSignatureCanvas [options]="initialSignaturePadOptions" (onBeginEvent)="drawStart()" (onEndEvent)="drawComplete('initial')"></signature-pad>
+            </div>
+            <a href="javascript:void(0);" title="" class="clear-sig" (click)="clearInitialSign()">Clear Initial</a>
+
+
+            <!-- <div class="draw-signature">
+              <p>Draw signature here</p>
+            </div>
+            <a href="javascript:void(0);" title="" class="client-sign">Clear Signature</a> -->
+            <!-- <div class="draw-sign-info">
+              <p>By signing this document with an electronic signature, I agree that my electronic signature is the legal
+                equivalent of my written signature to the extent allowed by local laws.</p>
+            </div> -->
+          </div>
+        </div>
+
+        <div class="type-sec" *ngIf="divType =='type'">
+          <div class="left">
+            <label>Signature</label>
+            <input type="text" name="text" [(ngModel)]="SignaturerName" value="" placeholder="Enter Signature" [ngStyle]="{'font-weight': selected  == 1 ? '300' : '600' }">
+            <div class="choose-sec">
+              <!-- <h5>Choose your preferred style</h5> -->
+              <div class="style-containner">
+                <div class="style-sec" id="type1Sign" [ngClass]="{'active' : selected  == 1}" (click)="styleSelected(1)">
+                  <p>{{SignaturerName}}</p>
+                </div>
+                <!-- <div class="style-sec" id="type2Sign" [ngClass]="{'active' : selected  == 2}" (click)="styleSelected(2)">
+                  <p>{{SignaturerName}}</p>
+                </div> -->
+              </div>
+              <!-- <div class="choose-sec-info">
+                <p>By signing this document with an electronic signature, I agree that my electronic signature is the
+                  legal equivalent of my written signature to the extent allowed by local laws.</p>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- Right -->
+          <div class="right">
+            <label>Initial</label>
+            <input type="text" name="text" [(ngModel)]="HasInitialText" value="" placeholder="Enter Initial" [ngStyle]="{'font-weight': selected  == 1 ? '300' : '600' }">
+            <div class="choose-sec">
+              <!-- <h5>Choose your preferred style</h5> -->
+              <div class="style-containner">
+                <div class="style-sec" id="initialType1Sign" [ngClass]="{'active' : initialSelected  == 1}" (click)="styleSelectedForInitial(1)">
+                  <p>{{HasInitialText}}</p>
+                </div>
+                <!-- <div class="style-sec" id="initialType2Sign" [ngClass]="{'active' : initialSelected  == 2}" (click)="styleSelectedForInitial(2)">
+                  <p>{{SignaturerName}}</p>
+                </div> -->
+              </div>
+              <!-- <div class="choose-sec-info">
+                <p>By signing this document with an electronic signature, I agree that my electronic signature is the
+                  legal equivalent of my written signature to the extent allowed by local laws.</p>
+              </div> -->
+            </div>
+          </div>
+        </div>
+
+        <div class="type-sec">
+          <div class="choose-sec">
+            <div class="choose-sec-info">
+              <p>By signing this document with an electronic signature, I agree that my electronic signature is the
+                legal equivalent of my written signature to the extent allowed by local laws.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sms-verification">
+          <h5 *ngIf="smsVerification">SMS Verification</h5>
+          <a href="javascript:void(0);" *ngIf="smsVerification && !otpSent" title="" class="request-btn uni-button" (click)="sendCode()">Request code</a>
+          <div class="sms-submit-sec" *ngIf="smsVerification && otpSent">
+            <input *ngIf="!verifiedOtp" type="text" name="OTP" [(ngModel)]="OTP">
+            <a class="submit-btn" *ngIf="!verifiedOtp" title="" href="javascript:void(0);" (click)="verifyCode()">Submit</a>
+            <a class="resend-btn" *ngIf="!verifiedOtp" title="" href="javascript:void(0);" (click)="sendCode()">Resend</a>
+          </div>
+          <div class="sms-code-info" *ngIf="smsVerification && otpSent">
+            <p *ngIf="!verifiedOtp">An SMS code was sent to {{convertNumberToXXX(detailForm.Phone)}} at {{otpSentTime}}.<br>
+              <!-- <p>An SMS code was sent to {{convertNumberToXXX('0123 45678')}}.<br> -->
+              This code expires after 10 minutes.</p>
+
+            <p *ngIf="verifiedOtp">SMS verification completed</p>
+          </div>
+          <div class="sms-footer-sec">
+            <a class="cancel-btn" title="" href="javascript:void(0);" (click)="closeModel()">Cancel</a>
+            <a class="finish-btn" title="" href="javascript:void(0);" (click)="FinalSignDoc()">Finish</a>
+          </div>
+        </div>
+      </div>
+
+      <progress-bar [progress]="percentage" [color]="'#488aff'">
+      </progress-bar>
+    </div>
+  </div>
+</div>
+
+<!-- Withdrawn Modal -->
+<div class="send-document-block-wrapper add-user-block" *ngIf="withdrawModelOpen">
+  <div (click)="closeWithdrawModel()" style="position:fixed;top:0;left:0;width: 60%;height: 100%;"></div>
+  <div class="card" *ngIf="withdrawModelOpen_anim" @slideInOut>
+    <div class="contianer-sm">
+      <button class="close" (click)="closeWithdrawModel()"></button>
+      <h2> Withdraw document</h2>
+        <ul class="withdraw-points">
+          <li>By withdrawing a document the ability to sign the document will stop</li>
+          <li>Recipients will be sent an email notification of the withdrawal</li>
+        </ul>
+      <form class="send-document-form withdraw-document-form" #withdrawForm="ngForm">
+        <fieldset>
+          <label for="reason">Reason</label>
+          <textarea class="form-control" id="reason" name="reason" #Reason="ngModel" [(ngModel)]="withdrawnMessage" required>{{withdrawnMessage}}</textarea>
+          <div class="send-msg-sec">
+            <p class="error"  *ngIf="(withdrawForm.submitted || Reason.touched) && Reason.errors?.required">Reason is required</p>
+          </div>
+        </fieldset>
+        <fieldset>
+              <div class="send-msg-sec">
+            <p>The above reason will be sent to all recipients.</p>
+            </div>
+        </fieldset>
+         <div class="bottom-buttons">
+           <button type="button" class="uni-button text-only" (click)="closeWithdrawModel()">Cancel</button>
+           <button type="button" class="uni-button pink" (click)="documentWithdrawn()">Withdraw</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Document Submit successfully -->
+<div class="send-document-block-wrapper sign-document-container" *ngIf="finishModelShow">
+    <div class="card">
+        <div class="contianer-sm">
+            <button class="close" (click)="finishModel()"></button>
+            <h2>Sign document</h2>
+            <div class="message-send-section">
+                <span class="sent-icon"></span>
+                <h4>Document submitted successfully</h4>
+                <p>Awesome, you're job's done!</p>
+                <a href="javascript:void(0);" title="" class="close-link" (click)="finishModel()"> Close Window</a>
+            </div>
+        </div><!-- contianer-sm -->
+    </div><!-- card -->
+</div>
+<section class="edit-party-footer flex-end">
+  <div class="info-block">
+
+    <a><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 23.625 23.625" style="enable-background:new 0 0 23.625 23.625;" xml:space="preserve">
+      <g>
+        <path d="M11.812,0C5.289,0,0,5.289,0,11.812s5.289,11.813,11.812,11.813s11.813-5.29,11.813-11.813   S18.335,0,11.812,0z M14.271,18.307c-0.608,0.24-1.092,0.422-1.455,0.548c-0.362,0.126-0.783,0.189-1.262,0.189   c-0.736,0-1.309-0.18-1.717-0.539s-0.611-0.814-0.611-1.367c0-0.215,0.015-0.435,0.045-0.659c0.031-0.224,0.08-0.476,0.147-0.759   l0.761-2.688c0.067-0.258,0.125-0.503,0.171-0.731c0.046-0.23,0.068-0.441,0.068-0.633c0-0.342-0.071-0.582-0.212-0.717   c-0.143-0.135-0.412-0.201-0.813-0.201c-0.196,0-0.398,0.029-0.605,0.09c-0.205,0.063-0.383,0.12-0.529,0.176l0.201-0.828   c0.498-0.203,0.975-0.377,1.43-0.521c0.455-0.146,0.885-0.218,1.29-0.218c0.731,0,1.295,0.178,1.692,0.53   c0.395,0.353,0.594,0.812,0.594,1.376c0,0.117-0.014,0.323-0.041,0.617c-0.027,0.295-0.078,0.564-0.152,0.811l-0.757,2.68   c-0.062,0.215-0.117,0.461-0.167,0.736c-0.049,0.275-0.073,0.485-0.073,0.626c0,0.356,0.079,0.599,0.239,0.728   c0.158,0.129,0.435,0.194,0.827,0.194c0.185,0,0.392-0.033,0.626-0.097c0.232-0.064,0.4-0.121,0.506-0.17L14.271,18.307z    M14.137,7.429c-0.353,0.328-0.778,0.492-1.275,0.492c-0.496,0-0.924-0.164-1.28-0.492c-0.354-0.328-0.533-0.727-0.533-1.193   c0-0.465,0.18-0.865,0.533-1.196c0.356-0.332,0.784-0.497,1.28-0.497c0.497,0,0.923,0.165,1.275,0.497   c0.353,0.331,0.53,0.731,0.53,1.196C14.667,6.703,14.49,7.101,14.137,7.429z"/>
+      </g>
+      </svg>
+      </a>
+      <!-- <span class="title">{{documentData.Title}} </span> -->
+      <div class="dropdown-info">
+        <p><span>ID</span> {{documentData.DocumentNumber}}</p>
+        <p><span>Account Name</span> {{documentData.AccountName}}</p>
+        <p><span>Sender</span> {{senderData.FirstName}} {{senderData.LastName}}</p>
+        <p><span>Email</span> {{senderData.Email}}</p>
+      </div>
+  </div>
+  <button class="uni-button withdraw-btn" (click)="openWithdrawnModel()">Withdraw</button>
+  <!-- <p>Copyright &copy;Ready2Sign</p> -->
+  <!-- <button class="uni-button pg-border start-btn" (click)="loadScript()">Start</button> -->
+</section>

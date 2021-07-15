@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/core/service/authentication.service';
 import { AlertService } from '../../core/service/alert.service';
+import { NgxSpinnerService } from "ngx-spinner";
 
 
 @Component({ templateUrl: 'login.component.html',styleUrls: ['./login.component.css'] })
@@ -13,13 +14,18 @@ export class LoginComponent implements OnInit {
     submitted = false;
     returnUrl: string;
     error = '';
+    showLoginError: boolean = false;
+    errorMessage : string = "";
+
+    showPassword = false;
 
     constructor(
         private alert : AlertService,
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private spinner: NgxSpinnerService
     ) {
         // redirect to home if already logged in
         if (this.authenticationService.currentUserValue) {
@@ -43,7 +49,6 @@ export class LoginComponent implements OnInit {
     get f() { return this.loginForm.controls; }
 
     onSubmit() {
-      console.log("Calling---")
         this.submitted = true;
 
         // stop here if form is invalid
@@ -52,23 +57,29 @@ export class LoginComponent implements OnInit {
         }
 
         this.loading = true;
+        this.spinner.show()
         this.authenticationService.login(this.f.username.value, this.f.password.value)
             .pipe(first())
             .subscribe(
                 data => {
-                    // this.router.navigate([this.returnUrl]);
+                  this.spinner.hide()
                     this.router.navigate(['/admin/home']);
                 },
-                error => {                    
+                error => {
+                    this.spinner.hide();
                     this.error = error;
+                    this.showLoginError = true;
+                    this.errorMessage = "Your email or password is incorrct";
                     this.loading = false;
-                    this.alert.error(error.error_description);
                 });
     }
 
     acceptsTC(e){
-      console.log("target---",e.target.value)
       // this.f.acceptTerms = true
       // this.loginForm.setValue({acceptTerms : true})
+    }
+
+    showpass(){
+      this.showPassword = !this.showPassword
     }
 }

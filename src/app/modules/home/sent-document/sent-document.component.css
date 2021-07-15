@@ -1,0 +1,77 @@
+.doc-activity ul.wrapper-status-groups li span.tooltip{
+	top: -32px;
+}
+ul.wrapper-status-groups li span.tooltip{
+	bottom: 64px;
+}
+.people-block {
+    opacity: 1 !important;
+    display: block !important;
+  }
+
+  .insert-name,
+/* .btn-group, */
+.form-footer,
+.fields-block,
+.fields-selection,
+.fields-detail,
+.list-block,
+.child-selection,
+.clauses-block,
+.attach-block,
+.mail-block,
+.type-selection-error {
+  opacity: 1 !important;
+  display: block !important;
+}
+
+.template-controls .template-settings-wrapper {
+  display: block !important;
+  opacity: 1 !important;
+  right: 0px !important;
+}
+
+.prvw{
+  /* height: calc(100vh - 230px); */
+  margin-top: -13px;overflow: overlay;
+  border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    height: calc(100vh - 279px);
+    overflow: auto;
+}
+
+.filter-section ul.list-of-changes li .changes-status .tenant-recipient-sec {
+  margin-bottom: 23px;
+}
+
+mat-form-field {
+  margin-right: 12px;
+}
+
+.client-info p label{
+  /* min-width: 80px; */
+  /* font-weight: 600; */
+}
+
+.client-info p span{
+  /* margin-left: 5px; */
+  /* font-size: 15px; */
+}
+ul.wrapper-status-groups li{ display: inline-block;border-radius: 5px;padding: 0 5px;}
+ul.wrapper-status-groups li label{position: relative; top: -5px;}
+ul.wrapper-status-groups li:hover label{color: #73c2fb;}
+ul.wrapper-status-groups li:last-child{margin-left: 0;}
+.doc-activity ul.wrapper-status-groups li.fields:hover a, .doc-activity ul.wrapper-status-groups li.fields.selected a, .doc-activity ul.wrapper-status-groups li.parties:hover a, .doc-activity ul.wrapper-status-groups li.parties.selected a{background-color: transparent;}
+.template-controls{padding-top: 54px;}
+.pb-0{padding-bottom: 0;}
+
+a.disabled {
+  color: gray;
+  cursor: not-allowed;
+  text-decoration: underline;
+}
+.template-table {
+  overflow: auto;
+  height: calc(100vh - 279px);
+}

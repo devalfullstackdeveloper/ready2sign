@@ -2,202 +2,177 @@
   <div class="page-left">
       <a href="#" class="logo"><img src="assets/images/r2s-logo.svg" alt="Ready2Sign Logo" /></a>
 
-      <h1>Create account</h1>
+      <p class="p-header">Welcome to Ready2Sign, let's get you started.
 
-      <!-- <form class="signup-form" [formGroup]="signupForm">
-          <p>
-            <label for="first-name">Firstname</label>
-            <input type="text" id="Firstname" formControlName="Firstname" class="text-field">
+        Please enter and confirm the following information.</p>
 
-            <label *ngIf="submitted && f.Firstname.errors  && f.Firstname.errors.required" class="alert-red">Please enter Firstname</label>
-          </p>
+      <form class="signup-form" [appMatchPassword]="['Password', 'confirm_Password']" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
 
-          <p>
-            <label for="last-name">Lastname</label>
-            <input type="text" id="Lastname" formControlName="Lastname" class="text-field">
-
-            <label *ngIf="submitted && f.Lastname.errors  && f.Lastname.errors.required" class="alert-red">Please enter full Lastname</label>
-          </p>
-
-          <p>
-            <label for="email">Email</label>
-            <input type="email" id="Email" formControlName="Email" class="text-field">
-
-            <label *ngIf="submitted && f.Email.errors && f.Email.errors.required" class="alert-red">Please Enter Email</label>
-            <label *ngIf="submitted && f.Email.errors && f.Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
-          </p>
-
-          <p>
-            <label for="mobile">Mobile</label>
-            <input type="number" id="Mobile" formControlName="Mobile" class="text-field">
-
-            <label *ngIf="submitted && f.Mobile.errors && f.Mobile.errors.required" class="alert-red">Please Enter Mobile</label>
-          </p>
-
-          <p>
-            <label for="workmobile">Workphone</label>
-            <input type="number" id="Workphone" formControlName="Workphone" class="text-field">
-
-            <label *ngIf="submitted && f.Workphone.errors && f.Workphone.errors.required" class="alert-red">Please Enter Workphone</label>
-          </p>
-
-          <p>
-            <label for="branch">Branch</label>
-            <input type="text" id="Branch" formControlName="Branch" class="text-field">
-
-            <label *ngIf="submitted && f.Branch.errors && f.Branch.errors.required" class="alert-red">Please Enter Branch</label>
-          </p>
-
-          <p>
-            <label for="position">Position</label>
-            <input type="text" id="Position" formControlName="Position" class="text-field">
-
-            <label *ngIf="submitted && f.Position.errors && f.Position.errors.required" class="alert-red">Please Enter Position</label>
-          </p>
-
-          <p>
-            <label for="password">Password</label>
-            <input type="password" id="Password" formControlName="Password" placeholder="Start typing..." class="text-field">
-
-            <label *ngIf="submitted && f.Password.errors && f.Password.errors.required" class="alert-red">Please enter a Password</label>
-            <label *ngIf="f.Password.errors && f.Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
-          </p>
-
-          <p class="terms-block">
-              <input type="radio" id="terms" formControlName="acceptTerms" (change)="acceptsTC($event)" name="acceptTerms" [value]="acceptTerms">
-              <label for="terms">I agree with terms & conditions</label>
-
-              <label *ngIf="submitted && f.acceptTerms.errors && f.acceptTerms.errors.required" class="alert-red">Accept Terms & Conditions is required</label>
-          </p>
-          <div class="buttons-sec">
-              <a class="blue-btn btn pointer" (click)="onSubmit()">Sign Up</a>
-              <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
-          </div>
-      </form> -->
-
-      <!-- <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
         <p>
-          <label for="first-name">Firstname</label>
-          <input type="text" id="Firstname" name="Firstname" #Firstname="ngModel" [(ngModel)]="User.Firstname" class="text-field" required>
-
-          <label *ngIf="f.submitted && Firstname.invalid && Firstname.errors.required" class="alert-red">Please enter Firstname</label>
+          <input type="text" name="firstName" [(ngModel)]="User.FirstName"
+          [ngClass]="FirstName.valid ? 'border-bottom-green' : 'border-bottom-red'"
+          #FirstName="ngModel" placeholder="First name" class="text-field" required />
+          <label *ngIf="(FirstName.touched || f.submitted) && FirstName.invalid && FirstName.errors.required" class="alert-red">Required</label>
         </p>
 
         <p>
-          <label for="last-name">Lastname</label>
-          <input type="text" id="Lastname" name="Lastname" #Lastname="ngModel" [(ngModel)]="User.Lastname" class="text-field" required>
+          <input type="text" name="lastName" [(ngModel)]="User.LastName"
+          [ngClass]="LastName.valid ? 'border-bottom-green' : 'border-bottom-red'"
+          #LastName="ngModel" placeholder="Last name" class="text-field" required />
+          <label *ngIf="(LastName.touched || f.submitted) && LastName.invalid && LastName.errors.required" class="alert-red">Required</label>
+        </p>
 
-          <label *ngIf="f.submitted && Lastname.invalid  && Lastname.errors.required" class="alert-red">Please enter full Lastname</label>
+
+        <p>
+         <label for="email">Email</label>
+          <input type="email" id="Email" name="Email" [readOnly]="disableUser.Email"
+          [ngClass]="[Email.valid ? 'border-bottom-green' : 'border-bottom-red', disableUser.Email ? 'email-disabled': '']"
+          #Email="ngModel" [(ngModel)]="User.Email" placeholder="Email address" class="text-field" required email>
+
+          <label *ngIf="(Email.touched || f.submitted) && Email.invalid && Email.errors.required" class="alert-red">Required</label>
+          <label *ngIf="(Email.touched || f.submitted) && Email.invalid && Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
         </p>
 
         <p>
-          <label for="email">Email</label>
-          <input type="email" id="Email" name="Email" #Email="ngModel" [(ngModel)]="User.Email" class="text-field" required email>
-
-          <label *ngIf="f.submitted && Email.invalid && Email.errors.required" class="alert-red">Please Enter Email</label>
-          <label *ngIf="f.submitted && Email.invalid && Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
+          <input type="tel" name="mobile" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au', utilsScript: 'node_modules/intl-tel-input/build/js/utils.js'}"
+          [(ngModel)]="User.Mobile"
+          [ngClass]="Mobile.valid ? 'border-bottom-green' : 'border-bottom-red'"
+          (intlTelInputObject)="telInputObject($event)"
+          (countryChange)="onCountryChange($event)"
+          #Mobile="ngModel" placeholder="Mobile" class="text-field" required />
+          <label *ngIf="(Mobile.touched || f.submitted) && Mobile.invalid && Mobile.errors.required" class="alert-red">Required</label>
         </p>
 
-        <p>
-          <label for="mobile">Mobile</label>
-          <input type="number" id="Mobile" name="Mobile" #Mobile="ngModel" [(ngModel)]="User.Mobile" class="text-field" required>
+        <!-- <p>
+          <input type="tel" name="phone" [(ngModel)]="User.Phone"  #Phone="ngModel" placeholder="Phone" class="text-field"/>
+          <label *ngIf="(Phone.touched || f.submitted) && Phone.invalid && Phone.errors.required" class="alert-red">Please Enter Phone</label>
+        </p> -->
 
-          <label *ngIf="f.submitted && Mobile.invalid && Mobile.errors.required" class="alert-red">Please Enter Mobile</label>
+        <p>
+          <input type="text" name="position" [(ngModel)]="User.Position"  #Position="ngModel" placeholder="Position" class="text-field" />
+          <label *ngIf="(Position.touched || f.submitted) && Position.invalid && Position.errors.required" class="alert-red">Required</label>
         </p>
 
-        <p>
-          <label for="workmobile">Workphone</label>
-          <input type="number" id="Workphone" name="Workphone" #Workphone="ngModel" [(ngModel)]="User.Workphone" class="text-field" required>
+        <!-- <p>
+          <input autocomplete="doNotAutoComplete" type="text" name="branch" [(ngModel)]="User.Branch"  #Branch="ngModel" placeholder="Branch" class="text-field" />
+          <label *ngIf="(Branch.touched || f.submitted) && Branch.invalid && Branch.errors.required" class="alert-red">Required</label>
+        </p> -->
+        <div class="drop-area">
+          <!-- <svg _ngcontent-nuq-c172="" (click)="showpass()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 23.625 23.625" xml:space="preserve" style="enable-background: new 0 0 23.625 23.625;" class="ng-tns-c172-0"><g _ngcontent-nuq-c172="" class="ng-tns-c172-0"><path _ngcontent-nuq-c172="" d="M11.812,0C5.289,0,0,5.289,0,11.812s5.289,11.813,11.812,11.813s11.813-5.29,11.813-11.813   S18.335,0,11.812,0z M14.271,18.307c-0.608,0.24-1.092,0.422-1.455,0.548c-0.362,0.126-0.783,0.189-1.262,0.189   c-0.736,0-1.309-0.18-1.717-0.539s-0.611-0.814-0.611-1.367c0-0.215,0.015-0.435,0.045-0.659c0.031-0.224,0.08-0.476,0.147-0.759   l0.761-2.688c0.067-0.258,0.125-0.503,0.171-0.731c0.046-0.23,0.068-0.441,0.068-0.633c0-0.342-0.071-0.582-0.212-0.717   c-0.143-0.135-0.412-0.201-0.813-0.201c-0.196,0-0.398,0.029-0.605,0.09c-0.205,0.063-0.383,0.12-0.529,0.176l0.201-0.828   c0.498-0.203,0.975-0.377,1.43-0.521c0.455-0.146,0.885-0.218,1.29-0.218c0.731,0,1.295,0.178,1.692,0.53   c0.395,0.353,0.594,0.812,0.594,1.376c0,0.117-0.014,0.323-0.041,0.617c-0.027,0.295-0.078,0.564-0.152,0.811l-0.757,2.68   c-0.062,0.215-0.117,0.461-0.167,0.736c-0.049,0.275-0.073,0.485-0.073,0.626c0,0.356,0.079,0.599,0.239,0.728   c0.158,0.129,0.435,0.194,0.827,0.194c0.185,0,0.392-0.033,0.626-0.097c0.232-0.064,0.4-0.121,0.506-0.17L14.271,18.307z    M14.137,7.429c-0.353,0.328-0.778,0.492-1.275,0.492c-0.496,0-0.924-0.164-1.28-0.492c-0.354-0.328-0.533-0.727-0.533-1.193   c0-0.465,0.18-0.865,0.533-1.196c0.356-0.332,0.784-0.497,1.28-0.497c0.497,0,0.923,0.165,1.275,0.497   c0.353,0.331,0.53,0.731,0.53,1.196C14.667,6.703,14.49,7.101,14.137,7.429z" class="ng-tns-c172-0"></path></g></svg> -->
 
-          <label *ngIf="f.submitted && Workphone.invalid && Workphone.errors.required" class="alert-red">Please Enter Workphone</label>
+          <svg *ngIf="!showPassword" _ngcontent-nuq-c172="" (click)="showpass()" xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path _ngcontent-nuq-c172="" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+            <path _ngcontent-nuq-c172="" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+          </svg>
+
+          <svg *ngIf="showPassword" _ngcontent-nuq-c172="" (click)="showpass()" xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+            <path _ngcontent-nuq-c172="" d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+            <path _ngcontent-nuq-c172="" d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+          </svg>
+         <p>
+          <!-- <label for="password">Password</label> -->
+          <!-- <input type="password" id="Password" name="Password" #Password="ngModel" [(ngModel)]="User.Password" placeholder="Password" class="text-field" required
+          minlength="6" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" [ngClass]="{'success' : Password.valid}"> -->
+
+          <input autocomplete="new-password" [type]="showPassword ? 'text' : 'password'" id="Password" name="Password"
+          [ngClass]="Password.valid ? 'border-bottom-green success' : 'border-bottom-red'"
+          #Password="ngModel" [(ngModel)]="User.Password" placeholder="Password" class="text-field" required
+          minlength="8" pattern="^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$">
+
+          <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.required" class="alert-red">Required</label>
+          <!-- <label *ngIf="f.submitted && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label> -->
+          <!-- <label *ngIf="f.submitted && Password.invalid && Password.errors.pattern" class="alert-red">Please enter min. of six character, at least one upper case letter, at least one lower case letter, at least one number, at least one special character</label> -->
+
+          <!-- <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 8 characters</label> -->
+
+          <!-- <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.pattern" class="alert-red">Password must be at least one lower case letter</label>
+          <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.pattern" class="alert-red">Password must be at least one number</label>
+          <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.pattern" class="alert-red">Password must be at least one special character</label>
+          <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.pattern" class="alert-red">Password must be at least one upper case letter</label> -->
+
+          <label *ngIf="(Password.touched || f.submitted) && Password.invalid && Password.errors.pattern" class="alert-red">Password is invalid</label>
         </p>
 
-        <p>
-          <label for="branch">Branch</label>
-          <input type="text" id="Branch" name="Branch" #Branch="ngModel" [(ngModel)]="User.Branch" class="text-field" required>
+        <p class="drop-content">
+          <label>Your password must have:</label>
+          <label> - Minimum of eight (8) characters</label>
+          <label> - At least one (1) number</label>
+          <label>- At least one (1) upper case letter</label>
 
-          <label *ngIf="f.submitted && Branch.invalid && Branch.errors.required" class="alert-red">Please Enter Branch</label>
+          <label>You can also add extra characters to make your password even stronger.</label>
         </p>
 
-        <p>
-          <label for="position">Position</label>
-          <input type="text" id="Position" name="Position" #Position="ngModel" [(ngModel)]="User.Position" class="text-field" required>
+      </div>
 
-          <label *ngIf="f.submitted && Position.invalid && Position.errors.required" class="alert-red">Please Enter Position</label>
+
+      <div class="drop-area">
+        <!-- <svg _ngcontent-nuq-c172="" (click)="showconfirmpass()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 23.625 23.625" xml:space="preserve" style="enable-background: new 0 0 23.625 23.625;" class="ng-tns-c172-0"><g _ngcontent-nuq-c172="" class="ng-tns-c172-0"><path _ngcontent-nuq-c172="" d="M11.812,0C5.289,0,0,5.289,0,11.812s5.289,11.813,11.812,11.813s11.813-5.29,11.813-11.813   S18.335,0,11.812,0z M14.271,18.307c-0.608,0.24-1.092,0.422-1.455,0.548c-0.362,0.126-0.783,0.189-1.262,0.189   c-0.736,0-1.309-0.18-1.717-0.539s-0.611-0.814-0.611-1.367c0-0.215,0.015-0.435,0.045-0.659c0.031-0.224,0.08-0.476,0.147-0.759   l0.761-2.688c0.067-0.258,0.125-0.503,0.171-0.731c0.046-0.23,0.068-0.441,0.068-0.633c0-0.342-0.071-0.582-0.212-0.717   c-0.143-0.135-0.412-0.201-0.813-0.201c-0.196,0-0.398,0.029-0.605,0.09c-0.205,0.063-0.383,0.12-0.529,0.176l0.201-0.828   c0.498-0.203,0.975-0.377,1.43-0.521c0.455-0.146,0.885-0.218,1.29-0.218c0.731,0,1.295,0.178,1.692,0.53   c0.395,0.353,0.594,0.812,0.594,1.376c0,0.117-0.014,0.323-0.041,0.617c-0.027,0.295-0.078,0.564-0.152,0.811l-0.757,2.68   c-0.062,0.215-0.117,0.461-0.167,0.736c-0.049,0.275-0.073,0.485-0.073,0.626c0,0.356,0.079,0.599,0.239,0.728   c0.158,0.129,0.435,0.194,0.827,0.194c0.185,0,0.392-0.033,0.626-0.097c0.232-0.064,0.4-0.121,0.506-0.17L14.271,18.307z    M14.137,7.429c-0.353,0.328-0.778,0.492-1.275,0.492c-0.496,0-0.924-0.164-1.28-0.492c-0.354-0.328-0.533-0.727-0.533-1.193   c0-0.465,0.18-0.865,0.533-1.196c0.356-0.332,0.784-0.497,1.28-0.497c0.497,0,0.923,0.165,1.275,0.497   c0.353,0.331,0.53,0.731,0.53,1.196C14.667,6.703,14.49,7.101,14.137,7.429z" class="ng-tns-c172-0"></path></g></svg> -->
+        <svg *ngIf="!showConfirmPassword" _ngcontent-nuq-c172="" (click)="showconfirmpass()" xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+          <path _ngcontent-nuq-c172="" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+          <path _ngcontent-nuq-c172="" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+        </svg>
+
+        <svg *ngIf="showConfirmPassword" _ngcontent-nuq-c172="" (click)="showconfirmpass()" xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+          <path _ngcontent-nuq-c172="" d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+          <path _ngcontent-nuq-c172="" d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+        </svg>
+        <p>
+          <!-- <label for="password">Confirm Password</label> -->
+          <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirm_Password" name="confirm_Password"
+          [ngClass]="confirm_Password.valid ? 'border-bottom-green success' : 'border-bottom-red'"
+          #confirm_Password="ngModel" [(ngModel)]="User.confirm_Password" placeholder="Confirm password" class="text-field" required
+          minlength="6">
+
+          <label *ngIf="(confirm_Password.touched || f.submitted) && confirm_Password.invalid && confirm_Password.errors.required" class="alert-red">Required</label>
+          <!-- <label *ngIf="(confirm_Password.touched || f.submitted) && confirm_Password.invalid && confirm_Password.errors.minlength" class="alert-red">Password must be at least 8 characters</label> -->
+          <label *ngIf="(confirm_Password.touched || f.submitted) && confirm_Password.invalid && confirm_Password.errors?.passwordMismatch" class="alert-red">Passwords doesnot match</label>
         </p>
 
-        <p>
-          <label for="password">Password</label>
-          <input type="password" id="Password" name="Password" #Password="ngModel" [(ngModel)]="User.Password" placeholder="Start typing..." class="text-field" required minlength="6">
+        <!-- <p class="drop-content">
+          <label>Your password must have:</label>
+          <label> - Minimum of eight (8) characters</label>
+          <label> - At least one (1) number</label>
+          <label>- At least one (1) upper case letter</label>
 
-          <label *ngIf="f.submitted && Password.invalid && Password.errors.required" class="alert-red">Please enter a Password</label>
-          <label *ngIf="f.submitted && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
-        </p>
+          <label>You can also add extra characters to make your password even stronger.</label>
+        </p> -->
+      </div>
 
-        <p class="terms-block">
-            <input type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
-            <label for="terms">I agree with terms & conditions</label>
 
-            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red">Accept Terms & Conditions is required</label>
-        </p>
-        <div class="buttons-sec">            
-            <button class="blue-btn btn" type="submit">Sign Up</button>
-            <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
-        </div>
-      </form> -->
 
-      <form class="signup-form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>        
-
-        <p>
-          <label for="email">Email</label>
-          <input type="email" id="Email" name="Email" #Email="ngModel" [(ngModel)]="User.Email" class="text-field" required email>
-
-          <label *ngIf="f.submitted && Email.invalid && Email.errors.required" class="alert-red">Please Enter Email</label>
-          <label *ngIf="f.submitted && Email.invalid && Email.errors.email" class="alert-red">Please Enter a valid Email address</label>
-        </p>        
-
-        <p>
-          <label for="password">Password</label>
-          <input type="password" id="Password" name="Password" #Password="ngModel" [(ngModel)]="User.Password" placeholder="Start typing..." class="text-field" required minlength="6">
-
-          <label *ngIf="f.submitted && Password.invalid && Password.errors.required" class="alert-red">Please enter a Password</label>
-          <label *ngIf="f.submitted && Password.invalid && Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
-        </p>
-
-        <p>
-          <label for="password">Confirm Password</label>
-          <input type="password" id="confirm_Password" name="confirm_Password" #confirm_Password="ngModel" [(ngModel)]="User.confirm_Password" placeholder="Start typing..." class="text-field" required minlength="6">
-
-          <label *ngIf="f.submitted && confirm_Password.invalid && confirm_Password.errors.required" class="alert-red">Please enter a Password</label>
-          <label *ngIf="f.submitted && confirm_Password.invalid && confirm_Password.errors.minlength" class="alert-red">Password must be at least 6 characters</label>
-        </p>       
 
 
 
         <p class="terms-block">
-          
+
 
               <input class="custom-check" type="checkbox" id="terms" name="acceptTerms" #acceptTerms="ngModel" [(ngModel)]="User.acceptTerms" required>
-            
-            <label for="terms" >I agree with terms & conditions</label>
 
-            <label *ngIf="f.submitted && acceptTerms.invalid" class="alert-red blck">Accept Terms & Conditions is required</label>
+            <label for="terms" >I agree with the terms of use of the app <a href="http://www.ready2sign.com.au/TOS" target="_blank">Terms of use</a></label>
+
+            <label *ngIf="(acceptTerms.touched || f.submitted) && acceptTerms.invalid" class="alert-red blck">Accept Terms & Conditions is required</label>
         </p>
-        <div class="buttons-sec" *ngIf="!showLoginButton">            
+
+        <p>
+          <re-captcha [(ngModel)]="User.reCaptcha" #reCaptcha="ngModel" name="reCaptcha" required></re-captcha>
+
+          <label *ngIf="(reCaptcha.touched || f.submitted) && reCaptcha.invalid && reCaptcha.errors.required" class="alert-red">Required</label>
+        </p>
+        <div class="buttons-sec" *ngIf="!showLoginButton">
             <button class="btnnew" type="submit">Sign Up</button>
             <a class="lightblue-btn btn pointer" [routerLink]="['/login']">Sign In</a>
         </div>
         <div class="return-box" *ngIf="showLoginButton">
           <span >User Activated</span>
-          <a class="blue-btn btn pointer grn" [routerLink]="['/login']" *ngIf="showLoginButton">Retrun to Login</a>
+          <a class="blue-btn btn pointer grn" [routerLink]="['/login']" *ngIf="showLoginButton">Return to Login</a>
         </div>
       </form>
 
-      <div class="other-options">
+      <!-- <div class="other-options">
         <span class="margin-right">Or sign in with</span>
         <a href="#" class="facebook"></a>
-        <a href="#" class="google"></a>          
-      </div>
+        <a href="#" class="google"></a>
+      </div> -->
   </div>
   <div class="page-right">
       <div class="image-block"></div>

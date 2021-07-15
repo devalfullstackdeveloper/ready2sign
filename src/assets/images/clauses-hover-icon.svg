@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="31px" height="21px" viewBox="0 0 31 21" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <desc>Created with Lunacy</desc>
+  <g id="Icon" transform="translate(1 1)">
+    <path d="M0 0.059375L21.375 0.059375" transform="translate(7.125 1.150391)" id="Icon-Path" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M0 0.0593748L21.375 0.0593748" transform="translate(7.125 9.462891)" id="Icon-Path" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M0 0.0593748L21.375 0.0593748" transform="translate(7.125 17.77539)" id="Icon-Path" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M1.1875 2.375C1.84334 2.375 2.375 1.84334 2.375 1.1875C2.375 0.531662 1.84334 0 1.1875 0C0.531662 0 0 0.531662 0 1.1875C0 1.84334 0.531662 2.375 1.1875 2.375Z" id="Icon-Oval" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M1.1875 2.375C1.84334 2.375 2.375 1.84334 2.375 1.1875C2.375 0.531662 1.84334 0 1.1875 0C0.531662 0 0 0.531662 0 1.1875C0 1.84334 0.531662 2.375 1.1875 2.375Z" transform="translate(0 8.3125)" id="Icon-Oval" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M1.1875 2.375C1.84334 2.375 2.375 1.84334 2.375 1.1875C2.375 0.531662 1.84334 0 1.1875 0C0.531662 0 0 0.531662 0 1.1875C0 1.84334 0.531662 2.375 1.1875 2.375Z" transform="translate(0 16.625)" id="Icon-Oval" fill="none" stroke="#73c2fb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

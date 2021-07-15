@@ -6,22 +6,88 @@
 .pointer{
   cursor: pointer;
 }
-
-input[type="text"].text-field {
-  background: url(/assets/images/user-icon.png) no-repeat 90% 6px / 20px;
+/* Change autocomplete styles in WebKit */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  /* -webkit-text-fill-color: green; */
+  box-shadow: none;
+  transition: background-color 5000s ease-in-out 0s;
+  background-color: transparent !important;
 }
+/* input[type="text"].text-field {
+  background: none;
+} */
+.icon {
+  width:16px;
+}
+.form-group {
+  border-bottom: 0px;
+}
+.form-control label{margin-bottom: 0;}
+/* .form-control {
+  display: flex;
+  border-bottom: 1px solid #F0F0F3;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.form-control input {
+  border-bottom: 0px;
+} */
 .text-field {
   border: none;
   border-bottom: 1px solid #F0F0F3;
   width: 100%;
-  padding: 5px 0 18px;
+  padding: 10px 0 10px;
   font-family: 'Lato', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  /* font-weight: 700; */
   color: #1C1D21;
 }
 .margin-right{
   margin-right:6px;
 }
 .frgt_pwd{display: block; margin-top: 5px;}
-.frgt_pwd a{text-decoration: none; font-weight: 800; color:#5E81F4; font-size: 16px; text-transform: capitalize;}
+.frgt_pwd a{text-decoration: none; color:#73c2fb; font-size: 16px; text-transform: capitalize;}
+
+.signup-form ::-webkit-input-placeholder {
+  color: #8181a5;
+  font-weight:normal;
+  }
+.signup-form :-moz-placeholder {
+  color: #8181a5;
+  font-weight:normal;
+  }
+.signup-form  ::-moz-placeholder {
+  color: #8181a5;
+  font-weight:normal;
+  }
+.signup-form  :-ms-input-placeholder {
+  color: #8181a5;
+  font-weight:normal;
+  }
+
+.signup-form {
+  margin-top: 50px;
+}
+
+.login-pg a{
+  width: 100%;
+}
+.full-error{
+  margin-bottom: -50px;padding: 20px 0;
+}
+
+input[type="text"].text-field{
+  background: none !important;
+}
+
+input[type="password"].text-field{
+  background: none !important;
+}

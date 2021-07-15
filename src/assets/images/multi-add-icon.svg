@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <desc>Created with Lunacy</desc>
+  <g id="Icon">
+    <path d="M3.95833 0L2.375 0L2.375 2.375L0 2.375L0 3.95833L2.375 3.95833L2.375 6.33333L3.95833 6.33333L3.95833 3.95833L6.33333 3.95833L6.33333 2.375L3.95833 2.375L3.95833 0Z" transform="translate(3.166992 6.333984)" id="Icon-Path" fill="#C1C7D0" stroke="none" />
+    <path d="M11.0833 12.6667L1.58333 12.6667C0.710125 12.6667 0 11.9565 0 11.0833L0 1.58333C0 0.710125 0.710125 0 1.58333 0L11.0833 0C11.9565 0 12.6667 0.710125 12.6667 1.58333L12.6667 11.0833C12.6667 11.9565 11.9565 12.6667 11.0833 12.6667ZM11.0833 1.58333L1.58333 1.58333L1.58333 11.0833L11.0849 11.0833L11.0833 1.58333Z" transform="translate(0 3.166992)" id="Icon-Shape" fill="#C1C7D0" fill-rule="evenodd" stroke="none" />
+    <path d="M9.5 0L0 0L0 1.58333L9.5 1.58333L9.5 11.0833L11.0833 11.0833L11.0833 1.58333C11.0833 0.710125 10.3732 0 9.5 0Z" transform="translate(4.75 0)" id="Icon-Path" fill="#C1C7D0" stroke="none" />
+  </g>
+</svg>

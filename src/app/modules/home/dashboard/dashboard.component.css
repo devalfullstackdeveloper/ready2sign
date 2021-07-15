@@ -1,3 +1,287 @@
-.pointer{
-    cursor: pointer;
-  }
+.pointer {
+  cursor: pointer;
+}
+
+.filter-table .dropup-arrow,
+.filter-table .filter-ico {
+  /* background: url("../../images/dropup-carrt.svg") no-repeat center / 12px; */
+  background: url("../../../../assets/images/dropup-carrt.svg");
+  display: inline-block;
+  /* background-size: 12px; */
+  width: 12px;
+  margin-left: 14px;
+  height: 7px;
+  cursor: pointer;
+}
+
+.select-ngx{
+  padding-bottom: 0;
+    margin-bottom: 0;
+    max-width: 441px;
+    width: 100%;
+    display: inline-block;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 16px;
+    font-family: "Lato", sans-serif;
+    line-height: 19px;
+    color: #1c1d21;
+}
+::ng-deep ngx-select.select-ngx .ngx-select__toggle.form-control{height: 35px;border-radius: 0;}
+::ng-deep ngx-select.select-ngx .ngx-select__toggle.form-control:hover{background-color: #fff;}
+::ng-deep ngx-select.select-ngx ul.ngx-select__choices li{list-style: none;text-transform: capitalize;}
+::ng-deep ngx-select.select-ngx ul.ngx-select__choices{top:34px;padding: 18px 31px 0 18px;background-color: #fff; z-index: 1; box-shadow: 0px 0px 13px rgba(0,0,0,0.16); max-width: 445px;}
+::ng-deep ngx-select.select-ngx ul.ngx-select__choices li .ngx-select__item_active{background-color: #fff;}
+::ng-deep ngx-select.select-ngx ul.ngx-select__choices li a.ngx-select__item{padding: 7px 0 31px;}
+::ng-deep ngx-select.select-ngx .ngx-select .ngx-select__toggle span{position: static;font-size: 14px;text-transform: capitalize; margin-right: 3px;}
+::ng-deep ngx-select.select-ngx .ngx-select__toggle-buttons a.btn{width: 25px;height: 25px;line-height: 25px;font-size: 12px;}
+.searchList{max-width: 441px;right: 0; display: block !important;}
+/* ul.searchList li span,  */
+::ng-deep ngx-select.select-ngx ul.ngx-select__choices .ngx-select__item span{
+  position: static;
+    color: #8181a5;
+    font-size: 14px;
+}
+/* ul.searchList li span:hover,  */
+/* ::ng-deep ngx-select.select-ngx ul.ngx-select__choices .ngx-select__item span:hover{color: #73c2fb;} */
+.error span{
+  margin-left: 150px;
+    top: -10px;
+    position: relative;
+    color: #ff808b;
+    font-size: 14px;
+}
+
+.checkbox-error span{
+  top: 1px;
+  position: relative;
+  color: #ff808b;
+  font-size: 14px;
+}
+
+.searchList li .new-contact-btn{position: inherit !important;}
+ul.searchList li span{color: #8c8c8c;position: static;font-size: 14px;}
+ul.searchList li span.fsearch span{color: #000;}
+ul.searchList li{flex-direction: column;}
+
+.delete,
+.edit-doc {
+  width: 150px !important;
+}
+
+.info-popup-sm .edit-doc {
+  background-image: none;
+  background-size: 15px;
+  width:auto;
+}
+.select-template-wrapper .wrapper-status-groups{padding: 0;}
+.search-area{
+  margin-bottom: 0px !important;
+  /* padding: 35px 35px 20px 39px !important; */
+  border-top: 1px solid #f0f0f3;
+}
+
+.select-tmp{
+  border-top: 0px solid #f0f0f3 !important;
+}
+.filter-table table th, .filter-table table td{
+  /* width: 14.28%; */
+  /* padding: 16px 5px; */
+}
+.filter-table table th{color: #8c8c8c;}
+.home-table table th:first-of-type, .home-table table td:first-of-type{
+  padding-left: 40px;width: 24%;
+  /* padding-top: 5px; */
+    padding-bottom: 5px;
+}
+/* .home-table table th:first-of-type:hover, .home-table table td:first-of-type:hover{height: auto;} */
+/* .home-table table th, .home-table table td{width: 15%;} */
+.home-table table th:first-child .home-table table td:first-child{width: 17%;}
+.home-table table th:nth-child(2), .home-table table td:nth-child(2){width: 16%;}
+.home-table table th:nth-child(3), .home-table table td:nth-child(3){width: 15%;}
+.home-table table th:nth-child(4), .home-table table td:nth-child(4){width: 18%;}
+.home-table table th:nth-child(5), .home-table table td:nth-child(5){width: 15%;}
+.home-table table th:nth-child(6), .home-table table td:nth-child(6){width: 12%;}
+.home-table table th:last-child, .home-table table td:last-child{width: 10%;}
+.home-table table th:nth-child(5), .home-table table th:nth-child(6){padding-left: 7px;}
+
+/* .filter-table th:last-child, .filter-table tr td:last-child{padding-right: 30px !important;} */
+.home-table table tbody{height: calc(100vh - 220px);overflow-y:scroll;margin-bottom: 15px;}
+::ng-deep dp-date-picker.dp-material .dp-picker-input{border: 0;height: auto !important;}
+.property-details-form-sec-6 fieldset{margin-bottom: 28px;}
+
+.search-border{
+  border-color: #F0F0F3 !important;
+}
+.select-template-wrapper .filter-table th:first-child{width: 70%;}
+/* tbody{
+  display: block;
+    max-height: 500px;
+    overflow-y: auto;
+} */
+
+
+
+.home-table table{
+  display: block;
+  empty-cells: show;
+  border-spacing: 0;
+}
+
+.home-table table thead{
+  position:relative;
+  display: block;
+  width:100%;
+}
+
+.home-table table tbody{
+  display: block; position:relative;
+  width:100%; overflow-y:auto;
+}
+
+.home-table table tr{
+  width: 100%;
+  display:flex;
+}
+
+.home-table table td,.home-table table th{
+  /* flex-basis:100%;
+  flex-grow:2; */
+  display: block;
+}
+.home-table table td{
+  display: flex;
+    flex-direction: column;
+    height: 60px;
+    justify-content: center;
+}
+.search-area .max-search .search-field, .max-search .search-expanded{width: 250px;}
+.wrapper-status-groups .search-area .search-expanded .search-field{margin-right: 20px;}
+.select-template-wrapper .wrapper-status-groups select{margin: 0;}
+.wrapper-status-groups .select-box{margin-left: 0;width: 45%;}
+::ng-deep.iti--allow-dropdown{width: 441px;}
+::ng-deep.iti--allow-dropdown input{
+  padding-bottom: 6px;
+    padding-top: 6px;
+}
+ ::ng-deep.iti__country-list span{
+  position: static !important;
+ }
+ .spanerror div.error{margin-top: 10 !important;}
+ .spanerror div.error span{top: 0px !important}
+ .select-tmp{margin-right: 20px;width: 40%;}
+ /* .form-control.ng-invalid{border-color: #ff808b;} */
+ ::ng-deep ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option span, form.property-details-form fieldset .form-control ::ng-deep ng-select .ng-value-label{position: static;color: #1c1d21;font-size: 14px;}
+ ::ng-deep ng-select .ng-select-container .ng-value-container .ng-placeholder{font-size: 14px;}
+ form.property-details-form fieldset .form-control.select-box{margin-left: 0;}
+ form.property-details-form fieldset .form-control.select-box ::ng-deep ng-select .ng-select-container{
+  height: auto;
+  min-height: auto;
+  border: 0;
+ }
+ form.property-details-form fieldset ::ng-deep dp-date-picker.form-control{width: auto;}
+
+ ::ng-deep.mat-paginator-icon{width: 17px !important;}
+ ::ng-deep.mat-icon-button {
+  width: 35px !important;
+  height: 36px !important;
+  line-height: 35px !important;
+}
+
+.searchSuggestions li img{
+  width: 12px;
+  height: 12px;
+  fill: #000;
+  object-fit: cover;
+  position: relative;
+  top: 2px;
+  margin-right: 5px;
+}
+/* .disabledRow{
+  background-color: #f6f8f9
+} */
+.disabledRow .link img{
+  filter: grayscale(1);
+}
+
+.disableImg{
+  filter: grayscale(1);
+}
+
+.unsaved-changes-info p {
+  font-size: 22px;
+  background: url(../../../../assets/images/exclamation-sign.svg) no-repeat 0px 29px / 30px;
+}
+
+.border-bottom-red {
+  border-bottom-color: #ff808b !important;
+}
+/*
+.border-bottom-green {
+  border-bottom-color: green !important;
+} */
+
+.cust-image-file::after, .cust-image-file::before{
+  content: "Drop files here";
+  position: absolute;
+  left: 0;
+  right: 150;
+  top:0px;
+  bottom: 0;
+  background-color: #F6F8F9;
+  text-align: center;
+  font-size: 13px;
+  padding: 20px 65px 70px;
+}
+.cust-image-file::before{
+  top: auto;
+  bottom: 33px;
+  content: "Select file";
+  border: 1px solid #868686;
+  border-radius: 5px;
+  width: 100px;
+    z-index: 1;
+    padding: 2px 0;
+    margin: 0 auto;
+}
+span.orfile{
+  display: block;
+  margin-top: -45px;
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  right: -147px;
+  top: auto;
+  text-align: center;
+  font-size: 13px;
+  bottom: 80px;
+  color: #1c1d21;
+}
+span.orMaxMsg {
+  display: block;
+  margin-top: -45px;
+  z-index: 999;
+  position: absolute;
+  left: 0;
+  right: -147px;
+  top: auto;
+  text-align: center;
+  font-size: 13px;
+  bottom: 20px;
+  color: #1c1d21;
+}
+span.file-name{
+  border: 1px solid #ddd;
+    padding: 3px 7px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: inline-flex;
+    position: initial;
+}
+
+.btn-green:hover, .dodger-blue:hover{
+  background: #2f9dec !important;
+}
+
+
+

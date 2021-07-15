@@ -1,0 +1,10 @@
+.thankyou-wrapper h1 {
+    font-size: 50px;
+    margin-bottom: 30px;
+}
+.thankyou-wrapper p{font-size: 20px;}
+.page-left{text-align: center;}
+@media screen and (max-width:991px) {
+    .page-left{width: 100%;padding: 15px;height: 100vh;min-height: auto;border-radius: 0;}
+    .page-left .logo img{max-width: 250px;margin: 0 auto;}
+}

@@ -5,7 +5,7 @@
 .pointer{
   cursor: pointer;
 }
-.text-field {
+/* .text-field {
   border: none;
   border-bottom: 1px solid #F0F0F3;
   width: 100%;
@@ -14,10 +14,24 @@
   font-size: 14px;
   font-weight: 700;
   color: #1C1D21;
-}
+} */
 
 .margin-right{
   margin-right:6px;
+}
+/* Change autocomplete styles in WebKit */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  /* -webkit-text-fill-color: green; */
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .btnnew{
@@ -27,11 +41,11 @@
   display: inline-block;
   height: 46px;
   line-height: 46px;
-  text-decoration: none;  
+  text-decoration: none;
   width: 178px;
   text-align: center;
   margin-right: 9px;
-  background: #5E81F4;
+  background: #73c2fb;
   border-radius: 8px;
   color: #fff;
   border: 0px !important;
@@ -46,7 +60,7 @@
 } */
 
 
-.unchecked{
+/* .unchecked{
   content: '';
   width: 20px;
   height: 20px;
@@ -58,9 +72,9 @@
   border-radius: 100%;
   transition: all 0.2s ease;
   box-sizing: border-box;
-}
+} */
 
-.checked {
+/* .checked {
   content: '';
   width: 20px;
   height: 20px;
@@ -72,7 +86,7 @@
   border-radius: 100%;
   transition: all 0.2s ease;
   box-sizing: border-box;
-}
+} */
 
 .pagination a {
   color: black;
@@ -81,7 +95,7 @@
   text-decoration: none;
   border: 1px solid #ddd;
 }
-.custom-check[type="checkbox"]:not(:checked) + label:before, .custom-check[type="checkbox"]:checked + label:before{
+/* .custom-check[type="checkbox"]:not(:checked) + label:before, .custom-check[type="checkbox"]:checked + label:before{
   border-radius: 50%;border-width: 1px;
 }
 .custom-check[type="checkbox"]:checked + label:before{background: #1B51E5;}
@@ -92,7 +106,42 @@
     border-radius: 50%;
     top: 5px;
     left: 6px;
-}
+} */
 .grn
 {background: #7ce7ac;color: #fff;}
 .return-box{width: 100%;; display: flex; justify-content: space-between;align-items: center;}
+.signup-form {
+  margin-top: 30px;
+}
+
+.p-header{
+  color: #8181A5;
+  font-size: 13px;
+}
+
+.email-disabled{
+  background-color: #8080802e !important;
+}
+
+::ng-deep.iti{
+  display: block;
+}
+
+input[type="text"].text-field{
+  background: none !important;
+}
+
+input[type="password"].text-field{
+  background: none !important;
+}
+
+input[type="password"].text-field.success{
+  background: none !important;
+}
+
+.password-eye{
+  background: url(../../../assets/images/mail.png) no-repeat 94% 10px / 16px;
+  right: 7%;
+
+}
+

@@ -36,7 +36,6 @@ export class ForgotPasswordComponent implements OnInit {
   get f() { return this.forgotForm.controls; }
 
   resetPassword(){
-    console.log("Password reset-----");
 
     this.submitted = true;
 
@@ -46,13 +45,11 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     this.authenticationService.forgotPassword(this.f.email.value).subscribe(res => {
-      
+
       this.success = true;
       this.error = false;
       this.successRes = res;
-      console.log("success--",res);
-    },error => {      
-      console.log(error.Message);
+    },error => {
       this.error = true;
       this.success = false;
       this.errorRes = error.Message;

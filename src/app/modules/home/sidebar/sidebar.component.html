@@ -1,5 +1,5 @@
 <!-- <div class="sidebar-logo">
-  <a href="#" class="logomini"><img src="assets/images/logo-sm.png" alt="Sidebar Logo" /></a>  
+  <a href="#" class="logomini"><img src="assets/images/logo-sm.png" alt="Sidebar Logo" /></a>
 </div> -->
 
 <div class="sidebar-logo">
@@ -9,41 +9,39 @@
 
 <div class="sidebar-links" (click)="closeOption()">
   <ul class="nav">
-      <li class="documents pointer active" (click)="home()"><a >Documents</a></li>
-      <li class="template pointer"><a >Template</a></li>
-      <li class="settings pointer" (click)="setting()"><a >Settings</a></li>
-      <li class="help-center pointer"><a >Help Center</a></li>
+      <li routerLinkActive="active" [routerLink]="['/admin/home']" class="documents pointer active" [ngClass]="{'active': activeclass == 'home'}"  (click)="home()" *ngIf="currentUser.role == 'Admin' || currentUser.role == 'Manager' || currentUser.role == 'Standard' || currentUser.role == 'SuperAdmin'"><a  >Documents</a></li>
+      <li routerLinkActive="active" [routerLink]="['/admin/templates']" class="template pointer" [ngClass]="{'active': activeclass == 'templates'}"  (click)="templates()" *ngIf="currentUser.role == 'Admin' || currentUser.role == 'Manager' || currentUser.role == 'SuperAdmin'"><a  >Templates</a></li>
+      <li routerLinkActive="active" [routerLink]="['/admin/settings']" class="settings pointer" [ngClass]="{'active': activeclass == 'settings'}"  (click)="setting()" *ngIf="currentUser.role == 'Admin' || currentUser.role == 'SuperAdmin'"><a  >Settings</a></li>
+      <li class="help-center pointer"><a >Support</a></li>
   </ul>
 </div>
 
-<div class="sidebar-footer"> 
+<div class="sidebar-footer">
   <div class="selected-account" (click)="closeOption()">
       <label for="select_account">Selected account</label>
-      <!-- <select id="select_account" name="select_account">
-          <option value="Hocking Stuart">Hocking Stuart</option>
-          <option value="Hocking Stuart">Account b</option>
-          <option value="Hocking Stuart">Account c</option>
-          <option value="Hocking Stuart">Account d</option>
-          <option value="Hocking Stuart">Account e</option>
-      </select> -->
       <select id="select_account" class="sidebar-select" [(ngModel)]="selectedaccount" (change)="accountChange($event)">
-        <option *ngFor="let ac of userAccounts" [value]="ac.Id">{{ac.Name}}</option>
-        <!-- <option *ngIf="let ac of userAccounts" [value]="ac.Id"> {{ac.Name}} </option> -->
+        <option *ngFor="let ac of userAccounts" [value]="ac.Id" [disabled]="ac.StatusId !== constant.UserStatus_Active ? true : false">{{ac.Name}}</option>
       </select>
   </div>
 
-  <div class="user-info">
-      <div class="user-image">
-          <img src="assets/images/user-image.svg" alt="User Image" />
+  <div class="user-info" (clickOutside)="onClickedOutside()">
+      <!-- <div class="user-image" (click)="profileoption()" >
+          <img src="assets/images/user-image-profile.svg" alt="User Image" />
           <span class="status"></span>
-      </div>
-
-      <span class="userName">Catherine Shaw</span>
+      </div> -->
+      <h3 class="large pointer" (click)="profileoption()">
+        <span>{{firstCharacter(userName)}}</span>
+      </h3>
+      <span class="userName">{{userName}}</span>
 
       <a (click)="optionChange()" class="more-info-sec active pointer"></a>
 
+      <ol class="other-popup" *ngIf="pro_options">
+        <li class="profile pointer" (click)="viewProfile()"><a href="javascript:void(0);">View profile</a></li>
+        <li class="signout pointer" (click)="signOut()"><a>Sign out</a></li>
+      </ol>
       <ul class="info-popup-sm" *ngIf="options">
-          <li class="profile pointer"><a href="#">View profile</a></li>
+          <li class="profile pointer" (click)="viewProfile()"><a href="javascript:void(0);">View profile</a></li>
           <li class="signout pointer" (click)="signOut()"><a>Sign out</a></li>
       </ul>
   </div>

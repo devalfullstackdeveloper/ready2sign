@@ -1,0 +1,150 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+
+<div class="page-header">
+  <div class="header-left">
+      <div class="collapse-sidebar" (click)="toggleSidebar()">
+          <span class="icon-arrow-left"></span>
+          <button type="button" class="sidebar-toggle" ></button>
+      </div>
+
+      <span class="user-name">{{companyProfileData.Name}}</span>
+  </div>
+
+  <div class="header-right">
+      <!-- <a href="javascript:void(0);" class="btn btn-green create-doc" (click)="openSelectTemplate()">Create document</a> -->
+
+      <!-- <a href="#" class="search-btn"></a> -->
+  </div>
+</div>
+
+
+<div class="profile-block">
+  <section class="content-block w-100">
+    <div class="content-head pro-header">
+      <h2>Profile settings</h2>
+
+      <!-- <button type="button" class="reset-button" (click)="resetPassword()">Reset Password</button> -->
+    </div>
+    <form class="setting-form" [formGroup]="myprofileform" (ngSubmit)="updateProfile()">
+      <fieldset>
+        <label>First name</label>
+        <input type="text" class="form-control"
+          [ngClass]="myprofileFormControl.userfirstname.valid ? 'border-bottom-green' :'border-bottom-red'"
+          placeholder="" name="userfirstname" formControlName="userfirstname"/>
+          <!-- <span *ngIf="(myprofileFormControl.userfirstname.touched || myprofileformsubmitted ) && myprofileFormControl.userfirstname.errors?.required" class="invalid-feedback error">First name is required</span> -->
+      </fieldset>
+
+      <fieldset>
+        <label>Last name</label>
+        <input type="text" class="form-control"
+        [ngClass]="myprofileFormControl.userlastname.valid ? 'border-bottom-green' :'border-bottom-red'"
+          placeholder="" name="userlastname" formControlName="userlastname"/>
+          <!-- <span *ngIf="(myprofileFormControl.userlastname.touched || myprofileformsubmitted ) && myprofileFormControl.userlastname.errors?.required" class="invalid-feedback error">Last name is required</span> -->
+      </fieldset>
+
+      <fieldset>
+        <label>Email</label>
+        <input type="text" readonly="readonly" class="form-control" formControlName="useremail" name="useremail"
+        [ngClass]="myprofileFormControl.useremail.valid ? 'border-bottom-green' :'border-bottom-red'"/>
+          <!-- <span *ngIf="(myprofileFormControl.useremail.touched || myprofileformsubmitted) && myprofileFormControl.useremail.errors?.required" class="invalid-feedback error">Email is required</span> -->
+          <!-- <span *ngIf="(myprofileFormControl.useremail.touched || myprofileformsubmitted) && myprofileFormControl.useremail.errors?.email" class="invalid-feedback error">Email must be a valid email</span> -->
+
+          <a href="javascript:void(0);" class="reset-a-tag" (click)="resetPassword()">Reset Password</a>
+        </fieldset>
+
+      <fieldset class="spanerror">
+        <label>Mobile</label>
+        <input type="text" class="form-control" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au'}"
+          (hasError)="hasError($event)"
+          (ng2TelOutput)="getNumber($event)"
+          (intlTelInputObject)="telInputObject($event)"
+          (countryChange)="onCountryChange($event)"
+          formControlName="usermobile" name="usermobile"
+          [ngClass]="myprofileFormControl.usermobile.valid ? 'border-bottom-green' :'border-bottom-red'"/>
+          <!-- <span *ngIf="(myprofileFormControl.usermobile.touched || myprofileformsubmitted) && myprofileFormControl.usermobile.errors?.required" class="invalid-feedback error">Mobile number is required</span>
+          <span *ngIf="(myprofileFormControl.usermobile.touched || myprofileformsubmitted) && myprofileFormControl.usermobile.errors?.invalidPhoneNumber" class="invalid-feedback error">Mobile number is invalid</span>
+          <span *ngIf="(myprofileFormControl.usermobile.touched || myprofileformsubmitted) && myprofileFormControl.usermobile.errors?.maxlength" class="invalid-feedback error">Mobile number is maximum 10 digit</span> -->
+
+          <!-- <ngx-intl-tel-input>
+
+          </ngx-intl-tel-input> -->
+        </fieldset>
+
+      <!-- <fieldset>
+        <label>Bussiness Phone</label>
+        <input type="text" class="form-control"
+        ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au'}"
+          (intlTelInputObject)="workTelInputObject($event)"
+          (countryChange)="workOnCountryChange($event)"
+          placeholder=" "
+          name="userworkphone" formControlName="userworkphone"
+          [ngClass]="{ 'focused': (myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && (myprofileFormControl.userworkphone.errors?.invalidPhoneNumber)}"
+          />
+          <span *ngIf="(myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && myprofileFormControl.userworkphone.errors?.invalidPhoneNumber" class="invalid-feedback error">Phone number is invalid</span>
+          <span *ngIf="(myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && myprofileFormControl.userworkphone.errors?.maxlength" class="invalid-feedback error">Phone number is maximum 10 digit</span>
+      </fieldset> -->
+
+
+      <fieldset>
+        <label>Work phone</label>
+        <input type="text" class="form-control"
+          placeholder=" "
+          name="userworkphone" formControlName="userworkphone"
+          [ngClass]="{ 'focused': (myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && (myprofileFormControl.userworkphone.errors?.invalidPhoneNumber)}"
+          />
+          <!-- <span *ngIf="(myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && myprofileFormControl.userworkphone.errors?.invalidPhoneNumber" class="invalid-feedback error">Phone number is invalid</span>
+          <span *ngIf="(myprofileFormControl.userworkphone.touched || myprofileformsubmitted) && myprofileFormControl.userworkphone.errors?.maxlength" class="invalid-feedback error">Phone number is maximum 10 digit</span> -->
+      </fieldset>
+
+      <fieldset>
+        <label>Position</label>
+        <input type="text" class="form-control" name="userposition" formControlName="userposition"/>
+      </fieldset>
+
+      <fieldset>
+        <label>Branch</label>
+        <input type="text" class="form-control" name="userbranch" formControlName="userbranch"/>
+      </fieldset>
+
+      <!-- <fieldset>
+        <label>Signature</label>
+        <input type="text" name="" id="" class="form-control"/>
+      </fieldset> -->
+
+      <fieldset class="signature-block">
+        <label>Signature</label>
+        <div class="right-wrap-field">
+          <!-- <textarea> </textarea> -->
+          <div style="border: 1px solid #F0F0F3;" *ngIf="!signatureAdded">
+            <signature-pad #signatureCanvas [options]="signaturePadOptions" (onBeginEvent)="drawStart()" (onEndEvent)="drawComplete()"></signature-pad>
+          </div>
+
+          <div class="text-right" *ngIf="!signatureAdded">
+            <span class="clear-sig" *ngIf="myprofileFormControl.usersignature.value" (click)="close()">Close</span>
+            <span class="clear-sig" (click)="clear()">Clear signature</span>
+          </div>
+
+          <!-- Sign Image -->
+          <div style="border: 1px solid #F0F0F3;" *ngIf="signatureAdded">
+            <img [src]="myprofileFormControl.usersignature.value">
+          </div>
+
+          <div class="text-right" *ngIf="signatureAdded">
+            <span class="clear-sig" (click)="addNewSign()">Add new signature</span>
+          </div>
+        </div>
+      </fieldset>
+
+
+      <fieldset class="form-footer">
+        <button type="button" [routerLink]="['/admin/home']">Cancel</button>
+        <button type="submit" class="btn-grey">Save</button>
+      </fieldset>
+    </form>
+  </section>
+</div>
+
+
+
+
+

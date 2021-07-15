@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, Subject, of } from 'rxjs';
+import { map, catchError  } from 'rxjs/operators';
 import { User } from 'src/app/data/model/user/user';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
@@ -10,8 +10,9 @@ import { Router } from '@angular/router';
 export class AuthenticationService {
 
     public $accountNumber = new Subject<any>();
+    private selectedAccountNumber : BehaviorSubject<Number>
 
-    private currentUserSubject: BehaviorSubject<User>;
+    public currentUserSubject: BehaviorSubject<User>;
     public currentUser: Observable<User>;
 
     constructor(private http: HttpClient, private router: Router,) {
@@ -19,10 +20,15 @@ export class AuthenticationService {
         this.currentUser = this.currentUserSubject.asObservable();
 
         // this.$accountNumber = (<any>window).activeAcountNumber
+        this.selectedAccountNumber = new BehaviorSubject<Number>(JSON.parse(localStorage.getItem('acccountNumber')))
     }
 
     public get currentUserValue(): User {
         return this.currentUserSubject.value;
+    }
+
+    public get selectedAccountNumberValue(): Number {
+      return this.selectedAccountNumber.value
     }
 
     login(username: string, password: string) {
@@ -35,9 +41,9 @@ export class AuthenticationService {
                 .set('Content-Type', 'application/x-www-form-urlencoded')
         })
             .pipe(map(user => {
-                localStorage.setItem('currentUser', JSON.stringify(user));
                 this.currentUserSubject.next(user);
                 this.startRefreshTokenTimer();
+                localStorage.setItem('currentUser', JSON.stringify(user));
                 return user;
             }));
     }
@@ -51,7 +57,6 @@ export class AuthenticationService {
 
     refreshToken() {
         var refreshToken = this.getRefreshToken();
-        console.log("refresh-token---",refreshToken)
         const body = new HttpParams()
             .set('refresh_token', refreshToken)
             .set('grant_type', 'refresh_token');
@@ -63,13 +68,18 @@ export class AuthenticationService {
             this.currentUserSubject.next(user);
             this.startRefreshTokenTimer();
             return user;
+        }),
+        catchError(error => {
+          localStorage.removeItem('currentUser');
+          this.currentUserSubject.next(null);
+          // return of(0)
+          throw new Error(error)
         }));
     }
 
     private getRefreshToken() {
         var storageJson = localStorage.getItem("currentUser");
         var tokenDetails = JSON.parse(storageJson);
-        console.log(tokenDetails);
         if (tokenDetails != null)
             return tokenDetails["refresh_token"];
         else
@@ -139,6 +149,20 @@ export class AuthenticationService {
       }))
     }
 
+    updateUserProfile(data){
+      var User = this.currentUserSubject.value;
+
+      const httpHeader = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+ User.access_token
+      })
+
+      return this.http.put<any>(`${environment.apiUrl}/api/user/updateuserprofile`, data, {headers: httpHeader})
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
     getUserById(data){
       var User = this.currentUserSubject.value
 
@@ -154,32 +178,95 @@ export class AuthenticationService {
     setActiveAccountNumber(number){
       (<any>window).activeAcountNumber = number
       this.$accountNumber.next(number);
-      // console.log("Set-Account-Number---",(<any>window).activeAcountNumber)
     }
 
     getActiveAccountNumber(){
-      console.log("Account Number---",(<any>window).activeAcountNumber)
+      // console.log("Account Number---",(<any>window).activeAcountNumber)
+      // console.log("Subject Account---",this.$accountNumber)
       return this.$accountNumber.asObservable()
     }
 
     registerUser(data){
       const httpHeader = new HttpHeaders({
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       })
        return this.http.post<any>(`${environment.apiUrl}/api/authorize/register`,data,{headers:httpHeader})
        .pipe(map(res=>{
          return res;
        }))
     }
-    
+
     verifyEmailandCode(data){
       const httpHeader = new HttpHeaders({
-        'Content-Type': 'application/json'        
+        'Content-Type': 'application/json'
       })
        return this.http.post<any>(`${environment.apiUrl}/api/Authorize/verifyurl`,data,{headers:httpHeader})
        .pipe(map(res=>{
          return res;
        }))
+    }
+
+    getDocumentDetailById(id, partyId){
+      return this.http.get<any>(`${environment.apiUrl}/api/document/${id}/${partyId}`)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    editDocument(data){
+    return this.http.put<any>(`${environment.apiUrl}/api/Document/UpdateDocumentViaLink`,data)
+    .pipe(map(res=>{
+      return res;
+    }))
+  }
+
+    signDocument(data){
+      return this.http.post<any>(`${environment.apiUrl}/api/document/signdocument/`,data)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    sendVerificationCode(data){
+      return this.http.post<any>(`${environment.apiUrl}/api/smsauthenticator/requestcode`,data)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    verifyCode(data){
+      return this.http.post<any>(`${environment.apiUrl}/api/smsauthenticator/verifycode`,data)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    uploadFile(data){
+      return this.http.post<any>(`${environment.apiUrl}/api/file/upload`,data)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    withdrawnByRecipient(data){
+      return this.http.post<any>(`${environment.apiUrl}/api/document/withdrawnbyrecipient/`,data)
+      .pipe(map(res=>{
+        return res;
+      }))
+    }
+
+    propertyMe(data,token){
+      var httpHeader = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Authorization': 'Bearer '+ token
+      })
+
+      // return this.http.post<any>("https://login.propertyme.com/connect/token",data,{headers:this.httpHeader})
+      return this.http.post<any>(`${environment.apiUrl}/api/propertyme/token`,data,{headers: httpHeader})
+      .pipe(map(res => {
+        return res;
+      }));
     }
 
 }

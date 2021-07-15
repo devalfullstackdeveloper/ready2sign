@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+.toast-message{
+    white-space: pre-line;
+  }
+  .mat-button-toggle-label-content {
+    padding: 0px 25px !important;
+    line-height: 25px !important;
+  }
+  .fr-element.fr-view{
+    min-height: 500px !important;
+    height:500px !important;
+  }
+  .pac-container:after{
+    content:none !important;
+  }
+  body {
+    overflow-x:hidden;  
+}

@@ -1,0 +1,956 @@
+<!-- <p>edit-document works!</p> -->
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+<div class="page-header">
+  <div class="header-left">
+    <div class="collapse-sidebar">
+      <button type="button" class="sidebar-toggle" (click)="toggleSidebar()"></button>
+    </div>
+
+    <span class="user-name">{{companyProfileData.Name}}</span>
+  </div>
+
+  <!-- <div class="header-right">
+    <a href="#" class="search-btn"></a>
+  </div> -->
+</div>
+<div class="content-area">
+  <div class="main-content-section">
+    <div class="left-sidebar-block editing-block animated fadeInDown" id="navbar">
+        <h2 *ngIf="!title">Edit document</h2>
+        <h2 *ngIf="title">Draft document</h2>
+
+        <span *ngIf="propertyMeDisable" style="float: right;color:#F4BE5E;margin-top:-30px">This document is disabled due to the connected app being disabled. Refer to your System Administrator to re-enable the connection.</span>
+        <div class="template-title" id="leftfixheader">
+          <label for="edit-title">Title</label>
+          <input maxlength="70" type="search" [(ngModel)]="createDoc.Title" name="edit-title" id="edit-title" placeholder="Editable document name here">
+        </div>
+        <!-- <div class="template-editor">
+          <div class="row">
+            <img src="assets/images/edit-controls.png" alt="" title="">
+          </div>
+          <textarea></textarea>
+        </div> -->
+        <div *ngIf="!preview" class="froala" #froalaEditor>
+          <textarea id="froalaEditor"
+          (froalaInit)="initializeLink($event)"
+          [froalaEditor]="config"
+          [(froalaModel)]="documentData.Content"></textarea>
+        </div>
+
+        <!-- <iframe *ngIf="preview" class="preview" id="convertToPdf" type="application/pdf" width="100%" style="font-family: sans-serif;" #iframe></iframe> -->
+
+        <div *ngIf="preview && previewContent" class="preview" [innerHtml]="previewContent |safeHtml"></div>
+
+    </div>
+
+    <section class="right-block content-block template-controls">
+      <ul  id="rightfixheader" class="wrapper-status-groups">
+          <li class="parties selected" [ngClass]="{'selected' : selectedSection == 'parties'}" (click)="selectSection('parties')">
+            <a href="javascript:void(0);">
+              <img src="assets/images/people.svg" alt="" title="">
+            </a>
+            <label>Parties</label></li>
+
+          <li class="fields" [ngClass]="{'selected' : selectedSection == 'editParty'}" (click)="selectSection('editParty')">
+            <a href="javascript:void(0);" >
+              <img src="assets/images/edit-icon.svg" alt="" title="">
+            </a>
+            <label>Fields</label></li>
+          <li class="clauses" [ngClass]="{'selected' : selectedSection == 'clauses'}" (click)="selectSection('clauses')">
+            <a href="javascript:void(0);">
+              <img src="assets/images/clauses-icon.svg" alt="" title="">
+            </a>
+            <label>Clauses</label></li>
+          <li class="attachments" [ngClass]="{'selected' : selectedSection == 'attach'}" (click)="selectSection('attach')">
+            <a href="javascript:void(0);">
+              <img src="assets/images/attach-icon.svg" alt="" title="">
+            </a>
+            <label>Attach</label></li>
+          <li class="mail" [ngClass]="{'selected' : selectedSection == 'mail'}" (click)="selectSection('mail')">
+            <a href="javascript:void(0);">
+              <img src="assets/images/mail-icon.svg" alt="" title="">
+            </a>
+            <label>Mail</label></li>
+          <li class="settings" [ngClass]="{'selected' : selectedSection == 'settings'}" (click)="selectSection('settings')">
+            <!-- <a href="javascript:void(0);">
+              <img src="assets/images/gear-icon.svg" alt="" title="">
+            </a>
+            <span class="tooltip">Settings</span> -->
+          </li>
+        </ul>
+      <form class="template-table">
+          <fieldset class="people-block parties-form" *ngIf="selectedSection == 'parties'">
+            <form name="form" #partyListForm="ngForm" (ngSubmit)="partyListForm.form.valid && updatePartyData();">
+
+                <!-- New Changes -->
+                <div *ngFor="let party of documentData.Parties;let i = index">
+
+                  <!-- For User -->
+
+                  <ng-container *ngIf="party.PartyTypeId == 8 || party.PartyTypeId == 9">
+                    <label for="sender">{{party.PartyName}}</label>
+
+                    <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" [disabled]="IsExpired" value="Darren Middleton" class="form-control"
+                    [ngClass]="(partyNamefield.touched || partyListForm.submitted || createDoc[party.PartyName]) && partyNamefield.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                    (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changeApprover($event.target.value,i, party.PartyName)" placeholder="Search users" required [disabled]="propertyMeDisable"/>
+
+                    <div *ngIf="(partyListForm.submitted && !createDoc[party.PartyName] )" class="error">
+                        <span>{{party.PartyName}} is required</span>
+                    </div>
+
+                    <ul class="searchSuggestions searchList" *ngIf="party.focus && allUsers?.length > 0">
+                      <li *ngFor="let user of allUsers;let j=index" (click)="partyContactSelected(user,i,party.PartyName, party.PartyTypeId)">
+                          <span class="fsearch">{{user.FirstName}} {{user.LastName}}</span>
+                          <span class="esearch" *ngIf="user.Email">
+                            <!-- <img src="../../../../assets/images/email.png" alt="" /> -->
+                             {{user.Email}}</span>
+                      </li>
+                    </ul>
+
+                    <ul class="searchSuggestions searchList" *ngIf="party.focus && allUsers?.length == 0">
+                      <li>
+                        <span style="text-transform: none;">Users not found</span>
+                      </li>
+                    </ul>
+                    <span class="pointer assignSender" *ngIf="party.PartyTypeId == 9 && !IsExpired && !propertyMeDisable" (click)="assignMeAsSender(i,party.PartyName)">Assign to me</span>
+                  </ng-container>
+
+
+                  <!-- For Contact -->
+                  <ng-container *ngIf="party.PartyTypeId !== 8 && party.PartyTypeId !== 9">
+                    <!-- <div [ngClass]="{'owner_edit' : selectedPartyIndex == i+1}"> -->
+                    <div>
+                    <label for="sender">{{party.PartyName}}</label>
+
+                    <ng-container *ngIf="party.Mandatory">
+                      <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" [disabled]="IsExpired || selectedPartyIndex == i+1 || propertyMeDisable" value="Darren Middleton" class="form-control"
+                      [ngClass]="(partyNamefield.touched || partyListForm.submitted || createDoc[party.PartyName]) && partyNamefield.valid && createDoc[party.PartyName+'-details']?.detailAdded ? 'border-bottom-green' : 'border-bottom-red'"
+                      (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changePartyName($event.target.value,i, party.PartyName)" placeholder="Search contacts" required/>
+                      <div *ngIf="partyListForm.submitted" class="error">
+                        <span *ngIf="partyNamefield.errors?.required">{{party.PartyName}} is required</span>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="!party.Mandatory">
+                      <input type="text" name="{{party.PartyName}}_{{i}}" [ngModel]="createDoc[party.PartyName]" #partyNamefield="ngModel" [disabled]="IsExpired || propertyMeDisable" value="Darren Middleton" class="form-control"
+                      (focus)="partyFocusIn(i)" (focusout)="partyFocusOut(i)" (keyup)="changePartyName($event.target.value,i, party.PartyName)" placeholder="Search contacts" />
+                    </ng-container>
+
+
+                    <a *ngIf="createDoc[party.PartyName+'-details'].detailAdded && !IsExpired && !propertyMeDisable" (click)="setPartyIndex(i+1, party.PartyName)" class="edit-icon" title="edit"></a>
+
+                    <a *ngIf="createDoc[party.PartyName+'-details'].detailAdded && !IsExpired && !propertyMeDisable" (click)="clearPartyData(i,party.PartyName)" class="close-icon" title="close"></a>
+
+                    <ul class="searchSuggestions searchList" *ngIf="party.focus && contactList?.length > 0">
+                      <li *ngFor="let contact of contactList;let j=index" (click)="partyContactSelected(contact,i,party.PartyName, party.PartyTypeId)">
+                          <span>{{contact.FirstName}} {{contact.LastName}}</span>
+                          <span *ngIf="contact.Email"><img src="../../../../assets/images/email.png" alt="" /> {{contact.Email}}</span>
+                          <span *ngIf="contact.Phone"><img src="../../../../assets/images/phone.png" alt="" /> {{contact.Phone}}</span>
+                      </li>
+                    </ul>
+
+                    <ul class="searchSuggestions searchList" *ngIf="party.focus && party.EnterName && contactList?.length == 0">
+                      <li>
+                        <span style="text-transform: none;">Contacts not found</span>
+                      </li>
+
+                      <li>
+                        <a class="new-contact-btn pointer" (click)="clickNewContact(i)" title="">New contact</a>
+                      </li>
+                    </ul>
+
+                    <div class="inner" [ngClass]="{'owner_edit' : selectedPartyIndex == i+1}" *ngIf="selectedPartyIndex == i+1">
+                      <form class="partyDetailsForm" name="form" #partyDetailsForm="ngForm" (ngSubmit)="partyDetailsForm.form.valid && partyDetailForm(party.PartyName, i)">
+                        <div>
+                          <label  for="first-name">First name</label>
+                          <input type="text" name="first-name" value="Darren" id="first-name" class="form-control"
+                          [ngClass]="(FirstName.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['FirstName']) && FirstName.valid ? 'border-bottom-green' : 'border-bottom-red'" placeholder=""
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['FirstName']" #FirstName="ngModel" required />
+                          <div *ngIf="partyDetailsForm.submitted" class="error">
+                            <span *ngIf="FirstName.errors?.required">First Name is required</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label  for="last-name">Last name</label>
+                          <input type="text" name="last-name" value="Middleton" id="last-name" class="form-control"
+                          [ngClass]="(LastName.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['LastName']) && LastName.valid ? 'border-bottom-green' : 'border-bottom-red'" placeholder=""
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['LastName']" #LastName="ngModel" required/>
+                          <div *ngIf="partyDetailsForm.submitted" class="error">
+                            <span *ngIf="LastName.errors?.required">Last Name is required</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label  for="email">Email</label>
+                          <input type="email" name="email" value="daz@pf.com" id="email" class="form-control"
+                          [ngClass]="(Email.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['Email']) && Email.valid ? 'border-bottom-green' : 'border-bottom-red'" placeholder=""
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['Email']" #Email="ngModel" required/>
+
+                          <div *ngIf="partyDetailsForm.submitted" class="error">
+                            <span *ngIf="Email.errors?.required">Email is required</span>
+                          </div>
+                        </div>
+
+                        <div class="flag-wrapper" *ngIf="createDoc[party.PartyName+'-details']['PhoneRequired']">
+                          <label  for="mobile">Mobile</label>
+                          <input type="tel" name="mobile" value="(08) 0000 0000" id="mobile" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au'}"
+                          (intlTelInputObject)="telInputObject($event)"
+                          (countryChange)="onCountryChange($event, party.PartyName)"
+                          placeholder=" "
+                          class="form-control"
+                          [ngClass]="(Phone.touched || partyDetailsForm.submitted || createDoc[party.PartyName+'-details']['Phone']) && Phone.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['Phone']" #Phone="ngModel" required/>
+
+                          <div *ngIf="partyDetailsForm.submitted" class="error">
+                            <span *ngIf="Phone.errors?.required">Mobile number is required</span>
+                          </div>
+                        </div>
+
+                        <div class="flag-wrapper" *ngIf="!createDoc[party.PartyName+'-details']['PhoneRequired']">
+                          <label  for="mobile">Mobile</label>
+                          <input type="tel" name="mobile" value="(08) 0000 0000" id="mobile" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'au'}"
+                          (intlTelInputObject)="telInputObject($event)"
+                          (countryChange)="onCountryChange($event, party.PartyName)"
+                          placeholder=" "
+                          class="form-control"
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['Phone']" #Phone="ngModel"/>
+
+                          <div *ngIf="partyDetailsForm.submitted" class="error">
+                            <span *ngIf="Phone.errors?.required">Mobile number is required</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label  for="position">Position</label>
+                          <input type="tel" name="position" value="Lead Guitarist" id="position" class="form-control" placeholder=""
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['Position']" #Position="ngModel"/>
+                        </div>
+                        <div>
+                          <label  for="company">Company</label>
+                          <input type="text" name="company" value="Powderfinger" id="company" class="form-control" placeholder=""
+                          [(ngModel)]="createDoc[party.PartyName+'-details']['Company']" #Company="ngModel"/>
+                        </div>
+
+                        <div class="form-footer-2">
+                          <!-- <button *ngIf="partyDetailsForm.form.valid" (click)="setPartyIndex(0, null)" type="button">Cancel</button> -->
+
+                          <button *ngIf="createDoc[party.PartyName+'-details']?.detailAdded" type="button" (click)="setPartyIndex(0,null);cancelFormValidCheck(partyDetailsForm.form.valid, party.PartyName)">Cancel</button>
+                          <button *ngIf="!createDoc[party.PartyName+'-details']?.detailAdded" type="button" (click)="clearPartyData(i,party.PartyName)">Cancel</button>
+
+                          <button *ngIf="!clickedNewContact" type="submit" class="save update-btn">Update</button>
+                          <button *ngIf="clickedNewContact" type="submit" class="save update-btn">Add contact</button>
+                        </div>
+
+                      </form>
+                    </div>
+                  </div>
+                  </ng-container>
+                </div>
+
+                <!-- <div class="parties-form-footer">
+                  <button *ngIf="!selectedPartyIndex && !IsExpired && !propertyMeDisable" type="submit" class="save update-btn">Update</button>
+                </div> -->
+            </form>
+
+          </fieldset><!-- people-block -->
+
+          <fieldset class="fields-block custom-field selected_val_city" *ngIf="selectedSection == 'editParty'">
+            <form name="form" #partyListForm="ngForm" (ngSubmit)="partyListForm.form.valid && updateCustomFieldData();updatePartyData();">
+              <ng-container *ngFor="let party of documentData.Parties;let i = index">
+
+                <!-- Custom Field Only For Sender -->
+                <ng-container *ngIf="party.PartyTypeId == 9">
+                  <ng-container *ngIf="party.CustomFields.length > 0">
+
+                    <ng-container *ngFor="let customField of party.CustomFields;let j = index">
+
+                      <!-- singleLine -->
+                      <div *ngIf="customField.FieldTypeId == constant.SingleLineFieldTypeId">
+                          <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                          <ng-container *ngIf="customField.Mandatory">
+                            <input type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+                            [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required/>
+                            <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                                <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <input type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter singleline text'"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"/>
+                          </ng-container>
+
+                      </div>
+
+                      <!-- multiLine -->
+                      <div *ngIf="customField.FieldTypeId == constant.MultiLineFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <textarea  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required>
+                          </textarea>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <textarea  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" [placeholder]="customField.Watermark ? customField.Watermark : 'Enter multiline text'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel">
+                          </textarea>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- number -->
+                      <div *ngIf="customField.FieldTypeId == constant.NumberFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <input  type="number" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" placeholder="Enter number"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <input  type="number" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" placeholder="Enter number"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" />
+                        </ng-container>
+                      </div>
+
+                      <!-- currancy -->
+                      <div *ngIf="customField.FieldTypeId == constant.CurrencyFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <input  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" placeholder="Enter currancy"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required />
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <input  type="text" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control" (change)="calculateFooterFields()" [disabled]="IsExpired || propertyMeDisable" placeholder="Enter currancy"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel"/>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Date -->
+                      <!-- Date yyyy/mm/dd  -->
+                      <div *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'yyyy/mm/dd'">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="YY_MM_DD_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [theme]="'dp-material'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                          #customFieldModel="ngModel" required
+                          ></dp-date-picker>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="YY_MM_DD_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [theme]="'dp-material'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange1($event, party.PartyName, customField.Name, 'YYYY-MM-DD')"
+                          #customFieldModel="ngModel"
+                          ></dp-date-picker>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Date mm/dd/yyyy -->
+                      <div *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'mm/dd/yyyy'">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="MM_DD_YY_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [theme]="'dp-material'"
+                          [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                          #customFieldModel="ngModel" required
+                          ></dp-date-picker>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="MM_DD_YY_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [theme]="'dp-material'"
+                          [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange2($event, party.PartyName, customField.Name, 'MM-DD-YYYY')"
+                          #customFieldModel="ngModel"
+                          ></dp-date-picker>
+                        </ng-container>
+                      </div>
+
+                      <!-- Date dd/mm/yyyy -->
+                      <div *ngIf="customField.FieldTypeId == constant.DateFieldTypeId && customField.Format == 'dd/mm/yyyy'">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="DD_MM_YY_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [theme]="'dp-material'"
+                          [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                          #customFieldModel="ngModel" required
+                          ></dp-date-picker>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <dp-date-picker class="form-control" #dayPicker name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [config]="DD_MM_YY_config"
+                          [disabled]="IsExpired || propertyMeDisable"
+                          [theme]="'dp-material'"
+                          [ngModel]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (onSelect)="datePickerChange3($event, party.PartyName, customField.Name, 'DD-MM-YYYY')"
+                          #customFieldModel="ngModel"
+                          ></dp-date-picker>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Time -->
+                      <!-- Time 12 Hour -->
+                      <div *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '12'">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control" (change)="calculateFooterFields()"
+                          [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable" required  readonly>
+                          <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                            <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+
+                          <input placeholder="Select 12 hour time format" aria-label="default time" class="form-control" (change)="calculateFooterFields()"
+                          [ngxTimepicker]="defaultValue" #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable"  readonly>
+                          <ngx-material-timepicker #defaultValue></ngx-material-timepicker>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Time 24 Hour -->
+                      <div *ngIf="customField.FieldTypeId == constant.TimeFieldTypeId && customField.Format == '24'">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+
+                          <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format" (change)="calculateFooterFields()"
+                          #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [ngxTimepicker]="fullTime" [format]="24"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable" required  readonly>
+                          <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                            <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+
+                          <input placeholder="Select 24 hour time format" class="form-control" aria-label="24hr format" (change)="calculateFooterFields()"
+                          #customFieldModel="ngModel" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [ngxTimepicker]="fullTime" [format]="24"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable"  readonly>
+                          <ngx-material-timepicker #fullTime></ngx-material-timepicker>
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Checkbox -->
+                      <div class="property-checkbox" *ngIf="customField.FieldTypeId == constant.CheckboxFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+                        <div class="setcheckbox">
+                          <ng-container *ngIf="customField.Mandatory">
+
+                            <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                              <mat-checkbox name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" [disabled]="IsExpired || propertyMeDisable" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                            </ng-container>
+
+                            <div *ngIf="partyListForm.submitted && parseInJSON(createDoc[party.PartyName+'-'+customField.Name]).length == 0" class="checkbox-error">
+                              <span>{{party.PartyName}} {{customField.Name}} is required</span>
+                            </div>
+                          </ng-container>
+
+                          <ng-container *ngIf="!customField.Mandatory">
+                            <!-- <input  type="text" name="checkbox" class="form-control" placeholder="Enter checkbox value"
+                            [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" /> -->
+
+                            <ng-container *ngFor="let checkValue of parseInJSON(customField.Format);let c = index">
+                              <mat-checkbox name="{{party.PartyName}}-{{customField.Name}}-{{checkValue}}-{{i}}-{{j}}" [disabled]="IsExpired || propertyMeDisable" (change)="changeCustomCheckValue(party.PartyName, customField.Name, $event.checked, checkValue)" [checked]="checkCheckBoxExist(party.PartyName, customField.Name, checkValue)">{{checkValue}}</mat-checkbox>
+                            </ng-container>
+
+                          </ng-container>
+                        </div>
+                      </div>
+
+                      <!-- Dropdown -->
+                      <div *ngIf="customField.FieldTypeId == constant.DropdownFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <div class="select-box">
+                            <ng-select name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel" required (change)="calculateFooterFields()">
+                              <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                            </ng-select>
+                          </div>
+
+                          <!-- <select name="dropdown" class="form-control" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel" required>
+                            <option value=null>{{customField.Name}}</option>
+                            <option *ngFor="let op of parseInJSON(customField.Format)">{{op}}</option>
+                          </select> -->
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <div class="select-box">
+                            <ng-select name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" [disabled]="IsExpired || propertyMeDisable" [placeholder]="createDoc[party.PartyName+'-'+customField.Name] ? '' : customField.Name" #customFieldModel="ngModel" (change)="calculateFooterFields()">
+                              <ng-option *ngFor="let op of parseInJSON(customField.Format)" [value]="op">{{op}}</ng-option>
+                            </ng-select>
+                          </div>
+
+                          <!-- <select name="dropdown" class="form-control" [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]" #customFieldModel="ngModel">
+                            <option value="" selected hidden>{{customField.Name}}</option>
+                            <option *ngFor="let op of parseInJSON(customField.Format)">{{op}}</option>
+                          </select> -->
+                        </ng-container>
+
+                      </div>
+
+                      <!-- Image -->
+                      <div *ngIf="customField.FieldTypeId == constant.ImageFieldTypeId">
+                        <label for="property-address">{{party.PartyName}} {{customField.Name}}</label>
+
+                        <ng-container *ngIf="customField.Mandatory">
+                          <span class="file-name">{{documentData.Parties[i].CustomFields[j].Format}}</span>
+                          <input  type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" class="form-control cust-image-file" placeholder="Upload Image" (change)="calculateFooterFields()"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                          [ngClass]="(customFieldModel.touched || partyListForm.submitted || createDoc[party.PartyName+'-'+customField.Name]) && customFieldModel.valid ? 'border-bottom-green' : 'border-bottom-red'"
+                          (change)="onImageChange($event, party.PartyName, customField.Name, i, j)"
+                          [disabled]="IsExpired || propertyMeDisable" #customFieldModel="ngModel" required />
+                          <span class="orfile">or</span>
+                          <span class="orMaxMsg">Max. size limit: 2MB</span>
+                          <div *ngIf="partyListForm.submitted && customFieldModel.invalid" class="error">
+                              <span *ngIf="customFieldModel.errors?.required">{{party.PartyName}} {{customField.Name}} is required</span>
+                          </div>
+                        </ng-container>
+
+                        <ng-container *ngIf="!customField.Mandatory">
+                          <span class="file-name">{{documentData.Parties[i].CustomFields[j].Format}}</span>
+                          <input  type="file" name="{{party.PartyName}}-{{customField.Name}}-{{i}}-{{j}}" [disabled]="IsExpired || propertyMeDisable"  class="form-control cust-image-file" placeholder="Upload Image" (change)="calculateFooterFields()"
+                          [(ngModel)]="createDoc[party.PartyName+'-'+customField.Name]"
+                          (change)="onImageChange($event, party.PartyName, customField.Name, i, j)"
+                          #customFieldModel="ngModel" />
+                          <span class="orfile">or</span>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+
+                    <div class="fields-form-footer">
+                      <button *ngIf="!IsExpired && !propertyMeDisable" type="submit" class="save update-btn">Update</button>
+                    </div>
+
+                  </ng-container>
+
+                  <ng-container *ngIf="party.CustomFields.length == 0">
+                    <p>No customfield available.</p>
+                  </ng-container>
+
+
+                </ng-container>
+              </ng-container>
+
+          </form>
+        </fieldset><!-- fields-block -->
+
+          <fieldset class="clauses-block clauses-form" *ngIf="selectedSection == 'clauses'">
+            <div class="list-block">
+              <ng-container *ngFor="let section of documentData.Sections;let i = index;">
+                <mat-checkbox [checked]="section.IsAdded" [disabled]="IsExpired || propertyMeDisable" (change)="sectionCheckboxChange($event.checked,i,section)"></mat-checkbox>
+                <label class="clause-list-title"
+                draggable="true"
+                 dir="{{i}}"
+                 id="{{section.Name}}-{{i}}"
+                 (dragstart)="sectionDragStart($event,i,'sections',section.Name,section.UUID)"
+
+                 >
+                 <!-- {{section.Index}}.  -->
+                 {{section.Name}}</label>
+                <!-- below content is dragable clause -->
+                 <!-- <table>
+                  <tbody cdkDropList [cdkDropListData]="section.Clauses" (cdkDropListDropped)="clauseDropTable(i,$event)">
+                    <tr *ngFor="let clause of section.Clauses;let j = index;" cdkDrag [cdkDragData]="clause" [cdkDragDisabled]="IsExpired">
+                      <td
+                      draggable="true"
+                        (dragstart)="clauseDragStart($event, i,j,'clauses',section.UUID,clause.UUID, section.Name, clause.Name)"
+                      >
+                        <mat-checkbox [checked]="clause.IsAdded" (change)="clauseCheckboxChange($event.checked,i,j,section,clause)"></mat-checkbox>
+                      </td>
+                      <td>
+                        <span class="field-type" draggable="true">{{clause.Name}}</span>
+                      </td>
+                      <td>
+                        <a href="javascript:void(0)" *ngIf="clause.IsSenderEdit && !IsExpired" (click)="editClauseByIndex(i,j)"><span class="edit"></span></a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table> -->
+
+                <tbody cdkDropList [cdkDropListData]="section.Clauses" (cdkDropListDropped)="clauseDropTable(i,$event)">
+                  <tr *ngFor="let clause of section.Clauses;let j = index;" cdkDrag [cdkDragData]="clause" [cdkDragDisabled]="IsExpired">
+                    <td class="clause-checkbox-td">
+                      <mat-checkbox [checked]="clause.IsAdded" [disabled]="IsExpired || propertyMeDisable" (change)="clauseCheckboxChange($event.checked,i,j,section,clause)"></mat-checkbox>
+                    </td>
+                    <td>
+                      <label class="field-type cl-title"
+                      draggable="true"
+                      id="{{i}}-{{j}}"
+                      dir="{{i}}-{{j}}"
+                      (dragstart)="clauseDragStart($event, i,j,'clauses',section.UUID,clause.UUID, section.Name, clause.Name)"
+                      >{{clause.Name}}</label>
+                    </td>
+                    <td>
+                      <a href="javascript:void(0)" *ngIf="clause.IsSenderEdit && !IsExpired" (click)="editClauseByIndex(i,j)"><span class="edit"></span></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </ng-container>
+            </div>
+        </fieldset><!-- calauses-block -->
+
+        <fieldset class="attach-block attach-form" [attr.disabled]="IsExpired || propertyMeDisable ? 'disabled' : null" *ngIf="selectedSection == 'attach'">
+
+          <ngx-file-drop [disabled]="IsExpired || propertyMeDisable" id="fileDrop" dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)"
+            (onFileOver)="fileOver($event)" (onFileLeave)="fileLeave($event)" dropZoneClassName="drag-file-sec" accept=".pdf">
+              <ng-template *ngIf="!IsExpired" ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                <div class="file-icon" (click)="openFileSelector()"><img src="assets/images/pdf-icon.svg"/></div>
+                <div class="file-text" (click)="openFileSelector()"><p>Drag & drop or click to upload your PDF <br><span>Limited to 10MB in total files</span></p></div>
+              </ng-template>
+
+              <ng-template *ngIf="IsExpired" ngx-file-drop-content-tmp let-openFileSelector="openFileSelector" >
+                <div class="file-icon"><img src="assets/images/pdf-icon.svg"/></div>
+                <div class="file-text"><p>Drag & drop or click to upload your PDF <br><span>Limited to 10MB in total files</span></p></div>
+              </ng-template>
+          </ngx-file-drop>
+
+          <p class="attached-files">PDF attached</p>
+          <div class="files-list" *ngFor="let file of documentData.Attachments;let i=index;">
+              <p>{{file.FileName}} <strong>{{calculateKbToMb(file.Size)}} MB</strong></p>
+              <a class="del-file pointer" *ngIf="!IsExpired" (click)="deleteFile(i)" title=""></a>
+          </div>
+          <div class="no-pdf" *ngIf="documentData.Attachments.length == 0">
+            No PDFs uploaded
+          </div>
+        </fieldset><!-- attach-block -->
+
+        <fieldset class="mail-block mail-form" *ngIf="selectedSection == 'mail'">
+          <h2>Email preview</h2>
+          <div class="form-control subject-div">
+              <!-- <label>Subject Line</label> -->
+              <input type="text" name="text" value="" placeholder="Email subject" [(ngModel)]="createDoc.EmailBuilder.Subject" class="subject-field" [disabled]="IsExpired || propertyMeDisable"/>
+          </div>
+          <div class="form-control">
+              <label for="message">Message</label>
+              <div class="message-box">
+                <!-- <img src="assets/images/edit-controls.png" alt="" title="" width="100%"> -->
+                <!-- <textarea id="message" placeholder="Edit email body copy-WYSIWYG editor"></textarea> -->
+                <textarea id="message"
+                    [froalaEditor]="emailBuildorConfig"
+                    (froalaInit)="emailFroalaInit($event)"
+                    [(froalaModel)]="createDoc.EmailBuilder.Body"
+                    placeholder="Edit email body copy-WYSIWYG editor">
+                </textarea>
+              </div>
+          </div>
+          <!-- <label>Drag merge field into the text box above to add to email</label> -->
+
+          <!-- <button id="Sender name" draggable="true" (dragstart)="builderDragStart($event,'Sender name')" (click)="addToEmailBuilder('Sender name')">Sender name</button> -->
+
+            <!-- <div class="form-control button-wrapper mail-block-buttons">
+              <button id="Document name" draggable="true" (dragstart)="builderDragStart($event,'Document name')" (click)="addToEmailBuilder('Document name')">Document name</button>
+              <button id="Sender first name" draggable="true" (dragstart)="builderDragStart($event,'Sender first name')" (click)="addToEmailBuilder('Sender first name')">Sender first name</button>
+              <button id="Sender last name" draggable="true" (dragstart)="builderDragStart($event,'Sender last name')" (click)="addToEmailBuilder('Sender last name')">Sender last name</button>
+            </div>
+
+            <div class="form-control button-wrapper mail-block-buttons">
+              <button id="Sender email" draggable="true" (dragstart)="builderDragStart($event,'Sender email')" (click)="addToEmailBuilder('Sender email')">Sender email</button>
+              <button id="Sender position" draggable="true" (dragstart)="builderDragStart($event,'Sender position')" (click)="addToEmailBuilder('Sender position')">Sender position</button>
+              <button id="Sender mobile" draggable="true" (dragstart)="builderDragStart($event,'Sender mobile')" (click)="addToEmailBuilder('Sender mobile')">Sender mobile</button>
+            </div>
+            <div class="form-control button-wrapper mail-block-buttons">
+              <button id="Recipient first name" draggable="true" (dragstart)="builderDragStart($event,'Recipient first name')" (click)="addToEmailBuilder('Recipient first name')">Recipient first name</button>
+              <button id="Recipient last name" draggable="true" (dragstart)="builderDragStart($event,'Recipient last name')" (click)="addToEmailBuilder('Recipient last name')">Recipient last name</button>
+              <button id="Recipient mobile" draggable="true" (dragstart)="builderDragStart($event,'Recipient mobile')" (click)="addToEmailBuilder('Recipient mobile')">Recipient mobile</button>
+            </div>
+            <div class="form-control button-wrapper mail-block-buttons">
+              <button id="Recipient email" draggable="true" (dragstart)="builderDragStart($event,'Recipient email')" (click)="addToEmailBuilder('Recipient email')">Recipient email</button>
+              <button id="Recipient company" draggable="true" (dragstart)="builderDragStart($event,'Recipient company')" (click)="addToEmailBuilder('Recipient company')">Recipient company</button>
+              <button id="Recipient position" draggable="true" (dragstart)="builderDragStart($event,'Recipient position')" (click)="addToEmailBuilder('Recipient position')">Recipient position</button>
+            </div> -->
+
+            <!-- <div class="wrapper-status-groups"> -->
+
+              <ng-select [(ngModel)]="emailPlaceholder" [disabled]="IsExpired" [placeholder]="emailPlaceholder ? '' : 'Insert Placeholder'" name="emailPlaceholder" (change)="addToEmailBuilder($event)">
+                <ng-option value="Document name">Document name</ng-option>
+                <ng-option value="Sender first name">Sender first name</ng-option>
+                <ng-option value="Sender last name">Sender last name</ng-option>
+                <ng-option value="Sender email">Sender email</ng-option>
+                <ng-option value="Sender position">Sender position</ng-option>
+                <ng-option value="Sender mobile">Sender mobile</ng-option>
+                <ng-option value="Recipient first name">Recipient first name</ng-option>
+                <ng-option value="Recipient last name">Recipient last name</ng-option>
+                <ng-option value="Recipient mobile">Recipient mobile</ng-option>
+                <ng-option value="Recipient email">Recipient email</ng-option>
+                <ng-option value="Recipient company">Recipient company</ng-option>
+                <ng-option value="Recipient position">Recipient position</ng-option>
+              </ng-select>
+            <!-- </div> -->
+            <div class="sender-message">
+              <p><strong>{{createDoc.Sender ? createDoc.Sender : 'Sender Name'}}</strong> has sent you a document - <strong>{{createDoc.Title}}</strong> to review and sign</p>
+            </div>
+            <label>The above statement is automatically applied to your email content.</label>
+        </fieldset>
+      </form>
+
+      <div class="site-search-wrapper template-settings-wrapper" *ngIf="editClause">
+        <div class="card">
+          <div class="container">
+            <button class="close" (click)="closeClause()"></button>
+            <h2>Clause details</h2>
+            <form #addClauseForm="ngForm" (ngSubmit)="addClauseForm.form.valid && editClauseSubmit()"  class="setting-form template-settings clause-settings">
+                <fieldset class="title-setting">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    name="clauseName"
+                    id="clauseName"
+                    class="form-control"
+                    placeholder=""
+                    pattern="(?!^ +$)^.+$"
+                    [ngClass]="(addClauseForm.submitted || clauseName.touched || clauseName) && clauseName.valid ? 'border-bottom-green' :
+                    (addClauseForm.submitted || clauseName.touched) && !clauseName.valid ?'border-bottom-red': ''"
+                    [(ngModel)]="addClause.Name" #clauseName="ngModel" required
+                  />
+                  <span *ngIf="addClauseForm.submitted && clauseName.invalid" class="error">
+                    <span *ngIf="clauseName.errors?.required">Clause name is required</span>
+                    <span *ngIf="clauseName.errors.pattern">Enter valid clause name</span>
+                  </span>
+                </fieldset>
+
+                <fieldset>
+                  <label>Clause</label>
+                  <div class="form-control clause-editor">
+                    <textarea
+                    [froalaEditor]="clauseConfig"
+                    (froalaInit)="initializeClauseLink($event)"
+                    [(froalaModel)]="addClause.Description"
+                    ></textarea>
+                  </div>
+
+                </fieldset>
+
+                <fieldset>
+                  <label></label>
+                  <!-- <a href="javascript:void(0);" style="margin-bottom: 5px;" type="button" (click)="setDifaultClause()">Set default clause</a> -->
+                  <div class="form-control st-def-cls-div">
+                    <span class="set-default" type="button" (click)="setDifaultClause()">Reset to original clause text</span>
+                  </div>
+
+                </fieldset>
+
+
+                <fieldset>
+                  <label>Section</label>
+                  <div class="custom-select section-select form-control w-100"
+                  [ngClass]="(addClauseForm.submitted || clauseSection.touched || clauseSection) && clauseSection.valid ? 'border-bottom-green' :
+                  (addClauseForm.submitted || clauseSection.touched) && !clauseSection.valid ?'border-bottom-red': ''">
+
+                    <ng-select [(ngModel)]="addClause.section" [placeholder]="documentData.Sections.length > 0 ? '' : 'Select section'" #clauseSection="ngModel" name="clauseSection" (change)="sectionChange($event)" required>
+                      <ng-option *ngFor="let section of documentData.Sections,let i = index" [value]="i">{{section.Name}}</ng-option>
+                    </ng-select>
+
+                    <br />
+                  </div>
+                  <span *ngIf="addClauseForm.submitted && clauseSection.invalid" class="error">
+                    <span *ngIf="clauseSection.errors?.required">Select section</span>
+                  </span>
+                </fieldset>
+
+              <!-- <fieldset class="notifications">
+                <label>Numbering <br> start</label>
+                <div class="btn-group form-control">
+                  <input type="number" name="exp-days" value="000" [customMin]="1" [customMax]="addClause.indexMax"
+                  [ngClass]="(addClauseForm.submitted || clauseIndex.touched || clauseIndex) && clauseIndex.valid ? 'border-bottom-green' :
+                  (addClauseForm.submitted || clauseIndex.touched) && !clauseIndex.valid ?'border-bottom-red': ''"
+                  [(ngModel)]="addClause.Index" #clauseIndex="ngModel" name="clauseIndex" required>
+                </div>
+                <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                  <span *ngIf="clauseIndex.errors?.required" style="color: #ff808b;">Numbering start is required</span>
+                </span>
+                <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                  <span *ngIf="clauseIndex.errors?.customMin" style="color: #ff808b;">Minimum required numbering start is 1.</span>
+                </span>
+                <span *ngIf="addClauseForm.submitted && clauseIndex.invalid" class="error">
+                  <span *ngIf="clauseIndex.errors?.customMax" style="color: #ff808b;">Maximum required numbering start is {{ addClause.indexMax}}.</span>
+                </span>
+              </fieldset> -->
+
+              <fieldset class="form-footer">
+                <button type="button" (click)="closeClause()">Cancel</button>
+                <!-- <button type="submit" *ngIf="!clauseEdit" class="save pastel-green">Add</button> -->
+                <!-- <button type="submit" *ngIf="clauseEdit" class="save pastel-green" (click)="updateClause()">Update</button> -->
+                <button type="submit" *ngIf="editClause" class="save pastel-green">Update</button>
+
+              </fieldset>
+              </form>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+    <section class="edit-party-footer flex-end">
+      <div >
+        <span [ngClass]="{'progress-check-0' : mandatoryPercentage < 1,'progress-check-25' : (mandatoryPercentage >= 1 && mandatoryPercentage <= 25), 'progress-check-50': (mandatoryPercentage > 25 && mandatoryPercentage <= 50), 'progress-check-75' : (mandatoryPercentage > 50 && mandatoryPercentage <= 99)}"
+          *ngIf="mandatoryPercentage !== 100">
+          {{mandatoryPercentage}}% -
+          <span *ngIf="mandatoryRemain">{{mandatoryRemain}} </span>
+
+          <span *ngIf="mandatoryRemain == 1"> mandatory party remains </span>
+          <span *ngIf="mandatoryRemain > 1"> mandatory parties remain </span>
+
+          <span *ngIf="mandatoryRemain && mandatoryRemainCustomField">&</span>
+
+        <span *ngIf="mandatoryRemainCustomField"> {{mandatoryRemainCustomField}} </span>
+          <span *ngIf="mandatoryRemainCustomField == 1">mandatory field remains</span>
+          <span *ngIf="mandatoryRemainCustomField > 1">mandatory fields remain</span>
+        </span>
+        <span class="progress-check-100 progress-done" *ngIf="mandatoryPercentage == 100 && !IsExpired && !propertyMeDisable">Ready to send</span>
+      </div>
+      <div>
+      <button class="uni-button text-only" (click)="closeDocument()">Close</button>
+      <button *ngIf="!preview" class="uni-button pg-border" (click)="showPreview()">Preview</button>
+      <button *ngIf="preview" class="uni-button pg-border" (click)="closePreview()">Close Preview</button>
+      <button class="uni-button pastel-green" *ngIf="!IsExpired && !propertyMeDisable" (click)="saveDocument()">Save</button>
+       <button class="uni-button pg-border send-btn" *ngIf="mandatoryPercentage == 100 && !IsExpired && !propertyMeDisable" (click)="sendDocument()">Send</button>
+      </div>
+    </section>
+
+    <!-- Sent Document -->
+    <div class="send-document-block-wrapper add-user-block" *ngIf="sendDoc">
+      <div class="card">
+        <div class="contianer-sm">
+          <button class="close" (click)="closeSentModel()"></button>
+          <h2> Send document</h2>
+          <!-- <form #sendDocumentForm="ngForm" (ngSubmit)="sendDocumentForm.form.valid && sendDocumentData()" class="send-document-form"> -->
+          <form class="send-document-form">
+            <fieldset>
+              <label for="to">To</label>
+              <input type="text" name="text" id="to" class="form-control"
+               placeholder="" #to="ngModel" [(ngModel)]="sentDocField.to"/>
+
+              <!-- <span class="error" *ngIf="sendDocumentForm.submitted && to.invalid && to.errors.required">To is required</span> -->
+            </fieldset>
+            <fieldset>
+              <label for="from">From</label>
+              <input type="text" name="from" id="from" class="form-control"
+               placeholder="" #from="ngModel" [(ngModel)]="sentDocField.from"/>
+
+              <!-- <span class="error" *ngIf="sendDocumentForm.submitted && from.invalid && from.errors.required">From is required</span> -->
+            </fieldset>
+            <fieldset>
+              <label for="subject">Subject</label>
+              <input type="text" name="subject" id="subject" class="form-control"
+               placeholder="" #subject="ngModel" [(ngModel)]="sentDocField.Subject" />
+
+            <!-- <span class="error" *ngIf="sendDocumentForm.submitted && subject.invalid && subject.errors.required">Subject is required</span> -->
+            </fieldset>
+
+            <fieldset>
+              <label for="messages">Message</label>
+              <!-- <textarea class="form-control" id="messages" name="message" [(ngModel)]="sentDocField.Body">
+                Email text and subject line should be prefilled from templates and any edits made on the email menu tab while editing the document. This area provides a last chance to make alterations before hitting send.
+              </textarea> -->
+              <div class="form-control">
+                <div class="message-box">
+                  <!-- <img src="assets/images/edit-controls.png" alt="" title="" width="100%"> -->
+                  <!-- <textarea id="message" placeholder="Edit email body copy-WYSIWYG editor"></textarea> -->
+                  <textarea id="message"
+                      [froalaEditor]="emailBuildorConfig"
+                      (froalaInit)="emailFroalaInit($event)"
+                      [(froalaModel)]="sentDocField.Body"
+                      placeholder="Edit email body copy-WYSIWYG editor">
+                  </textarea>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset>
+                  <div class="send-msg-sec">
+                <!-- <div class="send-msg-box"><strong>{{loginUser.FirstName}} {{loginUser.LastName}}</strong> has sent you a document - <strong>{{createDoc.Title}}</strong> to review and sign</div> -->
+                <div class="send-msg-box"><strong>{{createDoc.Sender ? createDoc.Sender : 'Sender Name'}}</strong> has sent you a document - <strong>{{createDoc.Title}}</strong> to review and sign</div>
+                <p>The above statement is automatically applied to your email content.</p>
+                </div>
+            </fieldset>
+             <div class="bottom-buttons">
+               <button class="uni-button text-only" (click)="closeSentModel()">Cancel</button>
+               <button class="uni-button pastel-green" (click)="sendDocumentData()">Send</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="closePopup" class="unsaved-changes-pop-up fixed-popup">
+    <div>
+      <div class="unsaved-changes-info">
+        <p>You have unsaved changes.</p>
+      </div>
+      <div class="unsaved-changes-btns">
+        <button class="uni-button unsaved-button pg-border green-border" [routerLink]="['/admin/home']">Discard changes</button>
+        <button class="uni-button unsaved-button pastel-green" (click)="saveDocument()">Save and close</button>
+      </div>
+    </div>
+  </div>

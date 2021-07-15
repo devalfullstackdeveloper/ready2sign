@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="15px" height="17px" viewBox="0 0 15 17" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <desc>Created with Lunacy</desc>
+  <g id="Icon" transform="matrix(-1 0 0 1 14.625 0)">
+    <path d="M0 0L1.21875 0L1.21875 7.20652L0 7.20652L0 0Z" transform="translate(4.875 6.004883)" id="Icon-Path" fill="#C1C7D0" stroke="none" />
+    <path d="M0 0L1.21875 0L1.21875 7.20652L0 7.20652L0 0Z" transform="translate(8.53125 6.004883)" id="Icon-Path" fill="#C1C7D0" stroke="none" />
+    <path d="M0 1.20109L0 0L14.625 0L14.625 1.20109L13.4063 1.20109L13.4063 13.212C13.4063 13.8753 12.8606 14.413 12.1875 14.413L2.4375 14.413C1.7644 14.413 1.21875 13.8753 1.21875 13.212L1.21875 1.20109L0 1.20109ZM2.4375 1.20109L2.4375 13.212L12.1875 13.212L12.1875 1.20109L2.4375 1.20109Z" transform="translate(0 2.401367)" id="Icon-Shape" fill="#C1C7D0" fill-rule="evenodd" stroke="none" />
+    <path d="M0 0L4.875 0L4.875 1.20109L0 1.20109L0 0Z" transform="translate(4.875 0)" id="Icon-Path" fill="#C1C7D0" stroke="none" />
+  </g>
+</svg>
